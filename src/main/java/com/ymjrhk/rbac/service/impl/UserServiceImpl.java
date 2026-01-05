@@ -67,7 +67,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         String peppered = rawPassword + "#" + newUserId;
         String password = passwordEncoder.encode(peppered);
 
-        // 4. 回写 password
+        // 4. 回写 password（// TODO：此处 auth_version 暂时不需要加一。未来应分为管理员创建用户版和用户自己注册版）
         User updateUser = new User();
         updateUser.setUserId(newUserId);
         updateUser.setPassword(password);
@@ -132,6 +132,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional
+    // 暂不更新 status
     public void update(UserDTO userDTO) {
         User dbUser = userMapper.getByUserId(userDTO.getUserId());
 
@@ -171,28 +172,20 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public void changeStatus(Long userId, Integer status) {
+        // 1. 查数据库
         User dbUser = userMapper.getByUserId(userId);
-
         if (dbUser == null) { // 用户不存在
             throw new UserNotExistException(USER_NOT_EXIST);
         }
 
-        // 用户状态未改变，无需更改
-        if (Objects.equals(dbUser.getStatus(), status)) {
-            throw new StatusNotChangeException(STATUS_NOT_CHANGE);
-        }
-
+        // 2. 构造“更新用实体”（只放必要字段）
         User user = new User();
         user.setUserId(userId);
-        user.setStatus(status);
 
-        Integer version = dbUser.getVersion(); // 获取版本号
-        String secretToken = dbUser.getSecretToken(); // 获取旧 secretToken
-        String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        // 3. 调 BaseService 的模板方法
+        changeStatus(dbUser, user, status);
 
-        fillOptimisticLockFields(user, version, secretToken, newSecretToken, updateUserId);
-
+        // 4. 执行 update
         doUpdate(user);
         // TODO:写历史表和审计表
     }

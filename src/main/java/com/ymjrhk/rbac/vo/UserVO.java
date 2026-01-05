@@ -9,9 +9,13 @@ import lombok.Data;
 @Schema(description = "用户查询返回参数")
 public class UserVO {
     private Long userId;
+
     private String username;
+
     private String nickname;
+
     private String email;
+
     private Integer status;
     // TODO: 注册时间/修改时间？
 }

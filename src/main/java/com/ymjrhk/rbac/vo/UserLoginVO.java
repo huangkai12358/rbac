@@ -9,8 +9,11 @@ import lombok.Data;
 @Schema(description = "用户登录返回参数")
 public class UserLoginVO {
     private Long userId;
+
     @Schema(description = "用户名", example = "admin")
     private String username;
+
     private String nickname;
+
     private String token;
 }

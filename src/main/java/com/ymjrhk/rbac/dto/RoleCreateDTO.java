@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "角色创建参数")
+// 和 RoleCreateDTO 相比少 id，多 status
 public class RoleCreateDTO {
     @Schema(description = "角色名", example = "USER")
     @NotBlank(message = "角色名不能为空")

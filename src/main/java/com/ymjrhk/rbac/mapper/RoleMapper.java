@@ -16,7 +16,7 @@ public interface RoleMapper {
      * 创建角色
      * @param role
      */
-    void insert(Role role);
+    int insert(Role role);
 
     /**
      * 角色分页查询

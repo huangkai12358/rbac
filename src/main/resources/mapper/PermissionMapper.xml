@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ymjrhk.rbac.mapper.PermissionMapper">
+
+    <insert id="insert">
+        insert into sys_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            permission_name,
+            permission_display_name,
+            <if test="description != null">description,</if>
+            <if test="status != null">status,</if>
+            secret_token,
+            type,
+            <if test="parentId != null">parent_id,</if>
+            <if test="path != null">path,</if>
+            <if test="method != null">method,</if>
+            <if test="sort != null">sort,</if>
+            create_user_id,
+            update_user_id,
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{permissionName},
+            #{permissionDisplayName},
+            <if test="description != null">#{description},</if>
+            <if test="status != null">#{status},</if>
+            #{secretToken},
+            #{type},
+            <if test="parentId != null">#{parentId},</if>
+            <if test="path != null">#{path},</if>
+            <if test="method != null">#{method},</if>
+            <if test="sort != null">#{sort},</if>
+            #{createUserId},
+            #{updateUserId},
+        </trim>
+    </insert>
+
+    <select id="pageQuery" resultType="Permission">
+        select * from sys_permission
+        <where>
+            <if test="permissionName != null and permissionName !=''">
+                and permission_name like concat('%', #{permissionName}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <update id="update">
+        update sys_permission
+        <set>
+            <if test="permissionName != null">permission_name = #{permissionName},</if>
+            <if test="permissionDisplayName != null">permission_display_name = #{permissionDisplayName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            version = version + 1,
+            secret_token = #{newSecretToken},
+            <if test="type != null">type = #{type},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="path != null">path = #{path},</if>
+            <if test="method != null">method = #{method},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            update_user_id = #{updateUserId},
+        </set>
+        where permission_id = #{permissionId}
+        and version = #{version}
+        and secret_token = #{secretToken}
+    </update>
+</mapper>

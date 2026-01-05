@@ -45,7 +45,10 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         role.setCreateUserId(userId);
         role.setUpdateUserId(userId);
 
-        roleMapper.insert(role);
+        int result = roleMapper.insert(role);
+        if (result != 1) {
+            throw new RoleCreateFailed(ROLE_CREATE_FAILED); // 创建角色失败
+        }
     }
 
     /**
@@ -128,30 +131,21 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     @Override
     @Transactional
     public void changeStatus(Long roleId, Integer status) {
+        // 1. 查数据库
         Role dbRole = roleMapper.getByRoleId(roleId);
-
-        // 角色不存在
-        if (dbRole == null) {
+        if (dbRole == null) { // 角色不存在
             throw new RoleNotExistException(ROLE_NOT_EXIST);
         }
-
-        // 角色状态未改变，无需更改
-        if (Objects.equals(dbRole.getStatus(), status)) {
-            throw new StatusNotChangeException(STATUS_NOT_CHANGE);
-        }
-
+        // 2. 构造“更新用实体”（只放必要字段）
         Role role = new Role();
         role.setRoleId(roleId);
-        role.setStatus(status);
 
-        Integer version = dbRole.getVersion(); // 获取版本号
-        String secretToken = dbRole.getSecretToken(); // 获取旧 secretToken
-        String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        // 3. 调 BaseService 的模板方法
+        changeStatus(dbRole, role, status);
 
-        fillOptimisticLockFields(role, version, secretToken, newSecretToken, updateUserId);
-
+        // 4. 执行 update
         doUpdate(role);
+        // TODO:写历史表和审计表
     }
 
     /**

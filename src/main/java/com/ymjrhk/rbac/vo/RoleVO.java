@@ -9,8 +9,12 @@ import lombok.Data;
 @Schema(description = "角色查询返回参数")
 public class RoleVO {
     private Long roleId;
+
     private String roleName;
+
     private String roleDisplayName;
+
     private String description;
+
     private Integer status;
 }

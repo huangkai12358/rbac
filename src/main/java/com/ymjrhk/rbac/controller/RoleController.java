@@ -38,7 +38,7 @@ public class RoleController {
      * @param rolePageQueryDTO
      * @return
      */
-    @GetMapping
+    @GetMapping("/page")
     @Operation(summary = "角色分页查询")
     public Result<PageResult> pageQuery(RolePageQueryDTO rolePageQueryDTO) {
         log.info("角色分页查询，参数为：{}", rolePageQueryDTO);

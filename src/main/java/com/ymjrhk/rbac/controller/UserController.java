@@ -42,7 +42,7 @@ public class UserController {
      * @param userPageQueryDTO
      * @return
      */
-    @GetMapping
+    @GetMapping("/page")
     @Operation(summary = "用户分页查询") // TODO: 目前策略是前端不传pageNum和pageSize会报错
     public Result<PageResult> pageQuery(UserPageQueryDTO userPageQueryDTO) {
         log.info("用户分页查询，参数为：{}", userPageQueryDTO);

@@ -46,7 +46,7 @@ public abstract class BaseService {
             OptimisticLockEntity updateEntity,
             Integer newStatus
     ) {
-        // 状态未改变，无需更改
+        // 状态未改变，无需修改
         if (Objects.equals(dbEntity.getStatus(), newStatus)) {
             throw new StatusNotChangeException(STATUS_NOT_CHANGE);
         }
