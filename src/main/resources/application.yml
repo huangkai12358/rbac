@@ -1,0 +1,58 @@
+server:
+  port: 8083
+
+spring:
+  profiles:
+    # 使用 dev 环境
+    active: dev
+  application:
+    name: rbac
+  datasource:
+    driver-class-name: ${rbac.datasource.driver-class-name}
+    url: jdbc:mysql://${rbac.datasource.host}:${rbac.datasource.port}/${rbac.datasource.database}?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${rbac.datasource.username}
+    password: ${rbac.datasource.password}
+
+mybatis:
+  # mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ymjrhk.rbac.entity
+  configuration:
+    # 开启驼峰命名
+    map-underscore-to-camel-case: true
+    # 打开 MyBatis SQL 日志
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.ymjrhk.rbac: debug
+
+rbac:
+  jwt:
+    secret-key: ${rbac.jwt.secret-key}
+    token-name: ${rbac.jwt.token-name}
+    ttl: ${rbac.jwt.ttl}
+
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+#mybatis 分页插件
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
