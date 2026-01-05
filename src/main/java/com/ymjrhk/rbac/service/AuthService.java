@@ -1,8 +1,8 @@
 package com.ymjrhk.rbac.service;
 
 import com.ymjrhk.rbac.dto.UserLoginDTO;
-import com.ymjrhk.rbac.entity.User;
+import com.ymjrhk.rbac.vo.UserLoginVO;
 
 public interface AuthService {
-    User login(UserLoginDTO userLoginDTO);
+    UserLoginVO login(UserLoginDTO userLoginDTO);
 }

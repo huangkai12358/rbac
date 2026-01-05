@@ -1,32 +1,28 @@
 package com.ymjrhk.rbac.controller;
 
+import com.ymjrhk.rbac.dto.UserDTO;
+import com.ymjrhk.rbac.dto.UserPageQueryDTO;
+import com.ymjrhk.rbac.dto.StatusDTO;
+import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.service.UserService;
+import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 @Slf4j
-@Tag(name = "用户管理")
+@Tag(name = "用户管理模块")
 public class UserController {
-    @Autowired
-    private UserService userService;
 
-    /**
-     * 根据 id 查询用户
-     * @param userId
-     * @return
-     */
-    @GetMapping("/{id}")
-    @Operation(summary = "根据id查询用户")
-    public Result queryUserById(@PathVariable("id") Long userId) {
-        return Result.success();
-    }
+    private final UserService userService;
 
     /**
      * 创建用户
@@ -35,10 +31,72 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "创建用户")
-    public Result create(@RequestBody UserLoginDTO userLoginDTO) {
+    public Result<Void> create(@RequestBody @Valid UserLoginDTO userLoginDTO) {
         log.info("创建用户：{}", userLoginDTO);
         userService.create(userLoginDTO);
         return Result.success();
     }
 
+    /**
+     * 用户分页查询
+     * @param userPageQueryDTO
+     * @return
+     */
+    @GetMapping
+    @Operation(summary = "用户分页查询") // TODO: 目前策略是前端不传pageNum和pageSize会报错
+    public Result<PageResult> pageQuery(UserPageQueryDTO userPageQueryDTO) {
+        log.info("用户分页查询，参数为：{}", userPageQueryDTO);
+        PageResult pageResult = userService.pageQuery(userPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 根据 userId 查询用户
+     * @param userId
+     * @return
+     */
+    @GetMapping("/{userId}")
+    @Operation(summary = "根据 userId 查询用户")
+    public Result<UserVO> queryUserById(@PathVariable("userId") Long userId) {
+        UserVO userVO = userService.getByUserId(userId);
+        return Result.success(userVO);
+    }
+
+    /**
+     * 修改用户
+     * @param userDTO
+     * @return
+     */
+    @PutMapping
+    @Operation(summary = "修改用户")
+    public Result<Void> update(@RequestBody UserDTO userDTO) {
+        log.info("修改用户：{}", userDTO);
+        userService.update(userDTO);
+        return Result.success();
+    }
+
+    /**
+     * 启用或禁用用户
+     * @param userId
+     * @param statusDTO
+     * @return
+     */
+    @PutMapping("/{userId}/status")
+    @Operation(summary = "启用或禁用用户")
+    public Result<Void> changeStatus(@PathVariable("userId") Long userId, @RequestBody StatusDTO statusDTO) {
+        userService.changeStatus(userId, statusDTO.getStatus());
+        return Result.success();
+    }
+
+    /**
+     * 重置用户密码
+     * @param userId
+     * @return
+     */
+    @PostMapping("/{userId}/password/reset")
+    @Operation(summary = "重置用户密码")
+    public Result<Void> resetPassward(@PathVariable("userId") Long userId) {
+        userService.resetPassword(userId);
+        return Result.success();
+    }
 }

@@ -7,18 +7,16 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class User implements Serializable, OptimisticLockEntity {
+public class Role implements Serializable, OptimisticLockEntity{
     private static final long serialVersionUID = 1L;
 
-    private Long userId;
+    private Long roleId;
 
-    private String username;
+    private String roleName;
 
-    private String password;
+    private String roleDisplayName;
 
-    private String nickname;
-
-    private String email;
+    private String description;
 
     private Integer status;
 
@@ -27,8 +25,6 @@ public class User implements Serializable, OptimisticLockEntity {
     private String secretToken;
 
     private String newSecretToken; // 新 secret_token
-
-    private Integer authVersion;
 
     private LocalDateTime createTime;
 

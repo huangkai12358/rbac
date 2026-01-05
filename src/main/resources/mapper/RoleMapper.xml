@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ymjrhk.rbac.mapper.RoleMapper">
+
+    <insert id="insert">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            role_name,
+            role_display_name,
+            <if test="description != null">description,</if>
+            <if test="status != null">status,</if>
+            secret_token,
+            create_user_id,
+            update_user_id,
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{roleName},
+            #{roleDisplayName},
+            <if test="description != null">#{description},</if>
+            <if test="status != null">#{status},</if>
+            #{secretToken},
+            #{createUserId},
+            #{updateUserId},
+        </trim>
+    </insert>
+
+    <select id="pageQuery" resultType="Role">
+        select * from sys_role
+        <where>
+            <if test="roleName != null and roleName !=''">
+                and role_name like concat('%', #{roleName}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <update id="update">
+        update sys_role
+        <set>
+            <if test="roleName != null">role_name = #{roleName},</if>
+            <if test="roleDisplayName != null">role_display_name = #{roleDisplayName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            version = version + 1,
+            secret_token = #{newSecretToken},
+            update_user_id = #{updateUserId},
+        </set>
+        where role_id = #{roleId}
+        and version = #{version}
+        and secret_token = #{secretToken}
+    </update>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ymjrhk.rbac.mapper.UserMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        insert into sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            username,
+            password,
+            nickname,
+            <if test="email != null">email,</if>
+            <if test="status != null">status,</if>
+            secret_token,
+            create_user_id,
+            update_user_id,
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{username},
+            #{password},
+            #{nickname},
+            <if test="email != null">#{email},</if>
+            <if test="status != null">#{status},</if>
+            #{secretToken},
+            #{createUserId},
+            #{updateUserId},
+        </trim>
+    </insert>
+
+    <select id="pageQuery" resultType="User">
+        select * from sys_user
+        <where>
+            <if test="username != null and username !=''">
+                and username like concat('%', #{username}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <update id="update">
+        update sys_user
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="status != null">status = #{status},</if>
+            version = version + 1,
+            secret_token = #{newSecretToken},
+            <if test="authVersion != null">auth_version = auth_version + 1,</if>
+            update_user_id = #{updateUserId},
+        </set>
+        where user_id = #{userId}
+            and version = #{version}
+            and secret_token = #{secretToken}
+    </update>
+</mapper>

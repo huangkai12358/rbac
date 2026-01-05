@@ -1,0 +1,86 @@
+package com.ymjrhk.rbac.controller;
+
+import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.result.Result;
+import com.ymjrhk.rbac.service.RoleService;
+import com.ymjrhk.rbac.vo.RoleVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/role")
+@RequiredArgsConstructor
+@Slf4j
+@Tag(name = "角色管理模块")
+public class RoleController {
+    private final RoleService roleService;
+
+    /**
+     * 创建角色
+     * @param roleCreateDTO
+     * @return
+     */
+    @PostMapping
+    @Operation(summary = "创建角色")
+    public Result<Void> create(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
+        log.info("创建角色：{}", roleCreateDTO);
+        roleService.create(roleCreateDTO);
+        return Result.success();
+    }
+
+    /**
+     * 角色分页查询
+     * @param rolePageQueryDTO
+     * @return
+     */
+    @GetMapping
+    @Operation(summary = "角色分页查询")
+    public Result<PageResult> pageQuery(RolePageQueryDTO rolePageQueryDTO) {
+        log.info("角色分页查询，参数为：{}", rolePageQueryDTO);
+        PageResult pageResult = roleService.pageQuery(rolePageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 根据 roleId 查询角色
+     * @param roleId
+     * @return
+     */
+    @GetMapping("/{roleId}")
+    @Operation(summary = "根据 roleId 查询角色")
+    public Result<RoleVO> queryRoleById(@PathVariable("roleId") Long roleId) {
+        RoleVO roleVO = roleService.getByRoleId(roleId);
+        return Result.success(roleVO);
+    }
+
+    /**
+     * 修改角色
+     * @param roleDTO
+     * @return
+     */
+    @PutMapping
+    @Operation(summary = "修改角色")
+    public Result<Void> update(@RequestBody RoleDTO roleDTO) {
+        log.info("修改角色：{}", roleDTO);
+        roleService.update(roleDTO);
+        return Result.success();
+    }
+
+    /**
+     * 启用或禁用角色
+     * @param roleId
+     * @param statusDTO
+     * @return
+     */
+    @PutMapping("/{roleId}/status")
+    @Operation(summary = "启用或禁用角色")
+    public Result<Void> changeStatus(@PathVariable("roleId") Long roleId, @RequestBody StatusDTO statusDTO) {
+        roleService.changeStatus(roleId, statusDTO.getStatus());
+        return Result.success();
+    }
+}

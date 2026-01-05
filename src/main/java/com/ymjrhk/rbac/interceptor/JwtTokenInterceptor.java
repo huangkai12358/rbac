@@ -7,6 +7,7 @@ import com.ymjrhk.rbac.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,11 +18,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * jwt令牌校验的拦截器
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class JwtTokenInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private JwtProperties jwtProperties;
+    private final JwtProperties jwtProperties;
 
     /**
      * 校验jwt

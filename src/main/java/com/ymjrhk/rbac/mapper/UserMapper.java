@@ -1,20 +1,16 @@
 package com.ymjrhk.rbac.mapper;
 
-import com.ymjrhk.rbac.dto.UserLoginDTO;
+import com.github.pagehelper.Page;
+import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
-
-    @Insert("insert into sys_user (username, password, nickname, secret_token, create_time, create_user_id, update_time, update_user_id)" +
-            "values" +
-            "(#{username}, #{password}, #{nickname}, #{secretToken}, #{createTime}, #{createUserId}, #{updateTime}, #{updateUserId})"
-    )
-    void create(User user);
-
     /**
      * 根据用户名查询用户
      * @param username
@@ -22,4 +18,37 @@ public interface UserMapper {
      */
     @Select("select * from sys_user where username = #{username}")
     User getByUsername(String username);
+
+    /**
+     * 创建用户
+     * @param user
+     */
+//    @Insert("insert into sys_user (username, password, nickname, secret_token, create_user_id, update_user_id)" +
+//            "values" +
+//            "(#{username}, #{password}, #{nickname}, #{secretToken}, #{createUserId}, #{updateUserId})"
+//    )
+    int insert(User user);
+
+    /**
+     * 用户分页查询
+     * @param userPageQueryDTO
+     * @return
+     */
+    Page<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
+
+    /**
+     * 根据 userId 查询用户
+     * @param userId
+     * @return
+     */
+    @Select("select * from sys_user where user_id = #{userId}")
+    User getByUserId(Long userId);
+
+    /**
+     * 修改用户
+     * @param user
+     */
+    int update(User user);
+    // TODO：xml不要updateTime
+    // TODO: 把update成几个
 }
