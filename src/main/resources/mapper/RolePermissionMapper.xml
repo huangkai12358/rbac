@@ -8,4 +8,20 @@
             (#{relation.roleId}, #{relation.permissionId}, #{relation.createUserId})
         </foreach>
     </insert>
+    
+    <select id="selectPermissionsByRoleId" resultType="com.ymjrhk.rbac.vo.RolePermissionVO">
+        select p.permission_id,
+               p.permission_name,
+               p.permission_display_name,
+               p.description,
+               p.status,
+               p.type,
+               p.parent_id,
+               p.path,
+               p.method,
+               p.sort
+        from sys_role_permission rp
+        join sys_permission p on rp.permission_id = p.permission_id
+        where rp.role_id = #{roleId}
+    </select>
 </mapper>

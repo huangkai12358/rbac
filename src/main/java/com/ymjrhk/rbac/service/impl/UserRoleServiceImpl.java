@@ -8,6 +8,7 @@ import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
 import com.ymjrhk.rbac.service.UserRoleService;
+import com.ymjrhk.rbac.vo.UserRoleVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +27,14 @@ public class UserRoleServiceImpl implements UserRoleService {
     private final RoleMapper roleMapper;
 
     /**
-     * 用户分配角色
+     * 给用户分配角色
      *
      * @param userId
      * @param roleIds
      */
     @Override
     @Transactional
-    public void userAssignRoles(Long userId, List<Long> roleIds) { // TODO: 需要version吗
+    public void assignRolesToUser(Long userId, List<Long> roleIds) { // TODO: 需要version吗
         // 1. 校验用户是否存在
         User dbUser = userMapper.getByUserId(userId);
         if (dbUser == null) { // 用户不存在
@@ -69,5 +70,22 @@ public class UserRoleServiceImpl implements UserRoleService {
         }
 
         // TODO: 5. 可选：写审计日志
+    }
+
+    /**
+     * 查询用户角色
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<UserRoleVO> getUserRoles(Long userId) {
+        // 1. 查 userId 是否存在
+        User user = userMapper.getByUserId(userId);
+        if (user == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        // 2. 查 userId 对应的角色
+        return userRoleMapper.selectRolesByUserId(userId);
     }
 }

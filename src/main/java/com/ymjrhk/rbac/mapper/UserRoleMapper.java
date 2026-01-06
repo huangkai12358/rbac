@@ -1,9 +1,9 @@
 package com.ymjrhk.rbac.mapper;
 
 import com.ymjrhk.rbac.entity.UserRole;
+import com.ymjrhk.rbac.vo.UserRoleVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,4 +23,11 @@ public interface UserRoleMapper {
      * @return
      */
     int batchInsert(List<UserRole> relations);
+
+    /**
+     * 查询用户角色
+     * @param userId
+     * @return
+     */
+    List<UserRoleVO> selectRolesByUserId(Long userId);
 }

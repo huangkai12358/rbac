@@ -28,7 +28,7 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "创建用户")
-    public Result<Void> create(@RequestBody @Valid UserLoginDTO userLoginDTO) {
+    public Result<Void> createUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
         log.info("创建用户：{}", userLoginDTO);
         userService.create(userLoginDTO);
         return Result.success();
@@ -66,7 +66,7 @@ public class UserController {
      */
     @PutMapping
     @Operation(summary = "修改用户")
-    public Result<Void> update(@RequestBody UserDTO userDTO) {
+    public Result<Void> updateUser(@RequestBody UserDTO userDTO) {
         log.info("修改用户：{}", userDTO);
         userService.update(userDTO);
         return Result.success();

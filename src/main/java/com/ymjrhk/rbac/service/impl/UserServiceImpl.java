@@ -107,6 +107,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         return new PageResult(total, records);
     }
     // TODO:为什么外卖里不填page,pageSize就查不到结果
+    // TODO: 将来直接返回需要的字段，免得转换
 
     /**
      * 根据 userId 查询用户

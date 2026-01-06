@@ -27,7 +27,7 @@ public class RoleController {
      */
     @PostMapping
     @Operation(summary = "创建角色")
-    public Result<Void> create(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
+    public Result<Void> createRole(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
         log.info("创建角色：{}", roleCreateDTO);
         roleService.create(roleCreateDTO);
         return Result.success();
@@ -65,7 +65,7 @@ public class RoleController {
      */
     @PutMapping
     @Operation(summary = "修改角色")
-    public Result<Void> update(@RequestBody RoleDTO roleDTO) {
+    public Result<Void> updateRole(@RequestBody RoleDTO roleDTO) {
         log.info("修改角色：{}", roleDTO);
         roleService.update(roleDTO);
         return Result.success();

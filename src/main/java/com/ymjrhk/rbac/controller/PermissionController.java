@@ -30,7 +30,7 @@ public class PermissionController {
      */
     @PostMapping
     @Operation(summary = "创建权限")
-    public Result<Void> create(@RequestBody @Valid PermissionCreateDTO permissionCreateDTO) {
+    public Result<Void> createPermission(@RequestBody @Valid PermissionCreateDTO permissionCreateDTO) {
         log.info("创建权限：{}", permissionCreateDTO);
         permissionService.create(permissionCreateDTO);
         return Result.success();
@@ -68,7 +68,7 @@ public class PermissionController {
      */
     @PutMapping
     @Operation(summary = "修改权限")
-    public Result<Void> update(@RequestBody PermissionDTO permissionDTO) {
+    public Result<Void> updatePermission(@RequestBody PermissionDTO permissionDTO) {
         log.info("修改权限：{}", permissionDTO);
         permissionService.update(permissionDTO);
         return Result.success();

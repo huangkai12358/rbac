@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.mapper;
 
 import com.ymjrhk.rbac.entity.RolePermission;
+import com.ymjrhk.rbac.vo.RolePermissionVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -22,4 +23,11 @@ public interface RolePermissionMapper {
      * @return
      */
     int batchInsert(List<RolePermission> relations);
+
+    /**
+     * 查询角色权限
+     * @param roleId
+     * @return
+     */
+    List<RolePermissionVO> selectPermissionsByRoleId(Long roleId);
 }

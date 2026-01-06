@@ -8,4 +8,15 @@
             (#{relation.userId}, #{relation.roleId}, #{relation.createUserId})
         </foreach>
     </insert>
+
+    <select id="selectRolesByUserId" resultType="com.ymjrhk.rbac.vo.UserRoleVO">
+        select r.role_id,
+               r.role_name,
+               r.role_display_name,
+               r.description,
+               r.status
+        from sys_user_role ur
+        join  sys_role r on ur.role_id = r.role_id
+        where ur.user_id = #{userId}
+    </select>
 </mapper>

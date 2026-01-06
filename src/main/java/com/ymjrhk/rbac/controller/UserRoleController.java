@@ -3,12 +3,15 @@ package com.ymjrhk.rbac.controller;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserRoleService;
+import com.ymjrhk.rbac.vo.UserRoleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,9 +30,17 @@ public class UserRoleController {
      */
     @PostMapping("/{userId}/roles")
     @Operation(summary = "用户分配角色")
-    public Result<Void> userAssignRoles(@PathVariable("userId") Long userId, @RequestBody @Valid IdsDTO roleIdsDTO) {
-        log.info("userId: {}, roleIds: {}", userId, roleIdsDTO);
-        userRoleService.userAssignRoles(userId, roleIdsDTO.getIds());
+    public Result<Void> assignRolesToUser(@PathVariable("userId") Long userId, @RequestBody @Valid IdsDTO roleIdsDTO) {
+        log.info("用户分配角色，userId: {}, roleIds: {}", userId, roleIdsDTO);
+        userRoleService.assignRolesToUser(userId, roleIdsDTO.getIds());
         return Result.success();
+    }
+
+    @GetMapping("/{userId}/roles")
+    @Operation(summary = "查询用户角色")
+    public Result<List<UserRoleVO>> getUserRoles(@PathVariable("userId") Long userId) {
+        log.info("查询用户角色，userId: {}", userId);
+        List<UserRoleVO> roles = userRoleService.getUserRoles(userId);
+        return Result.success(roles);
     }
 }
