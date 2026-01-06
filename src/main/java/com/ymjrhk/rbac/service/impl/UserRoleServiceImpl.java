@@ -27,6 +27,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     /**
      * 用户分配角色
+     *
      * @param userId
      * @param roleIds
      */
@@ -47,28 +48,26 @@ public class UserRoleServiceImpl implements UserRoleService {
             }
         }
 
-        // 2. 从 sys_user_role 表中删除原本的关联
+        // 3. 从 sys_user_role 表中删除原本的关联
         userRoleMapper.deleteByUserId(userId);
 
-        // 3. 新插入数据
+        // 4. 新插入数据
         Long operateUserId = BaseContext.getCurrentUserId();
 
-        if (roleIds != null && !roleIds.isEmpty()) {
-            List<UserRole> relations = roleIds.stream()
-                                              .map(roleId -> {
-                                                  UserRole userRole = new UserRole();
-                                                  userRole.setUserId(userId);
-                                                  userRole.setRoleId(roleId);
-                                                  userRole.setCreateUserId(operateUserId);
-                                                  return userRole;
-                                              })
-                                              .toList();
-            int result = userRoleMapper.batchInsert(relations);
-            if (result == 0) { // 分配角色失败
-                throw new AssignmentRoleFailedException(ASSIGNMENT_ROLE_FAILED);
-            }
+        List<UserRole> relations = roleIds.stream()
+                                          .map(roleId -> {
+                                              UserRole userRole = new UserRole();
+                                              userRole.setUserId(userId);
+                                              userRole.setRoleId(roleId);
+                                              userRole.setCreateUserId(operateUserId);
+                                              return userRole;
+                                          })
+                                          .toList();
+        int result = userRoleMapper.batchInsert(relations);
+        if (result == 0) { // 分配角色失败
+            throw new AssignmentRoleFailedException(ASSIGNMENT_ROLE_FAILED);
         }
 
-        // TODO: 4. 可选：写审计日志
+        // TODO: 5. 可选：写审计日志
     }
 }

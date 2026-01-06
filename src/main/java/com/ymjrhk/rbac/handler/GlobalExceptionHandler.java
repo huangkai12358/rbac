@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler(HttpMessageNotReadableException.class) // 请求体无法反序列化成 Java 对象，JSON 没读成功，@Valid 校验还没开始
     public Result<Void> handleBadRequest(HttpMessageNotReadableException ex) {
         return Result.error("请求参数格式错误");
     }
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class) // 请求体已经成功反序列化成 Java 对象，但字段校验失败
     public Result<Void> handleValidationException(MethodArgumentNotValidException ex) {
 
         // 拿到所有字段错误

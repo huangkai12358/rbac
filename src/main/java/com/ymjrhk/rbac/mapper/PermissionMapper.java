@@ -6,6 +6,8 @@ import com.ymjrhk.rbac.entity.Permission;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface PermissionMapper {
     /**
@@ -35,4 +37,11 @@ public interface PermissionMapper {
      * @return
      */
     int update(Permission permission);
+
+    /**
+     * 选出在 sys_permission 表中实际存在的 permissionIds
+     * @param permissionIds
+     * @return
+     */
+    List<Long> selectExistingPermissionIds(List<Long> permissionIds);
 }

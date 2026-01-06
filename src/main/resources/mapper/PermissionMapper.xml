@@ -66,4 +66,13 @@
         and version = #{version}
         and secret_token = #{secretToken}
     </update>
+
+    <select id="selectExistingPermissionIds" resultType="java.lang.Long">
+        select permission_id
+        from sys_permission
+        where permission_id in
+        <foreach collection="permissionIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
