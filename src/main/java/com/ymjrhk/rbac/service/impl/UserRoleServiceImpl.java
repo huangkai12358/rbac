@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.service.impl;
 
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.entity.User;
+import com.ymjrhk.rbac.entity.UserRole;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
@@ -53,7 +54,16 @@ public class UserRoleServiceImpl implements UserRoleService {
         Long operateUserId = BaseContext.getCurrentUserId();
 
         if (roleIds != null && !roleIds.isEmpty()) {
-            int result = userRoleMapper.batchInsert(userId, roleIds, operateUserId);
+            List<UserRole> relations = roleIds.stream()
+                                              .map(roleId -> {
+                                                  UserRole userRole = new UserRole();
+                                                  userRole.setUserId(userId);
+                                                  userRole.setRoleId(roleId);
+                                                  userRole.setCreateUserId(operateUserId);
+                                                  return userRole;
+                                              })
+                                              .toList();
+            int result = userRoleMapper.batchInsert(relations);
             if (result == 0) { // 分配角色失败
                 throw new AssignmentRoleFailedException(ASSIGNMENT_ROLE_FAILED);
             }
