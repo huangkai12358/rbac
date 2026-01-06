@@ -4,7 +4,7 @@ package com.ymjrhk.rbac.constant;
  * 信息提示常量类
  */
 public class MessageConstant {
-
+    public static final String ACCOUNT_OR_PASSWORD_ERROR = "账号或密码错误";
 
     public static final String USER_NOT_LOGIN = "用户未登录";
     public static final String USER_NOT_EXIST = "用户不存在";
@@ -16,14 +16,16 @@ public class MessageConstant {
 
     public static final String ROLE_NOT_EXIST = "角色不存在";
     public static final String ROLE_FORBIDDEN = "角色被禁用";
-    public static final String ROLE_CREATE_FAILED = "用户创建失败";
+    public static final String ROLE_CREATE_FAILED = "角色创建失败";
 //    public static final String ROLE_STATUS_NOT_CHANGE = "角色状态未改变，无需修改";
 
     public static final String PERMISSION_NOT_EXIST = "权限不存在";
     public static final String PERMISSION_FORBIDDEN = "权限被禁用";
     public static final String PERMISSION_CREATE_FAILED = "权限创建失败";
 
-    public static final String ACCOUNT_OR_PASSWORD_ERROR = "账号或密码错误";
+    public static final String ASSIGNMENT_ROLE_FAILED = "分配角色失败";
+    public static final String ASSIGNMENT_PERMISSION_FAILED = "分配权限失败";
+
     public static final String STATUS_NOT_CHANGE = "状态未改变，无需修改";
     public static final String UPDATE_FAILED = "更新失败，可能数据已被修改，请刷新后重试";
 

@@ -11,6 +11,7 @@ import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.result.ResultCode;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.service.base.BaseService;
@@ -58,7 +59,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 2. 先插入，拿到 userId
         int row = userMapper.insert(insertUser);   // insert 后 insertUser.getUserId() 才有值
         if (row != 1) {
-            throw new UserCreateFailed(USER_CREATE_FAILED); // 创建用户失败（如果是用户名重复会提示“用户名已存在”）
+            throw new UserCreateFailedException(USER_CREATE_FAILED); // 创建用户失败（如果是用户名重复会提示“用户名已存在”）
         }
         Long newUserId = insertUser.getUserId();
 
@@ -80,7 +81,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         int result = userMapper.update(updateUser);
         if (result != 1) {
-            throw new UserCreateFailed(USER_CREATE_FAILED); // 创建用户失败
+            throw new UserCreateFailedException(USER_CREATE_FAILED); // 创建用户失败
         }
         // TODO: 此处修改密码要加历史表和审计表吗
     }
@@ -228,6 +229,25 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         doUpdate(user);
         // TODO:写历史表和审计表
+    }
+
+    /**
+     * 用户分配角色
+     * @param userId
+     * @param ids
+     */
+    @Override
+    public void userAssignRoles(Long userId, List<Long> ids) {
+        // 1. 校验用户是否存在
+        User dbUser = userMapper.getByUserId(userId);
+
+        if (dbUser == null) { // 用户不存在
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        // 2. 从 sys_user_role 表中删除原本的关联
+
+
     }
 
     public void doUpdate(User user) {

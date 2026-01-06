@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.interceptor;
 
 import com.ymjrhk.rbac.constant.JwtClaimsConstant;
 import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.properties.JwtProperties;
 import com.ymjrhk.rbac.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import static com.ymjrhk.rbac.constant.MessageConstant.USER_NOT_LOGIN;
 
 /**
  * jwt令牌校验的拦截器
@@ -55,9 +58,10 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             //3、通过，放行
             return true;
         } catch (Exception ex) {
-            //4、不通过，响应 401 状态码
-            response.setStatus(401);
-            return false;
+//            //4、不通过，响应 401 状态码
+//            response.setStatus(401);
+//            return false;
+            throw new UserNotLoginException(USER_NOT_LOGIN);
         }
     }
 

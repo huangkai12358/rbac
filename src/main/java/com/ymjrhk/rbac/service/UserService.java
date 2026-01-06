@@ -5,6 +5,9 @@ import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.vo.UserVO;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.util.List;
 
 public interface UserService {
     void create(UserLoginDTO userLoginDTO);
@@ -18,4 +21,6 @@ public interface UserService {
     void changeStatus(Long userId, Integer status);
 
     void resetPassword(Long userId);
+
+    void userAssignRoles(Long userId, List<Long> ids);
 }

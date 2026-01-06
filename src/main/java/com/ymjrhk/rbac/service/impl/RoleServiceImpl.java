@@ -47,7 +47,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         int result = roleMapper.insert(role);
         if (result != 1) {
-            throw new RoleCreateFailed(ROLE_CREATE_FAILED); // 创建角色失败
+            throw new RoleCreateFailedException(ROLE_CREATE_FAILED); // 创建角色失败
         }
     }
 

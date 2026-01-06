@@ -2,9 +2,7 @@ package com.ymjrhk.rbac.mapper;
 
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.RolePageQueryDTO;
-import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.entity.Role;
-import com.ymjrhk.rbac.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -39,4 +37,11 @@ public interface RoleMapper {
      * @return
      */
     int update(Role role);
+
+    /**
+     * 选出在 sys_role 表中实际存在的 roleIds
+     * @param roleIds
+     * @return
+     */
+    List<Long> selectExistingRoleIds(List<Long> roleIds);
 }

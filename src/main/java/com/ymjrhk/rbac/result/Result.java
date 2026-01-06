@@ -9,31 +9,37 @@ import java.io.Serializable;
 @Schema(description = "返回结果封装")
 public class Result<T> implements Serializable {
 
-    @Schema(description = "响应码", example = "0成功，1和其它数字为失败")
-    private Integer code; //编码：0成功，1和其它数字为失败
+    @Schema(description = "业务状态码", example = "0 成功，1 和其它数字为失败")
+    private Integer code; // 编码：0成功，1和其它数字为失败
     @Schema(description = "错误提示信息")
-    private String errorMessage; //错误信息
-    @Schema(description = "数据")
-    private T data; //数据
+    private String errorMessage; // 错误信息
+    @Schema(description = "返回数据")
+    private T data; // 数据
 
+    /* ===== 成功 ===== */
     public static <T> Result<T> success() {
-        Result<T> result = new Result<>();
-        result.code = 0;
-        return result;
+        return success(null);
     }
 
-    public static <T> Result<T> success(T object) {
-        Result<T> result = new Result<>();
-        result.data = object;
-        result.code = 0;
-        return result;
+    public static <T> Result<T> success(T data) {
+        return of(0, null, data);
     }
 
-    public static <T> Result<T> error(String msg) {
-        Result<T> result = new Result<>();
-        result.errorMessage = msg;
-        result.code = 1;
-        return result;
+    /* ===== 失败 ===== */
+    public static <T> Result<T> error(Integer code, String errorMessage) {
+        return of(code, errorMessage, null);
     }
 
+    public static <T> Result<T> error(String errorMessage) {
+        return error(1, errorMessage);
+    }
+
+    /* ===== 通用 ===== */
+    public static <T> Result<T> of(Integer code, String errorMessage, T data) {
+        Result<T> r = new Result<>();
+        r.code = code;
+        r.errorMessage = errorMessage;
+        r.data = data;
+        return r;
+    }
 }

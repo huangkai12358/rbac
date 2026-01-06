@@ -1,0 +1,11 @@
+package com.ymjrhk.rbac.exception;
+
+public class PermissionCreateFailedException extends BaseException {
+
+    public PermissionCreateFailedException() {
+    }
+
+    public PermissionCreateFailedException(String message) {
+        super(message);
+    }
+}

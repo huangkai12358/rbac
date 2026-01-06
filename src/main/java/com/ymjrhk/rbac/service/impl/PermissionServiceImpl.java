@@ -49,7 +49,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         int result = permissionMapper.insert(permission);
         if (result != 1) {
-            throw new PermissionCreateFailed(PERMISSION_CREATE_FAILED); // 创建角色失败
+            throw new PermissionCreateFailedException(PERMISSION_CREATE_FAILED); // 创建角色失败
         }
     }
 

@@ -51,4 +51,13 @@
         and version = #{version}
         and secret_token = #{secretToken}
     </update>
+
+    <select id="selectExistingRoleIds" resultType="java.lang.Long">
+        select role_id
+        from sys_role
+        where role_id in
+        <foreach collection="roleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

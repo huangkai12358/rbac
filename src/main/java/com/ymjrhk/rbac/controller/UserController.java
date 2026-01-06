@@ -1,11 +1,8 @@
 package com.ymjrhk.rbac.controller;
 
-import com.ymjrhk.rbac.dto.UserDTO;
-import com.ymjrhk.rbac.dto.UserPageQueryDTO;
-import com.ymjrhk.rbac.dto.StatusDTO;
+import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
-import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
