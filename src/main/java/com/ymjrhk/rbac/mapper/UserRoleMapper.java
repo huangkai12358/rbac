@@ -25,7 +25,7 @@ public interface UserRoleMapper {
     int batchInsert(List<UserRole> relations);
 
     /**
-     * 查询用户角色
+     * 根据 userId 查询用户角色
      * @param userId
      * @return
      */

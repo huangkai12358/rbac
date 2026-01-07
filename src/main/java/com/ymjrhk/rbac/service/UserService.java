@@ -4,6 +4,7 @@ import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.vo.UserPermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -22,5 +23,5 @@ public interface UserService {
 
     void resetPassword(Long userId);
 
-    void userAssignRoles(Long userId, List<Long> ids);
+    List<UserPermissionVO> getUserPermissions(Long userId);
 }

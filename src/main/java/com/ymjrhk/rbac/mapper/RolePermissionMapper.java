@@ -25,7 +25,7 @@ public interface RolePermissionMapper {
     int batchInsert(List<RolePermission> relations);
 
     /**
-     * 查询角色权限
+     * 根据 roleId 查询角色权限
      * @param roleId
      * @return
      */

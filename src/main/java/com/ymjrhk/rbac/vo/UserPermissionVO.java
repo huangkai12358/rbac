@@ -1,11 +1,9 @@
 package com.ymjrhk.rbac.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class RolePermissionVO {
+public class UserPermissionVO {
     private Long permissionId;
 
     private String permissionName;
@@ -25,6 +23,4 @@ public class RolePermissionVO {
     private String method;
 
     private Integer sort;
-
-    // TODO: private Boolean assigned; 该角色是否已拥有 可能要加？前端勾选框直接用
 }

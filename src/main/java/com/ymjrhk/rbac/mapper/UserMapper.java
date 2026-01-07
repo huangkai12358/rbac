@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.mapper;
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.entity.User;
+import com.ymjrhk.rbac.vo.UserPermissionVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -48,7 +49,14 @@ public interface UserMapper {
      * 修改用户
      * @param user
      */
+    // TODO: 把update分成几个
     int update(User user);
-    // TODO：xml不要updateTime
-    // TODO: 把update成几个
+
+    /**
+     * 根据 userId 查询用户权限
+     * @param userId
+     * @return
+     */
+    List<UserPermissionVO> selectPermissionsByUserId(Long userId);
+
 }

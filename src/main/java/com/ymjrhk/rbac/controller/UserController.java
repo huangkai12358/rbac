@@ -4,6 +4,7 @@ import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserService;
+import com.ymjrhk.rbac.vo.UserPermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -95,5 +98,13 @@ public class UserController {
     public Result<Void> resetPassward(@PathVariable("userId") Long userId) {
         userService.resetPassword(userId);
         return Result.success();
+    }
+
+    @GetMapping("/{userId}/permissions")
+    @Operation(summary = "查询用户权限（非禁用）")
+    public Result<List<UserPermissionVO>> getUserPermissions(@PathVariable("userId") Long userId) {
+        log.info("查询用户权限，userId: {}", userId);
+        List<UserPermissionVO> permissions = userService.getUserPermissions(userId);
+        return Result.success(permissions);
     }
 }

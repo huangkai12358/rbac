@@ -15,6 +15,7 @@ import com.ymjrhk.rbac.result.ResultCode;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.service.base.BaseService;
+import com.ymjrhk.rbac.vo.UserPermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -233,22 +234,20 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 用户分配角色
+     * 用户查询权限
      * @param userId
-     * @param ids
+     * @return
      */
     @Override
-    public void userAssignRoles(Long userId, List<Long> ids) {
-        // 1. 校验用户是否存在
-        User dbUser = userMapper.getByUserId(userId);
-
-        if (dbUser == null) { // 用户不存在
+    public List<UserPermissionVO> getUserPermissions(Long userId) {
+        // 1. 查 userId 是否存在
+        User user = userMapper.getByUserId(userId);
+        if (user == null) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
 
-        // 2. 从 sys_user_role 表中删除原本的关联
-
-
+        // 2. 查 userId 对应的角色
+        return userMapper.selectPermissionsByUserId(userId);
     }
 
     public void doUpdate(User user) {
