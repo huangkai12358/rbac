@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
@@ -10,6 +11,7 @@ import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.service.base.BaseService;
@@ -34,6 +36,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final UserHistoryService userHistoryService;
 
     /**
      * 根据用户名和密码创建用户
@@ -76,7 +80,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (result != 1) {
             throw new UserCreateFailedException(USER_CREATE_FAILED); // 创建用户失败
         }
-        // TODO: 此处修改密码要加历史表和审计表吗
+
+        // 5. 写到历史表
+        userHistoryService.record(newUserId, OperateTypeConstant.CREATE);
     }
 
     /**
