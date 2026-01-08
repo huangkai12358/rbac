@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.service.base;
 
 import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.dto.base.PageQuery;
 import com.ymjrhk.rbac.entity.OptimisticLockEntity;
 import com.ymjrhk.rbac.exception.StatusNotChangeException;
 
@@ -10,6 +11,24 @@ import java.util.UUID;
 import static com.ymjrhk.rbac.constant.MessageConstant.STATUS_NOT_CHANGE;
 
 public abstract class BaseService {
+
+    protected static final int DEFAULT_PAGE_NUM = 1;
+    protected static final int DEFAULT_PAGE_SIZE = 10;
+    protected static final int MAX_PAGE_SIZE = 100;
+
+    protected void normalizePage(PageQuery dto) {
+        // pageSize 默认为 1
+        if (dto.getPageNum() == null || dto.getPageNum() < 1) {
+            dto.setPageNum(DEFAULT_PAGE_NUM);
+        }
+
+        // pageSize 默认为 10，最大为 100
+        if (dto.getPageSize() == null || dto.getPageSize() <= 0) {
+            dto.setPageSize(DEFAULT_PAGE_SIZE);
+        } else if (dto.getPageSize() > MAX_PAGE_SIZE) {
+            dto.setPageSize(MAX_PAGE_SIZE);
+        }
+    }
 
     /**
      * 用户/角色/权限 的乐观锁字段（包括 updateUserId）公共填充方法

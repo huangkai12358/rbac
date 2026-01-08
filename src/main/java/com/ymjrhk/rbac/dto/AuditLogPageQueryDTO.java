@@ -1,14 +1,16 @@
 package com.ymjrhk.rbac.dto;
 
+import com.ymjrhk.rbac.dto.base.PageQuery;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
-public class AuditLogPageQueryDTO implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class AuditLogPageQueryDTO extends PageQuery implements Serializable {
     private String username;
 
     private String permissionName;
@@ -21,8 +23,4 @@ public class AuditLogPageQueryDTO implements Serializable {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-
-    private Integer pageNum;
-
-    private Integer pageSize;
 }

@@ -49,6 +49,8 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         realPageQueryDTO.setEndTime(endTime);
 
         // 3. 分页
+        normalizePage(realPageQueryDTO);
+
         PageHelper.startPage(realPageQueryDTO.getPageNum(), realPageQueryDTO.getPageSize());
         Page<AuditLogVO> page = auditLogMapper.pageQuery(realPageQueryDTO);
 

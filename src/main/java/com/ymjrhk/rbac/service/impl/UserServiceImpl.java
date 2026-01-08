@@ -95,6 +95,8 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
+        normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
+
         PageHelper.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
 
         Page<User> page = userMapper.pageQuery(userPageQueryDTO);
@@ -105,6 +107,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                                    .stream()
                                    .map(user -> BeanUtil.copyProperties(user, UserVO.class))
                                    .toList();
+
         return new PageResult(total, records);
     }
     // TODO:为什么外卖里不填page,pageSize就查不到结果

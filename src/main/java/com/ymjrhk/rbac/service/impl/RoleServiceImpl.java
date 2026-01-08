@@ -58,6 +58,8 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      */
     @Override
     public PageResult pageQuery(RolePageQueryDTO rolePageQueryDTO) {
+        normalizePage(rolePageQueryDTO);
+
         PageHelper.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
 
         Page<Role> page = roleMapper.pageQuery(rolePageQueryDTO);
@@ -67,6 +69,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         List<RoleVO> records = page.getResult().stream()
                                    .map(role -> BeanUtil.copyProperties(role, RoleVO.class))
                                    .toList();
+
         return new PageResult(total, records);
     }
 

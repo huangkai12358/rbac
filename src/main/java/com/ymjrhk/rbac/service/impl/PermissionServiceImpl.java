@@ -60,6 +60,8 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     @Override
     public PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
+        normalizePage(permissionPageQueryDTO);
+
         PageHelper.startPage(permissionPageQueryDTO.getPageNum(), permissionPageQueryDTO.getPageSize());
 
         Page<Permission> page = permissionMapper.pageQuery(permissionPageQueryDTO);
@@ -69,6 +71,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         List<PermissionVO> records = page.getResult().stream()
                                    .map(permission -> BeanUtil.copyProperties(permission, PermissionVO.class))
                                    .toList();
+
         return new PageResult(total, records);
     }
 
