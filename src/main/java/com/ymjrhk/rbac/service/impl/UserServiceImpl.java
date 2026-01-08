@@ -57,7 +57,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         Long operatorId = BaseContext.getCurrentUserId(); // 拿到当前操作人
         insertUser.setCreateUserId(operatorId);
-        insertUser.setUpdateUserId(operatorId);
+        insertUser.setUpdateUserId(operatorId); // 初始更新人与创建人相同
 
         // 2. 先插入，拿到 userId
         int row = userMapper.insert(insertUser);   // insert 后 insertUser.getUserId() 才有值

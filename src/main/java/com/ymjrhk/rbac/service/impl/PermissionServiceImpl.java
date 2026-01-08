@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.dto.PermissionCreateDTO;
 import com.ymjrhk.rbac.dto.PermissionDTO;
@@ -11,6 +12,7 @@ import com.ymjrhk.rbac.entity.Permission;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.service.PermissionHistoryService;
 import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
@@ -30,11 +32,14 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 public class PermissionServiceImpl extends BaseService implements PermissionService {
     private final PermissionMapper permissionMapper;
 
+    private final PermissionHistoryService permissionHistoryService;
+
     /**
      * 创建权限
      * @param permissionCreateDTO
      */
     @Override
+    @Transactional
     public void create(PermissionCreateDTO permissionCreateDTO) {
         Permission permission = BeanUtil.copyProperties(permissionCreateDTO, Permission.class);
 
@@ -49,8 +54,13 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         int result = permissionMapper.insert(permission);
         if (result != 1) {
-            throw new PermissionCreateFailedException(PERMISSION_CREATE_FAILED); // 创建角色失败
+            throw new PermissionCreateFailedException(PERMISSION_CREATE_FAILED); // 创建权限失败
         }
+
+        // 写到历史表
+        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.CREATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -121,7 +131,11 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         fillOptimisticLockFields(permission, version, secretToken, newSecretToken, updateUserId);
 
         doUpdate(permission);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -146,7 +160,11 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         // 4. 执行 update
         doUpdate(permission);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**

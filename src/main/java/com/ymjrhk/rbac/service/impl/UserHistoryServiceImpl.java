@@ -1,7 +1,9 @@
 package com.ymjrhk.rbac.service.impl;
 
+import com.ymjrhk.rbac.constant.MessageConstant;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.entity.UserHistory;
+import com.ymjrhk.rbac.exception.HistoryInsertFailedException;
 import com.ymjrhk.rbac.mapper.UserHistoryMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.UserHistoryService;
@@ -38,6 +40,11 @@ public class UserHistoryServiceImpl implements UserHistoryService {
         userHistory.setOperateTime(user.getUpdateTime());
         userHistory.setOperatorId(user.getUpdateUserId());
 
-        userHistoryMapper.insert(userHistory);
+        int result = userHistoryMapper.insert(userHistory);
+
+        if (result != 1) { // 写入历史失败（应该极少）
+            throw new HistoryInsertFailedException(MessageConstant.HistoryInsertFailed);
+        }
+
     }
 }

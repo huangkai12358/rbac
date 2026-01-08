@@ -1,5 +1,7 @@
 package com.ymjrhk.rbac.constant;
 
+import com.ymjrhk.rbac.exception.HistoryInsertFailedException;
+
 /**
  * 信息提示常量类
  */
@@ -28,6 +30,7 @@ public class MessageConstant {
 
     public static final String STATUS_NOT_CHANGE = "状态未改变，无需修改";
     public static final String UPDATE_FAILED = "更新失败，可能数据已被修改，请刷新后重试";
+    public static final String HistoryInsertFailed = "写入历史失败";
 
     public static final String ALREADY_EXISTED = "已存在";
     public static final String UPLOAD_FAILED = "文件上传失败";

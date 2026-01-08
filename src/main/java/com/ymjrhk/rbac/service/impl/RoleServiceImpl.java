@@ -3,12 +3,14 @@ package com.ymjrhk.rbac.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.result.PageResult;
+import com.ymjrhk.rbac.service.RoleHistoryService;
 import com.ymjrhk.rbac.service.RoleService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.RoleVO;
@@ -28,11 +30,14 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 public class RoleServiceImpl extends BaseService implements RoleService {
     private final RoleMapper roleMapper;
 
+    private final RoleHistoryService roleHistoryService;
+
     /**
      * 创建角色
      * @param roleCreateDTO
      */
     @Override
+    @Transactional
     public void create(RoleCreateDTO roleCreateDTO) {
         Role role = BeanUtil.copyProperties(roleCreateDTO, Role.class);
 
@@ -49,6 +54,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         if (result != 1) {
             throw new RoleCreateFailedException(ROLE_CREATE_FAILED); // 创建角色失败
         }
+
+        // 写到历史表
+        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.CREATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -123,7 +133,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         fillOptimisticLockFields(role, version, secretToken, newSecretToken, updateUserId);
 
         doUpdate(role);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -148,7 +162,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         // 4. 执行 update
         doUpdate(role);
-        // TODO:写历史表和审计表
+
+        // 5. 写到历史表
+        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
