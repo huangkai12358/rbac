@@ -5,11 +5,12 @@ import com.ymjrhk.rbac.entity.UserHistory;
 import com.ymjrhk.rbac.mapper.UserHistoryMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.UserHistoryService;
-import com.ymjrhk.rbac.service.UserService;
-import com.ymjrhk.rbac.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * 只保存成功的记录
+ */
 @Service
 @RequiredArgsConstructor
 public class UserHistoryServiceImpl implements UserHistoryService {

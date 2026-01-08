@@ -164,7 +164,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         fillOptimisticLockFields(user, version, secretToken, newSecretToken, updateUserId);
 
         doUpdate(user);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -191,7 +195,11 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 4. 执行 update
         doUpdate(user);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        userHistoryService.record(userId, OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
@@ -231,7 +239,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         user.setAuthVersion(authVersion);
 
         doUpdate(user);
-        // TODO:写历史表和审计表
+
+        // 写到历史表
+        userHistoryService.record(userId, OperateTypeConstant.UPDATE);
+
+        // TODO:写审计表
     }
 
     /**
