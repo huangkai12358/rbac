@@ -7,6 +7,7 @@ import com.ymjrhk.rbac.vo.UserPermissionVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -51,6 +52,14 @@ public interface UserMapper {
      */
     // TODO: 把update分成几个
     int update(User user);
+
+    /**
+     * 因为创建用户而更新用户（只更新密码）
+     * @param user
+     * @return
+     */
+    @Update("update sys_user set password = #{password} where user_id = #{userId}")
+    int updateForCreateUser(User user);
 
     /**
      * 根据 userId 查询用户权限

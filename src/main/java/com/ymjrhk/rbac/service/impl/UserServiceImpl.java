@@ -3,7 +3,6 @@ package com.ymjrhk.rbac.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.ymjrhk.rbac.constant.VersionConstant;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
@@ -11,7 +10,6 @@ import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
-import com.ymjrhk.rbac.result.ResultCode;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.service.base.BaseService;
@@ -74,13 +72,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         updateUser.setUserId(newUserId);
         updateUser.setPassword(password);
 
-        Integer version = VersionConstant.originalVersion; // 一开始版本号为 1
-        String secretToken = insertUser.getSecretToken(); // 从 insertUser 中拿 secretToken
-        String newSecretToken = UUID.randomUUID().toString();
-
-        fillOptimisticLockFields(updateUser, version, secretToken, newSecretToken, operatorId);
-
-        int result = userMapper.update(updateUser);
+        int result = userMapper.updateForCreateUser(updateUser);
         if (result != 1) {
             throw new UserCreateFailedException(USER_CREATE_FAILED); // 创建用户失败
         }
