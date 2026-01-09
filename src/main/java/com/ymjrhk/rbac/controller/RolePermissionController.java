@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/role")
+@RequestMapping("/api/roles")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "角色-权限管理模块")

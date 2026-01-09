@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/permission")
+@RequestMapping("/api/permissions")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "权限管理模块")

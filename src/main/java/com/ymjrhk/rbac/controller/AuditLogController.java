@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/audit-log")
+@RequestMapping("/api/audit-logs")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "审计日志模块")
