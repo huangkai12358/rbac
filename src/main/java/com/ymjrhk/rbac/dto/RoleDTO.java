@@ -4,10 +4,8 @@ import lombok.Data;
 
 @Data
 // 修改用
-// 和 RoleCreateDTO 相比多 id，少 status
+// 和 RoleCreateDTO 相比少 status
 public class RoleDTO {
-    private Long roleId;
-
     private String roleName;
 
     private String roleDisplayName;

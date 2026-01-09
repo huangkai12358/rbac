@@ -104,12 +104,13 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
     /**
      * 修改权限
+     * @param permissionId
      * @param permissionDTO
      */
     @Override
     @Transactional
-    public void update(PermissionDTO permissionDTO) {
-        Permission dbPermission = permissionMapper.getByPermissionId(permissionDTO.getPermissionId());
+    public void update(Long permissionId, PermissionDTO permissionDTO) {
+        Permission dbPermission = permissionMapper.getByPermissionId(permissionId);
 
         // 权限不存在
         if (dbPermission == null) {
@@ -122,6 +123,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         }
 
         Permission permission = getPermission(permissionDTO); // 从 PermissionDTO 拷贝属性到 Permission
+        permission.setPermissionId(permissionId);
 
         Integer version = dbPermission.getVersion(); // 获取版本号
         String secretToken = dbPermission.getSecretToken(); // 获取旧 secretToken
@@ -185,7 +187,6 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     public static Permission getPermission(PermissionDTO permissionDTO) {
         Permission permission = new Permission();
-        permission.setPermissionId(permissionDTO.getPermissionId());
         permission.setPermissionName(permissionDTO.getPermissionName());
         permission.setPermissionDisplayName(permissionDTO.getPermissionDisplayName());
         permission.setDescription(permissionDTO.getDescription());

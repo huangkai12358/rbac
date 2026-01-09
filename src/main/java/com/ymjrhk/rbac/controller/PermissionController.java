@@ -63,14 +63,15 @@ public class PermissionController {
 
     /**
      * 修改权限
+     * @param permissionId
      * @param permissionDTO
      * @return
      */
-    @PutMapping
+    @PutMapping("/{permissionId}")
     @Operation(summary = "修改权限")
-    public Result<Void> updatePermission(@RequestBody PermissionDTO permissionDTO) {
-        log.info("修改权限：{}", permissionDTO);
-        permissionService.update(permissionDTO);
+    public Result<Void> updatePermission(@PathVariable Long permissionId, @RequestBody PermissionDTO permissionDTO) {
+        log.info("修改权限：permissionId: {}，permissionDTO: {}", permissionId, permissionDTO);
+        permissionService.update(permissionId, permissionDTO);
         return Result.success();
     }
 

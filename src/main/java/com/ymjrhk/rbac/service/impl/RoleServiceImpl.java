@@ -102,12 +102,13 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     /**
      * 修改角色
+     * @param roleId
      * @param roleDTO
      */
     @Override
     @Transactional
-    public void update(RoleDTO roleDTO) {
-        Role dbRole = roleMapper.getByRoleId(roleDTO.getRoleId());
+    public void update(Long roleId, RoleDTO roleDTO) {
+        Role dbRole = roleMapper.getByRoleId(roleId);
 
         // 角色不存在
         if (dbRole == null) {
@@ -120,7 +121,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         }
 
         Role role = new Role();
-        role.setRoleId(roleDTO.getRoleId());
+        role.setRoleId(roleId);
         role.setRoleName(roleDTO.getRoleName());
         role.setRoleDisplayName(roleDTO.getRoleDisplayName());
         role.setDescription(roleDTO.getDescription());

@@ -17,7 +17,7 @@ public interface UserService {
 
     UserVO getByUserId(Long userId);
 
-    void update(UserDTO userDTO);
+    void update(Long userId, UserDTO userDTO);
 
     void changeStatus(Long userId, Integer status);
 

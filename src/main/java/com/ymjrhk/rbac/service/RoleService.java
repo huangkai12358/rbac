@@ -14,7 +14,7 @@ public interface RoleService {
 
     RoleVO getByRoleId(Long roleId);
 
-    void update(RoleDTO roleDTO);
+    void update(Long roleId, RoleDTO roleDTO);
 
     void changeStatus(Long roleId, Integer status);
 }

@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 // 修改用
 public class UserDTO {
-    private Long userId;
-
     private String username;
 
     private String nickname;

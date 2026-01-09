@@ -60,14 +60,15 @@ public class RoleController {
 
     /**
      * 修改角色
+     * @param roleId
      * @param roleDTO
      * @return
      */
-    @PutMapping
+    @PutMapping("/{roleId}")
     @Operation(summary = "修改角色")
-    public Result<Void> updateRole(@RequestBody RoleDTO roleDTO) {
-        log.info("修改角色：{}", roleDTO);
-        roleService.update(roleDTO);
+    public Result<Void> updateRole(@PathVariable Long roleId, @RequestBody RoleDTO roleDTO) {
+        log.info("修改角色：roleId: {}，roleDTO: {}", roleId, roleDTO);
+        roleService.update(roleId, roleDTO);
         return Result.success();
     }
 

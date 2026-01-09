@@ -15,7 +15,7 @@ public interface PermissionService {
 
     PermissionVO getByPermissionId(Long permissionId);
 
-    void update(PermissionDTO permissionDTO);
+    void update(Long permissionId, PermissionDTO permissionDTO);
 
     void changeStatus(Long permissionId, Integer status);
 }

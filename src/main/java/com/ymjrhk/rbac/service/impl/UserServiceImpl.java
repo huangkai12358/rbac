@@ -137,14 +137,14 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 修改用户
-     *
+     * @param userId
      * @param userDTO
      */
     @Override
     @Transactional
     // 暂不更新 status
-    public void update(UserDTO userDTO) {
-        User dbUser = userMapper.getByUserId(userDTO.getUserId());
+    public void update(Long userId, UserDTO userDTO) {
+        User dbUser = userMapper.getByUserId(userId);
 
         // 用户不存在
         if (dbUser == null) {
@@ -157,7 +157,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         User user = new User();
-        user.setUserId(userDTO.getUserId());
+        user.setUserId(userId);
         user.setUsername(userDTO.getUsername());
         user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());

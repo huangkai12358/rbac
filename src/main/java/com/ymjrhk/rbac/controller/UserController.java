@@ -64,14 +64,15 @@ public class UserController {
 
     /**
      * 修改用户
+     * @param userId
      * @param userDTO
      * @return
      */
-    @PutMapping
+    @PutMapping("/{userId}")
     @Operation(summary = "修改用户")
-    public Result<Void> updateUser(@RequestBody UserDTO userDTO) {
-        log.info("修改用户：{}", userDTO);
-        userService.update(userDTO);
+    public Result<Void> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
+        log.info("修改用户：userId: {}，userDTO: {}", userId, userDTO);
+        userService.update(userId, userDTO);
         return Result.success();
     }
 
