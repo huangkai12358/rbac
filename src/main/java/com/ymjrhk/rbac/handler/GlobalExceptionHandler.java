@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.handler;
 
 import com.ymjrhk.rbac.constant.MessageConstant;
+import com.ymjrhk.rbac.exception.AccessDeniedException;
 import com.ymjrhk.rbac.exception.BaseException;
 import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.result.Result;
@@ -33,6 +34,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Result<Void> handleUserNotLogin(UserNotLoginException ex) {
         return Result.error(ResultCode.UNAUTHORIZED.getCode(), ex.getMessage());
+    }
+
+    /**
+     * 无权限访问
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result<Void> handleAccessDenied(AccessDeniedException ex) {
+        return Result.error(ResultCode.FORBIDDEN.getCode(), ex.getMessage());
     }
 
     /**

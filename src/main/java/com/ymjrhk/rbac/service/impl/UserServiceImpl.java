@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
+import com.ymjrhk.rbac.constant.PermissionTypeConstant;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
@@ -18,9 +19,11 @@ import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.UserPermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,12 +35,15 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl extends BaseService implements UserService {
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserHistoryService userHistoryService;
+
+    private final AntPathMatcher matcher = new AntPathMatcher();
 
     /**
      * 根据用户名和密码创建用户
@@ -261,6 +267,41 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 2. 查 userId 对应的角色
         return userMapper.selectPermissionsByUserId(userId);
+    }
+
+    /**
+     * 判断用户拥有的权限是否匹配当前请求路径+方法
+     * @param userId
+     * @param path
+     * @param method
+     * @return
+     */
+    public boolean hasPermission(Long userId, String path, String method) {
+        // 1. 查询该用户拥有的所有接口权限
+        List<UserPermissionVO> userPermissions = getUserPermissions(userId);
+
+        // 2. 路径 + 方法匹配
+        for (UserPermissionVO userPermission : userPermissions) {
+
+            // 2.1 只处理接口权限
+            if (!Objects.equals(userPermission.getType(), PermissionTypeConstant.ACTION)) {
+                continue;
+            }
+
+            // 2.2 兜底防御
+            if (userPermission.getPath() == null || userPermission.getMethod() == null) {
+                continue;
+            }
+
+            log.debug("正在匹配用户拥有的权限：权限名 {}, 权限路径 {}", userPermission.getPermissionName(), userPermission.getPath());
+
+            // 2.3 开始匹配
+            if (matcher.match(userPermission.getPath(), path)
+                    && userPermission.getMethod().equalsIgnoreCase(method)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void doUpdate(User user) {

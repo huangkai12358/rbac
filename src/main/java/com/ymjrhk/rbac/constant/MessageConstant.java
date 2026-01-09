@@ -32,6 +32,8 @@ public class MessageConstant {
     public static final String UPDATE_FAILED = "更新失败，可能数据已被修改，请刷新后重试";
     public static final String HistoryInsertFailed = "写入历史失败";
 
+    public static final String AccessDenied = "无权限访问";
+
     public static final String ALREADY_EXISTED = "已存在";
     public static final String UPLOAD_FAILED = "文件上传失败";
     public static final String UNKNOWN_ERROR = "未知错误";

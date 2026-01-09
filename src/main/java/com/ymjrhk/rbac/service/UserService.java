@@ -24,4 +24,6 @@ public interface UserService {
     void resetPassword(Long userId);
 
     List<UserPermissionVO> getUserPermissions(Long userId);
+
+    boolean hasPermission(Long userId, String path, String method);
 }

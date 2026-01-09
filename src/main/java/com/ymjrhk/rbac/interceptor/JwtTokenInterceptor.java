@@ -2,8 +2,10 @@ package com.ymjrhk.rbac.interceptor;
 
 import com.ymjrhk.rbac.constant.JwtClaimsConstant;
 import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.exception.AccessDeniedException;
 import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.properties.JwtProperties;
+import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import static com.ymjrhk.rbac.constant.MessageConstant.AccessDenied;
 import static com.ymjrhk.rbac.constant.MessageConstant.USER_NOT_LOGIN;
 
 /**
@@ -27,6 +30,8 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
     private final JwtProperties jwtProperties;
 
+    private final UserService userService;
+
     /**
      * 校验jwt
      *
@@ -38,31 +43,50 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //判断当前拦截到的是 Controller 的方法还是其他资源
+        // 1. 非 Controller 请求直接放行
+        // 判断当前拦截到的是 Controller 的方法还是其他资源
         if (!(handler instanceof HandlerMethod)) {
-            //当前拦截到的不是动态方法，直接放行
-            return true;
+            return true; //当前拦截到的不是动态方法，直接放行
         }
 
-        //1、从请求头中获取令牌
+        // 2. 获取 Token
         String token = request.getHeader(jwtProperties.getTokenName());
 
-        //2、校验令牌
-        try {
-            log.info("jwt校验:{}", token);
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
-            Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
-            log.info("当前用户id：{}", userId);
-            //调用ThreadLocale
-            BaseContext.setCurrentUserId(userId);
-            //3、通过，放行
-            return true;
-        } catch (Exception ex) {
-//            //4、不通过，响应 401 状态码
-//            response.setStatus(401);
-//            return false;
+        if (token == null || token.isEmpty()) {
             throw new UserNotLoginException(USER_NOT_LOGIN);
         }
+
+        try {
+            // 3. 校验 Token（认证）
+            log.info("JWT 校验：{}", token);
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
+
+            Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
+
+            log.info("当前用户id：{}", userId);
+            // 4. 保存上下文，调用ThreadLocale
+            BaseContext.setCurrentUserId(userId);
+
+            // 5. 鉴权（核心）
+            log.info("当前请求 URI：{}，请求方法：{}", request.getRequestURI(), request.getMethod());
+            boolean allowed = userService.hasPermission(userId, request.getRequestURI(), request.getMethod());
+
+            if (!allowed) {
+                throw new AccessDeniedException(AccessDenied);
+            }
+
+            return true;
+
+        } catch (UserNotLoginException | AccessDeniedException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("JWT 校验失败", e);
+            throw new UserNotLoginException(USER_NOT_LOGIN);
+        }
+
+//            // 4、不通过，响应 401 状态码
+//            response.setStatus(401);
+//            return false;
     }
 
     @Override
