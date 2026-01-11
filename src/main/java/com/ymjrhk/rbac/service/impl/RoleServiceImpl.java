@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.exception.*;
@@ -44,7 +44,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         String secretToken = UUID.randomUUID().toString();
 
         // 查询当前用户id
-        Long userId = BaseContext.getCurrentUserId();
+        Long userId = UserContext.getCurrentUserId();
 
         role.setSecretToken(secretToken);
         role.setCreateUserId(userId);
@@ -129,7 +129,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         Integer version = dbRole.getVersion(); // 获取版本号
         String secretToken = dbRole.getSecretToken(); // 获取旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        Long updateUserId = UserContext.getCurrentUserId();
 
         fillOptimisticLockFields(role, version, secretToken, newSecretToken, updateUserId);
 

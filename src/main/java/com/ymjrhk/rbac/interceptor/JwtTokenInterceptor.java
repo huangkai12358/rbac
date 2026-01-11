@@ -1,7 +1,8 @@
 package com.ymjrhk.rbac.interceptor;
 
 import com.ymjrhk.rbac.constant.JwtClaimsConstant;
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.LoginUser;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.exception.AccessDeniedException;
 import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.properties.JwtProperties;
@@ -12,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -62,10 +62,11 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
 
             Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
+            String username = claims.get(JwtClaimsConstant.USERNAME).toString();
 
-            log.info("当前用户id：{}", userId);
+            log.info("当前用户id：{}，username：{}", userId, username);
             // 4. 保存上下文，调用ThreadLocale
-            BaseContext.setCurrentUserId(userId);
+            UserContext.set(new LoginUser(userId, username));
 
             // 5. 鉴权（核心）
             log.info("当前请求 URI：{}，请求方法：{}", request.getRequestURI(), request.getMethod());
@@ -92,6 +93,6 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         // 移除用户
-        BaseContext.removeCurrentUserId();
+        UserContext.clear();
     }
 }

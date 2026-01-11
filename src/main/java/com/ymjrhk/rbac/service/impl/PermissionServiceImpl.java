@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.PermissionCreateDTO;
 import com.ymjrhk.rbac.dto.PermissionDTO;
 import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
@@ -46,7 +46,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         String secretToken = UUID.randomUUID().toString();
 
         // 查询当前用户id
-        Long userId = BaseContext.getCurrentUserId();
+        Long userId = UserContext.getCurrentUserId();
 
         permission.setSecretToken(secretToken);
         permission.setCreateUserId(userId);
@@ -128,7 +128,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         Integer version = dbPermission.getVersion(); // 获取版本号
         String secretToken = dbPermission.getSecretToken(); // 获取旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        Long updateUserId = UserContext.getCurrentUserId();
 
         fillOptimisticLockFields(permission, version, secretToken, newSecretToken, updateUserId);
 

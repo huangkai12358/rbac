@@ -17,7 +17,7 @@ import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
@@ -68,7 +68,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         insertUser.setNickname(userLoginDTO.getUsername()); // 默认昵称与用户名相同
         insertUser.setSecretToken(UUID.randomUUID().toString());
 
-        Long operatorId = BaseContext.getCurrentUserId(); // 拿到当前操作人
+        Long operatorId = UserContext.getCurrentUserId(); // 拿到当前操作人
         insertUser.setCreateUserId(operatorId);
         insertUser.setUpdateUserId(operatorId); // 初始更新人与创建人相同
 
@@ -173,7 +173,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         Integer version = dbUser.getVersion(); // 获取版本号
         String secretToken = dbUser.getSecretToken(); // 获取旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        Long updateUserId = UserContext.getCurrentUserId();
 
         fillOptimisticLockFields(user, version, secretToken, newSecretToken, updateUserId);
 
@@ -243,7 +243,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         Integer version = dbUser.getVersion();
         String secretToken = dbUser.getSecretToken();
         String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        Long updateUserId = UserContext.getCurrentUserId();
 
         fillOptimisticLockFields(user, version, secretToken, newSecretToken, updateUserId);
 

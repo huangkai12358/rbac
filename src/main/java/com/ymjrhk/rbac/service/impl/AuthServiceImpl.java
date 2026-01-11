@@ -58,7 +58,8 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. 登录成功后，生成 JWT
         Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.USER_ID, user.getUserId()); // JWT 存 userId 和 authVersion
+        claims.put(JwtClaimsConstant.USER_ID, user.getUserId()); // JWT 存 userId、username 和 authVersion
+        claims.put(JwtClaimsConstant.USERNAME, user.getUsername());
         claims.put(JwtClaimsConstant.AUTH_VERSION, user.getAuthVersion());
         String token = JwtUtil.createJWT(
                 jwtProperties.getSecretKey(),

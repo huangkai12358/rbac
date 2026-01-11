@@ -1,6 +1,6 @@
 package com.ymjrhk.rbac.service.base;
 
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.base.PageQuery;
 import com.ymjrhk.rbac.entity.OptimisticLockEntity;
 import com.ymjrhk.rbac.exception.StatusNotChangeException;
@@ -76,7 +76,7 @@ public abstract class BaseService {
         Integer version = dbEntity.getVersion(); // 获取版本号
         String secretToken = dbEntity.getSecretToken(); // 获取旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
-        Long updateUserId = BaseContext.getCurrentUserId();
+        Long updateUserId = UserContext.getCurrentUserId();
 
         // 乐观锁字段填充
         fillOptimisticLockFields(

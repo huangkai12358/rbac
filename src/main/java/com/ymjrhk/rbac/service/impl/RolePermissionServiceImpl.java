@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import com.ymjrhk.rbac.constant.RoleNameConstant;
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.entity.RolePermission;
 import com.ymjrhk.rbac.exception.AssignmentPermissionFailedException;
@@ -56,7 +56,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         rolePermissionMapper.deleteByRoleId(roleId);
 
         // 4. 新插入数据
-        Long operateRoleId = BaseContext.getCurrentUserId();
+        Long operateRoleId = UserContext.getCurrentUserId();
 
         List<RolePermission> relations = permissionIds.stream()
                                                       .map(permissionId -> {

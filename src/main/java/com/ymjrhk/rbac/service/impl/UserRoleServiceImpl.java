@@ -1,6 +1,6 @@
 package com.ymjrhk.rbac.service.impl;
 
-import com.ymjrhk.rbac.context.BaseContext;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.entity.UserRole;
 import com.ymjrhk.rbac.exception.*;
@@ -53,7 +53,7 @@ public class UserRoleServiceImpl implements UserRoleService {
         userRoleMapper.deleteByUserId(userId);
 
         // 4. 新插入数据
-        Long operateUserId = BaseContext.getCurrentUserId();
+        Long operateUserId = UserContext.getCurrentUserId();
 
         List<UserRole> relations = roleIds.stream()
                                           .map(roleId -> {
