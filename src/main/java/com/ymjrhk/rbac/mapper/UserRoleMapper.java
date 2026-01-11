@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.mapper;
 
 import com.ymjrhk.rbac.entity.UserRole;
-import com.ymjrhk.rbac.vo.UserRoleVO;
+import com.ymjrhk.rbac.vo.RoleVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -29,5 +29,13 @@ public interface UserRoleMapper {
      * @param userId
      * @return
      */
-    List<UserRoleVO> selectRolesByUserId(Long userId);
+    List<RoleVO> selectRolesByUserId(Long userId);
+
+    /**
+     * 根据 userId 查是否拥有角色 roleName
+     * @param userId
+     * @param roleName
+     * @return
+     */
+    int userHasRole(Long userId, String roleName);
 }

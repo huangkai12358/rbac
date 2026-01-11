@@ -1,19 +1,17 @@
 package com.ymjrhk.rbac.service.impl;
 
+import com.ymjrhk.rbac.constant.RoleNameConstant;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.entity.RolePermission;
-import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.exception.AssignmentPermissionFailedException;
 import com.ymjrhk.rbac.exception.PermissionNotExistException;
 import com.ymjrhk.rbac.exception.RoleNotExistException;
-import com.ymjrhk.rbac.exception.UserNotExistException;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.RolePermissionMapper;
 import com.ymjrhk.rbac.service.RolePermissionService;
-import com.ymjrhk.rbac.vo.RolePermissionVO;
-import com.ymjrhk.rbac.vo.UserRoleVO;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,15 +77,21 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
     /**
      * 查询角色权限
+     *
      * @param roleId
      * @return
      */
     @Override
-    public List<RolePermissionVO> getRolePermissions(Long roleId) {
+    public List<PermissionVO> getRolePermissions(Long roleId) {
         // 1. 查 roleId 是否存在
         Role role = roleMapper.getByRoleId(roleId);
         if (role == null) {
             throw new RoleNotExistException(USER_NOT_EXIST);
+        }
+
+        // 2. 是否是超级管理员
+        if (role.getRoleName().equals(RoleNameConstant.SUPER_ADMIN)) {
+            return permissionMapper.listAllActivePermissions();
         }
 
         // 2. 查 roleId 对应的权限

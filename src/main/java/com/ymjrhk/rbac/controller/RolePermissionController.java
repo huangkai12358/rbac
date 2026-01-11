@@ -3,7 +3,7 @@ package com.ymjrhk.rbac.controller;
 import com.ymjrhk.rbac.dto.IdsDTO;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.RolePermissionService;
-import com.ymjrhk.rbac.vo.RolePermissionVO;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,11 +35,12 @@ public class RolePermissionController {
         rolePermissionService.assignPermissionsToRole(roleId, permissionIdsDTO.getIds());
         return Result.success();
     }
+
     @GetMapping("/{roleId}/permissions")
     @Operation(summary = "查询角色权限")
-    public Result<List<RolePermissionVO>> getRolePermissions(@PathVariable("roleId") Long roleId) {
+    public Result<List<PermissionVO>> getRolePermissions(@PathVariable("roleId") Long roleId) {
         log.info("查询角色权限，roleId: {}", roleId);
-        List<RolePermissionVO> permissions = rolePermissionService.getRolePermissions(roleId);
+        List<PermissionVO> permissions = rolePermissionService.getRolePermissions(roleId);
         return Result.success(permissions);
     }
     

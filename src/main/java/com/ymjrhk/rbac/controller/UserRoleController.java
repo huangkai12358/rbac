@@ -3,7 +3,7 @@ package com.ymjrhk.rbac.controller;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserRoleService;
-import com.ymjrhk.rbac.vo.UserRoleVO;
+import com.ymjrhk.rbac.vo.RoleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,9 +38,9 @@ public class UserRoleController {
 
     @GetMapping("/{userId}/roles")
     @Operation(summary = "查询用户角色")
-    public Result<List<UserRoleVO>> getUserRoles(@PathVariable("userId") Long userId) {
+    public Result<List<RoleVO>> getUserRoles(@PathVariable("userId") Long userId) {
         log.info("查询用户角色，userId: {}", userId);
-        List<UserRoleVO> roles = userRoleService.getUserRoles(userId);
+        List<RoleVO> roles = userRoleService.getUserRoles(userId);
         return Result.success(roles);
     }
 }

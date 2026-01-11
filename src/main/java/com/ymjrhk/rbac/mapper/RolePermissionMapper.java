@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.mapper;
 
 import com.ymjrhk.rbac.entity.RolePermission;
-import com.ymjrhk.rbac.vo.RolePermissionVO;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -29,5 +29,5 @@ public interface RolePermissionMapper {
      * @param roleId
      * @return
      */
-    List<RolePermissionVO> selectPermissionsByRoleId(Long roleId);
+    List<PermissionVO> selectPermissionsByRoleId(Long roleId);
 }

@@ -5,18 +5,21 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.PermissionTypeConstant;
+import com.ymjrhk.rbac.constant.RoleNameConstant;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.UserHistoryService;
+import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.context.BaseContext;
 import com.ymjrhk.rbac.service.base.BaseService;
-import com.ymjrhk.rbac.vo.UserPermissionVO;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +49,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
+    private final UserRoleService userRoleService;
+
+    private final PermissionMapper permissionMapper;
+
     /**
      * 根据用户名和密码创建用户
      *
@@ -58,8 +66,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         insertUser.setUsername(userLoginDTO.getUsername());
         insertUser.setPassword("!INIT!"); // // 先插入一条“不可登录”的占位密码（因为 password 不能为空），之后要修改
         insertUser.setNickname(userLoginDTO.getUsername()); // 默认昵称与用户名相同
-        insertUser.setSecretToken(UUID.randomUUID()
-                                .toString());
+        insertUser.setSecretToken(UUID.randomUUID().toString());
 
         Long operatorId = BaseContext.getCurrentUserId(); // 拿到当前操作人
         insertUser.setCreateUserId(operatorId);
@@ -137,6 +144,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 修改用户
+     *
      * @param userId
      * @param userDTO
      */
@@ -253,57 +261,99 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 用户查询权限
+     * 用户查询权限（可以查被禁用的用户的权限，但是不能查出用户禁用的角色和权限）
+     *
      * @param userId
      * @return
      */
     @Override
-    public List<UserPermissionVO> getUserPermissions(Long userId) {
+    public List<PermissionVO> getUserPermissions(Long userId) {
         // 1. 查 userId 是否存在
         User user = userMapper.getByUserId(userId);
         if (user == null) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
 
-        // 2. 查 userId 对应的角色
+        // 2. 是否是超级管理员
+        if (isSuperAdmin(userId)) {
+            return permissionMapper.listAllActivePermissions();
+        }
+
+        // 3. 查 userId 对应的权限
         return userMapper.selectPermissionsByUserId(userId);
     }
 
     /**
      * 判断用户拥有的权限是否匹配当前请求路径+方法
+     *
      * @param userId
-     * @param path
-     * @param method
+     * @param requestPath
+     * @param requestMethod
      * @return
      */
-    public boolean hasPermission(Long userId, String path, String method) {
+    public boolean hasPermission(Long userId, String requestPath, String requestMethod) {
+        // 0. 超级管理员直接放行（最重要）
+        if (isSuperAdmin(userId)) {
+            log.info("超级管理员直接放行，userId={}, path={}, method={}",
+                    userId, requestPath, requestMethod);
+            return true;
+        }
+
         // 1. 查询该用户拥有的所有接口权限
-        List<UserPermissionVO> userPermissions = getUserPermissions(userId);
+        List<PermissionVO> permissions = getUserPermissions(userId);
+
+        if (CollectionUtils.isEmpty(permissions)) {
+            log.warn("无任何权限，userId={}", userId);
+            return false;
+        }
+
+        log.debug("开始权限匹配，userId={}, path={}, method={}", userId, requestPath, requestMethod);
 
         // 2. 路径 + 方法匹配
-        for (UserPermissionVO userPermission : userPermissions) {
+        for (PermissionVO permission : permissions) {
+            String permissionName = permission.getPermissionName();
+            String path = permission.getPath();
+            String method = permission.getMethod();
 
             // 2.1 只处理接口权限
-            if (!Objects.equals(userPermission.getType(), PermissionTypeConstant.ACTION)) {
+            if (!Objects.equals(permission.getType(), PermissionTypeConstant.ACTION)) {
                 continue;
             }
 
             // 2.2 兜底防御
-            if (userPermission.getPath() == null || userPermission.getMethod() == null) {
+            if (path == null || method == null) {
+                log.warn("权限配置不完整，permissionName={}", permissionName);
                 continue;
             }
 
-            log.debug("正在匹配用户拥有的权限：权限名 {}, 权限路径 {}", userPermission.getPermissionName(), userPermission.getPath());
-
             // 2.3 开始匹配
-            if (matcher.match(userPermission.getPath(), path)
-                    && userPermission.getMethod().equalsIgnoreCase(method)) {
+            if (matcher.match(path, requestPath) && method.equalsIgnoreCase(requestMethod)) {
+                log.info("权限匹配成功，userId={}, permissionName={}, path={}, method={}", userId, permissionName, path, method);
                 return true;
             }
+
+            log.debug("权限未匹配，permissionName={}, path={}, method={}", permissionName, path, method);
         }
+
+        // 3. 最终未匹配
+        log.warn("权限校验失败，userId={}, path={}, method={}",
+                userId, requestPath, requestMethod);
         return false;
     }
 
+    /**
+     * 判断是否是超级管理员，为 hasPermission() 服务
+     * @param userId
+     * @return
+     */
+    private boolean isSuperAdmin(Long userId) {
+        return userRoleService.userHasRole(userId, RoleNameConstant.SUPER_ADMIN);
+    }
+
+    /**
+     * 调用 mapper 的更新方法，同时进行乐观锁判断
+     * @param user
+     */
     public void doUpdate(User user) {
         int result = userMapper.update(user);
         if (result != 1) {

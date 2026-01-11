@@ -3,8 +3,7 @@ package com.ymjrhk.rbac.mapper;
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.vo.UserPermissionVO;
-import org.apache.ibatis.annotations.Insert;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -66,6 +65,6 @@ public interface UserMapper {
      * @param userId
      * @return
      */
-    List<UserPermissionVO> selectPermissionsByUserId(Long userId);
+    List<PermissionVO> selectPermissionsByUserId(Long userId);
 
 }

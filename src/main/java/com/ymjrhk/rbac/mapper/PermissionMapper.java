@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.mapper;
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
 import com.ymjrhk.rbac.entity.Permission;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -44,4 +45,12 @@ public interface PermissionMapper {
      * @return
      */
     List<Long> selectExistingPermissionIds(List<Long> permissionIds);
+
+    /**
+     * 查询 sys_permission 表中所有未禁用的权限
+     * @return
+     */
+    @Select("select permission_id, permission_name, permission_display_name, description, status, type, parent_id, path, method, sort " +
+            "from sys_permission where status = 1 and type = 2")
+    List<PermissionVO> listAllActivePermissions();
 }

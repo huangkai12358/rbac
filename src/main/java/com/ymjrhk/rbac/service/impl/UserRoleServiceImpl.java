@@ -8,7 +8,7 @@ import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
 import com.ymjrhk.rbac.service.UserRoleService;
-import com.ymjrhk.rbac.vo.UserRoleVO;
+import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,11 +74,12 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     /**
      * 查询用户角色
+     *
      * @param userId
      * @return
      */
     @Override
-    public List<UserRoleVO> getUserRoles(Long userId) {
+    public List<RoleVO> getUserRoles(Long userId) {
         // 1. 查 userId 是否存在
         User user = userMapper.getByUserId(userId);
         if (user == null) {
@@ -87,5 +88,17 @@ public class UserRoleServiceImpl implements UserRoleService {
 
         // 2. 查 userId 对应的角色
         return userRoleMapper.selectRolesByUserId(userId);
+    }
+
+    /**
+     * 查用户是否拥有某角色
+     * @param userId
+     * @param roleName
+     * @return
+     */
+    @Override
+    public boolean userHasRole(Long userId, String roleName) {
+        // 暂时不用查 userId 和 roleName 是否存在，调用它的函数后面部分查了，且不存在也没关系
+        return userRoleMapper.userHasRole(userId, roleName) == 1;
     }
 }

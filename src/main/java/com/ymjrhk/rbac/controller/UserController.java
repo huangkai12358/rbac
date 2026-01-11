@@ -4,7 +4,7 @@ import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserService;
-import com.ymjrhk.rbac.vo.UserPermissionVO;
+import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +43,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/page")
-    @Operation(summary = "用户分页查询") // TODO: 目前策略是前端不传pageNum和pageSize会报错
+    @Operation(summary = "用户分页查询")
     public Result<PageResult> pageQuery(UserPageQueryDTO userPageQueryDTO) {
         log.info("用户分页查询，参数为：{}", userPageQueryDTO);
         PageResult pageResult = userService.pageQuery(userPageQueryDTO);
@@ -103,9 +103,9 @@ public class UserController {
 
     @GetMapping("/{userId}/permissions")
     @Operation(summary = "查询用户权限（非禁用）")
-    public Result<List<UserPermissionVO>> getUserPermissions(@PathVariable("userId") Long userId) {
+    public Result<List<PermissionVO>> getUserPermissions(@PathVariable("userId") Long userId) {
         log.info("查询用户权限，userId: {}", userId);
-        List<UserPermissionVO> permissions = userService.getUserPermissions(userId);
+        List<PermissionVO> permissions = userService.getUserPermissions(userId);
         return Result.success(permissions);
     }
 }

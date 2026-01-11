@@ -56,7 +56,7 @@
             and secret_token = #{secretToken}
     </update>
 
-    <select id="selectPermissionsByUserId" resultType="com.ymjrhk.rbac.vo.UserPermissionVO">
+    <select id="selectPermissionsByUserId" resultType="com.ymjrhk.rbac.vo.PermissionVO">
         select p.permission_id,
                p.permission_name,
                p.permission_display_name,

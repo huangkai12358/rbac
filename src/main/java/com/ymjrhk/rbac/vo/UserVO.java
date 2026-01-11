@@ -1,11 +1,9 @@
 package com.ymjrhk.rbac.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @Schema(description = "用户查询返回参数")
 public class UserVO {
     private Long userId;
