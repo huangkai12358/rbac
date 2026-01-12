@@ -99,6 +99,6 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Override
     public boolean userHasRole(Long userId, String roleName) {
         // 暂时不用查 userId 和 roleName 是否存在，调用它的函数后面部分查了，且不存在也没关系
-        return userRoleMapper.userHasRole(userId, roleName) == 1;
+        return userRoleMapper.userHasRole(userId, roleName);
     }
 }

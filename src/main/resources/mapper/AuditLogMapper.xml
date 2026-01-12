@@ -2,30 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ymjrhk.rbac.mapper.AuditLogMapper">
-
-<!--    <insert id="insert">-->
-<!--        insert into sys_audit-->
-<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
-<!--            audit_name,-->
-<!--            audit_display_name,-->
-<!--            <if test="description != null">description,</if>-->
-<!--            <if test="status != null">status,</if>-->
-<!--            secret_token,-->
-<!--            create_user_id,-->
-<!--            update_user_id,-->
-<!--        </trim>-->
-<!--        values-->
-<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
-<!--            #{auditName},-->
-<!--            #{auditDisplayName},-->
-<!--            <if test="description != null">#{description},</if>-->
-<!--            <if test="status != null">#{status},</if>-->
-<!--            #{secretToken},-->
-<!--            #{createUserId},-->
-<!--            #{updateUserId},-->
-<!--        </trim>-->
-<!--    </insert>-->
-
     <select id="pageQuery" resultType="com.ymjrhk.rbac.vo.AuditLogVO">
         select log_seq,
                username,
@@ -61,5 +37,31 @@
         </where>
         order by create_time desc
     </select>
+
+    <insert id="insert" parameterType="AuditLog">
+        insert into sys_audit_log (
+            user_id,
+            username,
+            permission_id,
+            permission_name,
+            path,
+            method,
+            request_body,
+            ip,
+            success,
+            error_message
+        ) values (
+            #{userId},
+            #{username},
+            #{permissionId},
+            #{permissionName},
+            #{path},
+            #{method},
+            #{requestBody},
+            #{ip},
+            #{success},
+            #{errorMessage}
+        )
+    </insert>
 
 </mapper>

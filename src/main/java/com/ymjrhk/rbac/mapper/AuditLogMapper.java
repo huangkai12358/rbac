@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.mapper;
 
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.AuditLogRealPageQueryDTO;
+import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.vo.AuditLogVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,4 +14,11 @@ public interface AuditLogMapper {
      * @return
      */
     Page<AuditLogVO> pageQuery(AuditLogRealPageQueryDTO auditLogRealPageQueryDTO);
+
+    /**
+     * 插入审计日志
+     * @param auditLog
+     * @return
+     */
+    int insert(AuditLog auditLog);
 }

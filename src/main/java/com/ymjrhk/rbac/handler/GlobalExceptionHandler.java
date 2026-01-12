@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     public Result<Void> handleBusiness(BaseException ex){
-        log.error("业务异常：{}", ex.getMessage());
+        log.warn("业务异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
@@ -115,7 +115,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<Void> handleAll(Exception ex) {
-        log.error("系统异常", ex);
+        log.warn("系统异常", ex);
         return Result.error("系统繁忙，请稍后再试");
     }
 }

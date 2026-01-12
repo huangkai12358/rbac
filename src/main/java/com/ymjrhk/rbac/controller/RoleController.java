@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
+import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -25,6 +28,7 @@ public class RoleController {
      * @param roleCreateDTO
      * @return
      */
+    @Audit(permission = ROLE_CREATE)
     @PostMapping
     @Operation(summary = "创建角色")
     public Result<Void> createRole(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
@@ -38,6 +42,7 @@ public class RoleController {
      * @param rolePageQueryDTO
      * @return
      */
+    @Audit(permission = ROLE_VIEW)
     @GetMapping("/page")
     @Operation(summary = "角色分页查询")
     public Result<PageResult> pageQuery(RolePageQueryDTO rolePageQueryDTO) {
@@ -51,6 +56,7 @@ public class RoleController {
      * @param roleId
      * @return
      */
+    @Audit(permission = ROLE_VIEW)
     @GetMapping("/{roleId}")
     @Operation(summary = "根据 roleId 查询角色")
     public Result<RoleVO> queryRoleById(@PathVariable("roleId") Long roleId) {
@@ -64,6 +70,7 @@ public class RoleController {
      * @param roleDTO
      * @return
      */
+    @Audit(permission = ROLE_UPDATE)
     @PutMapping("/{roleId}")
     @Operation(summary = "修改角色")
     public Result<Void> updateRole(@PathVariable Long roleId, @RequestBody RoleDTO roleDTO) {
@@ -78,6 +85,7 @@ public class RoleController {
      * @param statusDTO
      * @return
      */
+    @Audit(permission = ROLE_STATUS)
     @PutMapping("/{roleId}/status")
     @Operation(summary = "启用或禁用角色")
     public Result<Void> changeStatus(@PathVariable("roleId") Long roleId, @RequestBody StatusDTO statusDTO) {

@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
+import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserRoleService;
@@ -12,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +31,7 @@ public class UserRoleController {
      * @param roleIdsDTO
      * @return
      */
+    @Audit(permission = USER_ASSIGN)
     @PostMapping("/{userId}/roles")
     @Operation(summary = "用户分配角色")
     public Result<Void> assignRolesToUser(@PathVariable("userId") Long userId, @RequestBody @Valid IdsDTO roleIdsDTO) {
@@ -36,6 +40,12 @@ public class UserRoleController {
         return Result.success();
     }
 
+    /**
+     * 查询用户角色
+     * @param userId
+     * @return
+     */
+    @Audit(permission = USER_VIEW)
     @GetMapping("/{userId}/roles")
     @Operation(summary = "查询用户角色")
     public Result<List<RoleVO>> getUserRoles(@PathVariable("userId") Long userId) {

@@ -1,11 +1,13 @@
 package com.ymjrhk.rbac.interceptor;
 
 import com.ymjrhk.rbac.constant.JwtClaimsConstant;
+import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.context.LoginUser;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.exception.AccessDeniedException;
 import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.properties.JwtProperties;
+import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -16,9 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import java.nio.charset.StandardCharsets;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.AccessDenied;
 import static com.ymjrhk.rbac.constant.MessageConstant.USER_NOT_LOGIN;
+import static com.ymjrhk.rbac.utils.IpUtil.getClientIp;
 
 /**
  * jwt令牌校验的拦截器
@@ -32,6 +38,8 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
     private final UserService userService;
 
+    private final AuditLogService auditLogService;
+
     /**
      * 校验jwt
      *
@@ -43,6 +51,9 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        log.info("拦截器开始运行...");
+
         // 1. 非 Controller 请求直接放行
         // 判断当前拦截到的是 Controller 的方法还是其他资源
         if (!(handler instanceof HandlerMethod)) {
@@ -73,6 +84,19 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             boolean allowed = userService.hasPermission(userId, request.getRequestURI(), request.getMethod());
 
             if (!allowed) {
+                log.warn("未授权访问，将保存到审计日志表中...");
+
+                auditLogService.saveForbiddenLog(
+                        UserContext.getCurrentUserId(),
+                        UserContext.getCurrentUsername(),
+                        request.getRequestURI(),
+                        request.getMethod(),
+                        getRequestBody(request),
+                        getClientIp(request),
+                        SuccessConstant.FAIL,
+                        AccessDenied
+                        );
+
                 throw new AccessDeniedException(AccessDenied);
             }
 
@@ -81,11 +105,12 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
         } catch (UserNotLoginException | AccessDeniedException e) {
             throw e;
         } catch (Exception e) {
-            log.error("JWT 校验失败", e);
+            log.warn("JWT 校验失败", e);
             throw new UserNotLoginException(USER_NOT_LOGIN);
         }
 
 //            // 4、不通过，响应 401 状态码
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //            response.setStatus(401);
 //            return false;
     }
@@ -94,5 +119,22 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         // 移除用户
         UserContext.clear();
+    }
+
+    /**
+     * 工具方法，在拦截器里安全获取请求体
+     * @param request
+     * @return
+     */
+    private String getRequestBody(HttpServletRequest request) {
+
+        if (request instanceof ContentCachingRequestWrapper wrapper) {
+            byte[] body = wrapper.getContentAsByteArray();
+            if (body.length == 0) {
+                return null;
+            }
+            return new String(body, StandardCharsets.UTF_8);
+        }
+        return null;
     }
 }

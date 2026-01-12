@@ -20,10 +20,13 @@
         where ur.user_id = #{userId}
     </select>
 
-    <select id="userHasRole" resultType="java.lang.Integer">
-        select count(1)
-        from sys_user_role ur
-        join  sys_role r on ur.role_id = r.role_id
-        where ur.user_id = #{userId} and r.role_name = #{roleName}
+    <select id="userHasRole" resultType="boolean">
+        select exists (
+            select 1
+            from sys_user_role ur
+                     join sys_role r on ur.role_id = r.role_id
+            where ur.user_id = #{userId}
+              and r.role_name = #{roleName}
+        )
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
+import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.PermissionCreateDTO;
 import com.ymjrhk.rbac.dto.PermissionDTO;
 import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
+
 @RestController
 @RequestMapping("/api/permissions")
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class PermissionController {
      * @param permissionCreateDTO
      * @return
      */
+    @Audit(permission = PERMISSION_CREATE)
     @PostMapping
     @Operation(summary = "创建权限")
     public Result<Void> createPermission(@RequestBody @Valid PermissionCreateDTO permissionCreateDTO) {
@@ -41,6 +45,7 @@ public class PermissionController {
      * @param permissionPageQueryDTO
      * @return
      */
+    @Audit(permission = PERMISSION_VIEW)
     @GetMapping("/page")
     @Operation(summary = "权限分页查询")
     public Result<PageResult> pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
@@ -54,6 +59,7 @@ public class PermissionController {
      * @param permissionId
      * @return
      */
+    @Audit(permission = PERMISSION_VIEW)
     @GetMapping("/{permissionId}")
     @Operation(summary = "根据 permissionId 查询权限")
     public Result<PermissionVO> queryPermissionById(@PathVariable("permissionId") Long permissionId) {
@@ -67,6 +73,7 @@ public class PermissionController {
      * @param permissionDTO
      * @return
      */
+    @Audit(permission = PERMISSION_UPDATE)
     @PutMapping("/{permissionId}")
     @Operation(summary = "修改权限")
     public Result<Void> updatePermission(@PathVariable Long permissionId, @RequestBody PermissionDTO permissionDTO) {
@@ -81,6 +88,7 @@ public class PermissionController {
      * @param statusDTO
      * @return
      */
+    @Audit(permission = PERMISSION_STATUS)
     @PutMapping("/{permissionId}/status")
     @Operation(summary = "启用或禁用权限")
     public Result<Void> changeStatus(@PathVariable("permissionId") Long permissionId, @RequestBody StatusDTO statusDTO) {

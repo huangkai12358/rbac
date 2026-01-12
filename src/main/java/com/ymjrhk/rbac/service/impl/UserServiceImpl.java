@@ -299,8 +299,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             return true;
         }
 
-        // 1. 查询该用户拥有的所有接口权限
-        List<PermissionVO> permissions = getUserPermissions(userId);
+        // 1. 查询该用户拥有的所有接口权限（已确定不是超级管理员）
+        List<PermissionVO> permissions = getOrdinaryUserPermissions(userId);
 
         if (CollectionUtils.isEmpty(permissions)) {
             log.warn("无任何权限，userId={}", userId);
@@ -347,7 +347,27 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     private boolean isSuperAdmin(Long userId) {
+        log.debug("查询用户是否是超级管理员...");
         return userRoleService.userHasRole(userId, RoleNameConstant.SUPER_ADMIN);
+    }
+
+    /**
+     * 查非超级管理员用户权限，只为 hasPermission() 方法服务
+     *
+     * @param userId
+     * @return
+     */
+    private List<PermissionVO> getOrdinaryUserPermissions(Long userId) {
+        // 1. 查 userId 是否存在
+        log.debug("查 userId 是否存在...");
+        User user = userMapper.getByUserId(userId);
+        if (user == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        // 2. 查 userId 对应的权限
+        log.debug("查 userId 对应的权限...");
+        return userMapper.selectPermissionsByUserId(userId);
     }
 
     /**

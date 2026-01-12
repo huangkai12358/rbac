@@ -37,5 +37,6 @@ public interface UserRoleMapper {
      * @param roleName
      * @return
      */
-    int userHasRole(Long userId, String roleName);
+    // 使用boolean代替int
+    boolean userHasRole(Long userId, String roleName);
 }

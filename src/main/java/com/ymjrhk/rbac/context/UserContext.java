@@ -16,6 +16,10 @@ public class UserContext {
         return TL.get() == null ? null : TL.get().getUserId();
     }
 
+    public static String getCurrentUsername() {
+        return TL.get() == null ? null : TL.get().getUsername();
+    }
+
     public static void clear() {
         TL.remove();
     }

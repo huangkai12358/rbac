@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
+import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class UserController {
      * @param userLoginDTO
      * @return
      */
+    @Audit(permission = USER_CREATE)
     @PostMapping
     @Operation(summary = "创建用户")
     public Result<Void> createUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
@@ -42,6 +46,7 @@ public class UserController {
      * @param userPageQueryDTO
      * @return
      */
+    @Audit(permission = USER_VIEW)
     @GetMapping("/page")
     @Operation(summary = "用户分页查询")
     public Result<PageResult> pageQuery(UserPageQueryDTO userPageQueryDTO) {
@@ -55,6 +60,7 @@ public class UserController {
      * @param userId
      * @return
      */
+    @Audit(permission = USER_VIEW)
     @GetMapping("/{userId}")
     @Operation(summary = "根据 userId 查询用户")
     public Result<UserVO> queryUserById(@PathVariable("userId") Long userId) {
@@ -63,11 +69,26 @@ public class UserController {
     }
 
     /**
+     * 启用或禁用用户
+     * @param userId
+     * @param statusDTO
+     * @return
+     */
+    @Audit(permission = USER_STATUS)
+    @PutMapping("/{userId}/status")
+    @Operation(summary = "启用或禁用用户")
+    public Result<Void> changeStatus(@PathVariable("userId") Long userId, @RequestBody StatusDTO statusDTO) {
+        userService.changeStatus(userId, statusDTO.getStatus());
+        return Result.success();
+    }
+
+    /**
      * 修改用户
      * @param userId
      * @param userDTO
      * @return
      */
+    @Audit(permission = USER_UPDATE)
     @PutMapping("/{userId}")
     @Operation(summary = "修改用户")
     public Result<Void> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
@@ -77,23 +98,11 @@ public class UserController {
     }
 
     /**
-     * 启用或禁用用户
-     * @param userId
-     * @param statusDTO
-     * @return
-     */
-    @PutMapping("/{userId}/status")
-    @Operation(summary = "启用或禁用用户")
-    public Result<Void> changeStatus(@PathVariable("userId") Long userId, @RequestBody StatusDTO statusDTO) {
-        userService.changeStatus(userId, statusDTO.getStatus());
-        return Result.success();
-    }
-
-    /**
      * 重置用户密码
      * @param userId
      * @return
      */
+    @Audit(permission = USER_PASSWORD_RESET)
     @PostMapping("/{userId}/password/reset")
     @Operation(summary = "重置用户密码")
     public Result<Void> resetPassward(@PathVariable("userId") Long userId) {
@@ -101,6 +110,12 @@ public class UserController {
         return Result.success();
     }
 
+    /**
+     * 查询用户权限（非禁用）// TODO: user status要不要为1
+     * @param userId
+     * @return
+     */
+    @Audit(permission = USER_VIEW)
     @GetMapping("/{userId}/permissions")
     @Operation(summary = "查询用户权限（非禁用）")
     public Result<List<PermissionVO>> getUserPermissions(@PathVariable("userId") Long userId) {

@@ -50,6 +50,7 @@ public interface UserMapper {
      * @param user
      */
     // TODO: 把update分成几个
+    // TODO：修改用户不会导致auth_version+1，修改密码才会
     int update(User user);
 
     /**
