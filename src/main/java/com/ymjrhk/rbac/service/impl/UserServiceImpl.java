@@ -374,7 +374,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      * 调用 mapper 的更新方法，同时进行乐观锁判断
      * @param user
      */
-    public void doUpdate(User user) {
+    private void doUpdate(User user) {
         int result = userMapper.update(user);
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试

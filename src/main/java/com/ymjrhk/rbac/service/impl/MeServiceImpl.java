@@ -1,0 +1,150 @@
+package com.ymjrhk.rbac.service.impl;
+
+import com.ymjrhk.rbac.constant.MessageConstant;
+import com.ymjrhk.rbac.constant.OperateTypeConstant;
+import com.ymjrhk.rbac.constant.StatusConstant;
+import com.ymjrhk.rbac.context.UserContext;
+import com.ymjrhk.rbac.dto.MePasswordUpdateDTO;
+import com.ymjrhk.rbac.dto.MeUpdateDTO;
+import com.ymjrhk.rbac.entity.User;
+import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.mapper.MeMapper;
+import com.ymjrhk.rbac.mapper.UserMapper;
+import com.ymjrhk.rbac.service.MeService;
+import com.ymjrhk.rbac.service.UserHistoryService;
+import com.ymjrhk.rbac.vo.MeViewVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.UUID;
+
+import static com.ymjrhk.rbac.constant.MessageConstant.*;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
+
+@Service
+@RequiredArgsConstructor
+public class MeServiceImpl implements MeService {
+    private final MeMapper meMapper;
+
+    private final UserMapper userMapper;
+
+    private final UserHistoryService userHistoryService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * 查询个人信息
+     * @return
+     */
+    @Override
+    public MeViewVO query() {
+        Long userId = UserContext.getCurrentUserId();
+
+        MeViewVO meViewVO = meMapper.getByUserId(userId);
+
+        // 如果 userId 不存在
+        if (meViewVO == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        return meViewVO;
+    }
+
+    /**
+     * 修改个人信息
+     * @param meUpdateDTO
+     */
+    @Override
+    public void update(MeUpdateDTO meUpdateDTO) {
+        Long userId = UserContext.getCurrentUserId();
+
+        User dbUser = userMapper.getByUserId(userId);
+
+        // 用户不存在
+        if (dbUser == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        // 用户被禁用，不能修改
+        if (Objects.equals(dbUser.getStatus(), DISABLE)) {
+            throw new UserForbiddenException(USER_FORBIDDEN);
+        }
+
+        User user = new User();
+        user.setUserId(userId);
+        user.setNickname(meUpdateDTO.getNickname());
+        user.setEmail(meUpdateDTO.getEmail());
+
+        user.setVersion(dbUser.getVersion());
+        user.setSecretToken(dbUser.getSecretToken());
+        user.setNewSecretToken(UUID.randomUUID().toString());
+        user.setUpdateUserId(userId); // 当前用户在更新自己
+
+        int result = userMapper.update(user);
+        if (result != 1) {
+            throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
+        }
+
+        // 写到历史表
+        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+    }
+
+    /**
+     * 修改个人密码
+     * @param mePasswordUpdateDTO
+     */
+    @Override
+    public void changePassword(MePasswordUpdateDTO mePasswordUpdateDTO) {
+        Long userId = UserContext.getCurrentUserId();
+
+        String oldPassword = mePasswordUpdateDTO.getOldPassword();
+        String newPassword = mePasswordUpdateDTO.getNewPassword();
+
+        // 1. 根据 userId 查数据库中数据
+        User dbUser = userMapper.getByUserId(userId);
+
+        // 2. 处理各种异常情况（用户不存在、密码错误、账号被禁用）
+        // 2.1 如果用户不存在
+        if (dbUser == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+
+        // 2.2 如果密码错误
+        String peppered = oldPassword + "#" + dbUser.getUserId(); // 加 userId 作为 pepper
+        if (!passwordEncoder.matches(peppered, dbUser.getPassword())) {
+            throw new PasswordErrorException(PASSWORD_ERROR);
+        }
+
+        // 2.3 如果账号被禁用
+        if (Objects.equals(dbUser.getStatus(), StatusConstant.DISABLE)) {
+            throw new UserForbiddenException(MessageConstant.USER_FORBIDDEN);
+        }
+
+        // 3. 修改密码
+        User user = new User();
+        user.setUserId(userId);
+
+        // 设置新密码
+        user.setPassword(newPassword);
+
+        user.setVersion(dbUser.getVersion());
+        user.setSecretToken(dbUser.getSecretToken());
+        user.setNewSecretToken(UUID.randomUUID().toString());
+        user.setUpdateUserId(userId); // 当前用户在更新自己
+
+        // 获取登录版本号
+        // 用于触发 auth_version + 1（强制下线），通过 authVersion + 1 使已有 jwt 失效
+        Integer authVersion = dbUser.getAuthVersion();
+        user.setAuthVersion(authVersion);
+
+        int result = userMapper.update(user);
+        if (result != 1) {
+            throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
+        }
+
+        // 4. 写到历史表
+        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+    }
+}

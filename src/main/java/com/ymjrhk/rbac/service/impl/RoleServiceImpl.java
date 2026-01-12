@@ -174,7 +174,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      * 公共的调用 mapper 的 update() 方法
      * @param role
      */
-    public void doUpdate(Role role) {
+    private void doUpdate(Role role) {
         int result = roleMapper.update(role);
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试

@@ -173,7 +173,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      * 公共的调用 mapper 的 update() 方法
      * @param permission
      */
-    public void doUpdate(Permission permission) {
+    private void doUpdate(Permission permission) {
         int result = permissionMapper.update(permission);
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
