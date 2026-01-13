@@ -57,16 +57,16 @@
     </update>
 
     <select id="selectPermissionsByUserId" resultType="com.ymjrhk.rbac.vo.PermissionVO">
-        select p.permission_id,
-               p.permission_name,
-               p.permission_display_name,
-               p.description,
-               p.status,
-               p.type,
-               p.parent_id,
-               p.path,
-               p.method,
-               p.sort
+        select distinct p.permission_id,
+                        p.permission_name,
+                        p.permission_display_name,
+                        p.description,
+                        p.status,
+                        p.type,
+                        p.parent_id,
+                        p.path,
+                        p.method,
+                        p.sort
         from sys_user u
                  join sys_user_role ur on u.user_id = ur.user_id
                  join sys_role r on ur.role_id = r.role_id

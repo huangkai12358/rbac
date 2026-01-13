@@ -15,13 +15,14 @@ import com.ymjrhk.rbac.mapper.MeMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.MeService;
 import com.ymjrhk.rbac.service.UserHistoryService;
-import com.ymjrhk.rbac.vo.MeViewVO;
+import com.ymjrhk.rbac.vo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -49,12 +50,20 @@ public class MeServiceImpl implements MeService {
     public MeViewVO query() {
         Long userId = UserContext.getCurrentUserId();
 
+        // 1. 基本信息
         MeViewVO meViewVO = meMapper.getByUserId(userId);
-
-        // 如果 userId 不存在 // TODO: 要删吗
+        // 如果 userId 不存在（冗余设计，/me 是认证后接口，AuthInterceptor 已经校验，可删）
         if (meViewVO == null) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
+
+        // 2. 角色
+        List<MeRoleVO> roles = meMapper.selectRolesByUserId(userId);
+        meViewVO.setRoles(roles);
+
+        // 3. 权限
+        List<MePermissionVO> permissions = meMapper.selectPermissionsByUserId(userId);
+        meViewVO.setPermissions(permissions);
 
         return meViewVO;
     }

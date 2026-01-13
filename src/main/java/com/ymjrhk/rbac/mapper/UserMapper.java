@@ -69,7 +69,7 @@ public interface UserMapper {
     int updateForCreateUser(User user);
 
     /**
-     * 根据 userId 查询用户权限
+     * 根据 userId 查询用户权限（user, role, permission status 都不能为 0）
      *
      * @param userId
      * @return
