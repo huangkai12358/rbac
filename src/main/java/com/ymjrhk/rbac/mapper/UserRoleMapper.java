@@ -12,6 +12,7 @@ public interface UserRoleMapper {
 
     /**
      * 根据 userId 从 sys_user_role 表中删除数据
+     *
      * @param userId
      */
     @Delete("delete from sys_user_role where user_id = #{userId}")
@@ -19,6 +20,7 @@ public interface UserRoleMapper {
 
     /**
      * 插入关系数据
+     *
      * @param relations
      * @return
      */
@@ -26,6 +28,7 @@ public interface UserRoleMapper {
 
     /**
      * 根据 userId 查询用户角色
+     *
      * @param userId
      * @return
      */
@@ -33,6 +36,7 @@ public interface UserRoleMapper {
 
     /**
      * 根据 userId 查是否拥有角色 roleName
+     *
      * @param userId
      * @param roleName
      * @return

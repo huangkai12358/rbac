@@ -12,6 +12,7 @@ public interface RolePermissionMapper {
 
     /**
      * 根据 roleId 从 sys_role_permission 表中删除数据
+     *
      * @param roleId
      */
     @Delete("delete from sys_role_permission where role_id = #{roleId}")
@@ -19,6 +20,7 @@ public interface RolePermissionMapper {
 
     /**
      * 插入关系数据
+     *
      * @param relations
      * @return
      */
@@ -26,6 +28,7 @@ public interface RolePermissionMapper {
 
     /**
      * 根据 roleId 查询角色权限
+     *
      * @param roleId
      * @return
      */

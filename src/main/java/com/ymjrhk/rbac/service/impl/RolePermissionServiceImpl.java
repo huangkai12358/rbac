@@ -41,14 +41,14 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         // 1. 校验角色是否存在
         Role dbRole = roleMapper.getByRoleId(roleId);
         if (dbRole == null) { // 角色不存在
-            throw new RoleNotExistException(USER_NOT_EXIST);
+            throw new RoleNotExistException(ROLE_NOT_EXIST);
         }
 
         // 2. 校验权限是否存在
         if (permissionIds != null && !permissionIds.isEmpty()) {
             List<Long> existPermissionIds = permissionMapper.selectExistingPermissionIds(permissionIds);
             if (existPermissionIds.size() != permissionIds.size()) { // 有某个权限不存在
-                throw new PermissionNotExistException(ROLE_NOT_EXIST);
+                throw new PermissionNotExistException(PERMISSION_NOT_EXIST);
             }
         }
 
@@ -69,10 +69,10 @@ public class RolePermissionServiceImpl implements RolePermissionService {
                                                       .toList();
         int result = rolePermissionMapper.batchInsert(relations);
         if (result == 0) { // 分配权限失败
-            throw new AssignmentPermissionFailedException(ASSIGNMENT_ROLE_FAILED);
+            throw new AssignmentPermissionFailedException(ASSIGNMENT_PERMISSION_FAILED);
         }
 
-        // TODO: 5. 可选：写审计日志
+        // 5. 写审计日志（通过 AOP）
     }
 
     /**
@@ -86,7 +86,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         // 1. 查 roleId 是否存在
         Role role = roleMapper.getByRoleId(roleId);
         if (role == null) {
-            throw new RoleNotExistException(USER_NOT_EXIST);
+            throw new RoleNotExistException(ROLE_NOT_EXIST);
         }
 
         // 2. 是否是超级管理员

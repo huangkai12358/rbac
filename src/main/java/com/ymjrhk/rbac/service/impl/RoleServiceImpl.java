@@ -5,9 +5,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
-import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.dto.RoleCreateDTO;
+import com.ymjrhk.rbac.dto.RoleDTO;
+import com.ymjrhk.rbac.dto.RolePageQueryDTO;
 import com.ymjrhk.rbac.entity.Role;
-import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.exception.RoleCreateFailedException;
+import com.ymjrhk.rbac.exception.RoleForbiddenException;
+import com.ymjrhk.rbac.exception.RoleNotExistException;
+import com.ymjrhk.rbac.exception.UpdateFailedException;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.RoleHistoryService;
@@ -15,6 +20,7 @@ import com.ymjrhk.rbac.service.RoleService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +33,7 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoleServiceImpl extends BaseService implements RoleService {
     private final RoleMapper roleMapper;
 
@@ -34,11 +41,12 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     /**
      * 创建角色
+     *
      * @param roleCreateDTO
      */
     @Override
     @Transactional
-    public void create(RoleCreateDTO roleCreateDTO) {
+    public Long create(RoleCreateDTO roleCreateDTO) {
         Role role = BeanUtil.copyProperties(roleCreateDTO, Role.class);
 
         String secretToken = UUID.randomUUID().toString();
@@ -58,11 +66,12 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         // 写到历史表
         roleHistoryService.record(role.getRoleId(), OperateTypeConstant.CREATE);
 
-        // TODO:写审计表
+        return role.getRoleId();
     }
 
     /**
      * 角色分页查询
+     *
      * @param rolePageQueryDTO
      * @return
      */
@@ -85,6 +94,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     /**
      * 根据 roleId 查询角色
+     *
      * @param roleId
      * @return
      */
@@ -102,12 +112,14 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     /**
      * 修改角色
+     *
      * @param roleId
      * @param roleDTO
      */
     @Override
     @Transactional
     public void update(Long roleId, RoleDTO roleDTO) {
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Role dbRole = roleMapper.getByRoleId(roleId);
 
         // 角色不存在
@@ -137,12 +149,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         // 写到历史表
         roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
      * 启用或禁用角色
+     *
      * @param roleId
      * @param status
      */
@@ -150,6 +161,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     @Transactional
     public void changeStatus(Long roleId, Integer status) {
         // 1. 查数据库
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Role dbRole = roleMapper.getByRoleId(roleId);
         if (dbRole == null) { // 角色不存在
             throw new RoleNotExistException(ROLE_NOT_EXIST);
@@ -166,12 +178,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         // 5. 写到历史表
         roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
      * 公共的调用 mapper 的 update() 方法
+     *
      * @param role
      */
     private void doUpdate(Role role) {

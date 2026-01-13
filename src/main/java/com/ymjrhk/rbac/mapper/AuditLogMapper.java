@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AuditLogMapper {
     /**
      * 审计日志分页查询
+     *
      * @param auditLogRealPageQueryDTO
      * @return
      */
@@ -17,6 +18,7 @@ public interface AuditLogMapper {
 
     /**
      * 插入审计日志
+     *
      * @param auditLog
      * @return
      */

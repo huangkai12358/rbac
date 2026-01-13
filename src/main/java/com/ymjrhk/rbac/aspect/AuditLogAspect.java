@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -67,12 +66,12 @@ public class AuditLogAspect {
         Object[] args = Arrays.stream(joinPoint.getArgs())
                               .filter(arg ->
                                       !(arg instanceof HttpServletRequest) &&
-                                      !(arg instanceof HttpServletResponse) &&
-                                      !(arg instanceof MultipartFile)
+                                              !(arg instanceof HttpServletResponse) &&
+                                              !(arg instanceof MultipartFile)
                               )
                               .toArray();
 
-        auditLog.setRequestBody(JSON.toJSONString(args));
+        auditLog.setRequestBody(serializeArgsSafely(args));
 
         try {
             Object result = joinPoint.proceed();
@@ -97,4 +96,36 @@ public class AuditLogAspect {
             log.info("AOP 审计日志表结束接管...");
         }
     }
+
+    /**
+     * 定义敏感字段名单
+     */
+    private static final String[] SENSITIVE_FIELDS = {
+            "password",
+            "oldPassword",
+            "newPassword",
+            "confirmPassword"
+    };
+
+    /**
+     * 隐藏掉密码字段
+     *
+     * @param args
+     * @return
+     */
+    private String serializeArgsSafely(Object[] args) {
+        try {
+            String json = JSON.toJSONString(args);
+            for (String field : SENSITIVE_FIELDS) {
+                json = json.replaceAll(
+                        "(\"" + field + "\"\\s*:\\s*\")[^\"]*\"",
+                        "$1******\""
+                );
+            }
+            return json;
+        } catch (Exception e) {
+            return "[unserializable]";
+        }
+    }
+
 }

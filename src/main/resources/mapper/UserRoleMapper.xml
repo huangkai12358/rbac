@@ -16,17 +16,15 @@
                r.description,
                r.status
         from sys_user_role ur
-        join  sys_role r on ur.role_id = r.role_id
+                 join sys_role r on ur.role_id = r.role_id
         where ur.user_id = #{userId}
     </select>
 
     <select id="userHasRole" resultType="boolean">
-        select exists (
-            select 1
-            from sys_user_role ur
-                     join sys_role r on ur.role_id = r.role_id
-            where ur.user_id = #{userId}
-              and r.role_name = #{roleName}
-        )
+        select exists (select 1
+                       from sys_user_role ur
+                                join sys_role r on ur.role_id = r.role_id
+                       where ur.user_id = #{userId}
+                         and r.role_name = #{roleName})
     </select>
 </mapper>

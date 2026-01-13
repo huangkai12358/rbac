@@ -7,15 +7,20 @@ import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.MePasswordUpdateDTO;
 import com.ymjrhk.rbac.dto.MeUpdateDTO;
 import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.exception.PasswordErrorException;
+import com.ymjrhk.rbac.exception.UpdateFailedException;
+import com.ymjrhk.rbac.exception.UserForbiddenException;
+import com.ymjrhk.rbac.exception.UserNotExistException;
 import com.ymjrhk.rbac.mapper.MeMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.MeService;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.vo.MeViewVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -25,6 +30,7 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MeServiceImpl implements MeService {
     private final MeMapper meMapper;
 
@@ -36,6 +42,7 @@ public class MeServiceImpl implements MeService {
 
     /**
      * 查询个人信息
+     *
      * @return
      */
     @Override
@@ -44,7 +51,7 @@ public class MeServiceImpl implements MeService {
 
         MeViewVO meViewVO = meMapper.getByUserId(userId);
 
-        // 如果 userId 不存在
+        // 如果 userId 不存在 // TODO: 要删吗
         if (meViewVO == null) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
@@ -54,9 +61,11 @@ public class MeServiceImpl implements MeService {
 
     /**
      * 修改个人信息
+     *
      * @param meUpdateDTO
      */
     @Override
+    @Transactional
     public void update(MeUpdateDTO meUpdateDTO) {
         Long userId = UserContext.getCurrentUserId();
 
@@ -93,9 +102,11 @@ public class MeServiceImpl implements MeService {
 
     /**
      * 修改个人密码
+     *
      * @param mePasswordUpdateDTO
      */
     @Override
+    @Transactional
     public void changePassword(MePasswordUpdateDTO mePasswordUpdateDTO) {
         Long userId = UserContext.getCurrentUserId();
 
@@ -112,7 +123,7 @@ public class MeServiceImpl implements MeService {
         }
 
         // 2.2 如果密码错误
-        String peppered = oldPassword + "#" + dbUser.getUserId(); // 加 userId 作为 pepper
+        String peppered = oldPassword + "#" + userId;
         if (!passwordEncoder.matches(peppered, dbUser.getPassword())) {
             throw new PasswordErrorException(PASSWORD_ERROR);
         }
@@ -127,14 +138,16 @@ public class MeServiceImpl implements MeService {
         user.setUserId(userId);
 
         // 设置新密码
-        user.setPassword(newPassword);
+        peppered = newPassword + "#" + userId;
+        String encodedPassword = passwordEncoder.encode(peppered);
+        user.setPassword(encodedPassword);
 
         user.setVersion(dbUser.getVersion());
         user.setSecretToken(dbUser.getSecretToken());
         user.setNewSecretToken(UUID.randomUUID().toString());
         user.setUpdateUserId(userId); // 当前用户在更新自己
 
-        // 获取登录版本号
+        // 获取登录版本号（其实这里随便填什么，只要不为 null 就可以触发 xml 中 auth_version + 1）
         // 用于触发 auth_version + 1（强制下线），通过 authVersion + 1 使已有 jwt 失效
         Integer authVersion = dbUser.getAuthVersion();
         user.setAuthVersion(authVersion);

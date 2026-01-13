@@ -3,19 +3,23 @@ package com.ymjrhk.rbac.service.impl;
 import com.ymjrhk.rbac.constant.JwtClaimsConstant;
 import com.ymjrhk.rbac.constant.MessageConstant;
 import com.ymjrhk.rbac.constant.StatusConstant;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.exception.UserForbiddenException;
 import com.ymjrhk.rbac.exception.AccountOrPasswordErrorException;
+import com.ymjrhk.rbac.exception.UserForbiddenException;
+import com.ymjrhk.rbac.exception.UserNotLoginException;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.properties.JwtProperties;
 import com.ymjrhk.rbac.service.AuthService;
+import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.utils.JwtUtil;
 import com.ymjrhk.rbac.vo.UserLoginVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +35,16 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtProperties jwtProperties;
 
+    private final UserService userService;
+
+    /**
+     * 用户登录
+     *
+     * @param userLoginDTO
+     * @return
+     */
     @Override
+    @Transactional
     public UserLoginVO login(UserLoginDTO userLoginDTO) {
         String username = userLoginDTO.getUsername();
         String password = userLoginDTO.getPassword();
@@ -68,10 +81,29 @@ public class AuthServiceImpl implements AuthService {
 
         // 4. 返回 UserLoginVO
         return UserLoginVO.builder()
-                .userId(user.getUserId())
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .token(token) // JWT 放到 token 中
-                .build();
+                          .userId(user.getUserId())
+                          .username(user.getUsername())
+                          .nickname(user.getNickname())
+                          .token(token) // JWT 放到 token 中
+                          .build();
+    }
+
+    /**
+     * 用户登出
+     */
+    @Override
+    @Transactional
+    public void logout() {
+        Long userId = UserContext.getCurrentUserId();
+        if (userId == null) {
+            // 理论上不会发生，兜底
+            throw new UserNotLoginException(MessageConstant.USER_NOT_LOGIN);
+        }
+
+        // authVersion + 1
+        // 不涉及其他字段修改，所以暂不考虑并发乐观锁字段，不用 update() 函数
+        userService.incrementAuthVersion(userId);
+
+        // TODO：写历史表
     }
 }

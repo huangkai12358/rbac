@@ -27,6 +27,6 @@ public class AuditLogVO {
 
     private String errorMessage;
 
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // 已经扩展了全局消息转换器，所以不需要这个注解了
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // 已经扩展了全局消息转换器，所以不需要这个注解了
     private LocalDateTime createTime;
 }

@@ -1,12 +1,8 @@
 package com.ymjrhk.rbac;
 
-import com.ymjrhk.rbac.controller.AuthController;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
-import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.AuthService;
 import com.ymjrhk.rbac.vo.UserLoginVO;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

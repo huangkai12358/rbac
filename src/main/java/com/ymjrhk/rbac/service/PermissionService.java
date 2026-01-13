@@ -5,11 +5,10 @@ import com.ymjrhk.rbac.dto.PermissionDTO;
 import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.vo.PermissionVO;
-import jakarta.validation.Valid;
 
 public interface PermissionService {
 
-    void create(@Valid PermissionCreateDTO permissionCreateDTO);
+    Long create(PermissionCreateDTO permissionCreateDTO);
 
     PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO);
 

@@ -1,9 +1,5 @@
 package com.ymjrhk.rbac;
 
-import com.ymjrhk.rbac.controller.RoleController;
-import com.ymjrhk.rbac.dto.RoleCreateDTO;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest

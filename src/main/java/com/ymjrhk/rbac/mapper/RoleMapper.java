@@ -12,12 +12,14 @@ import java.util.List;
 public interface RoleMapper {
     /**
      * 创建角色
+     *
      * @param role
      */
     int insert(Role role);
 
     /**
      * 角色分页查询
+     *
      * @param rolePageQueryDTO
      * @return
      */
@@ -25,6 +27,7 @@ public interface RoleMapper {
 
     /**
      * 根据 roleId 查询角色
+     *
      * @param roleId
      * @return
      */
@@ -33,6 +36,7 @@ public interface RoleMapper {
 
     /**
      * 更新角色
+     *
      * @param role
      * @return
      */
@@ -40,6 +44,7 @@ public interface RoleMapper {
 
     /**
      * 选出在 sys_role 表中实际存在的 roleIds
+     *
      * @param roleIds
      * @return
      */

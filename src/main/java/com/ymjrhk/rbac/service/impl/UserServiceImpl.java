@@ -6,18 +6,22 @@ import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.PermissionTypeConstant;
 import com.ymjrhk.rbac.constant.RoleNameConstant;
+import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
+import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.exception.UpdateFailedException;
+import com.ymjrhk.rbac.exception.UserCreateFailedException;
+import com.ymjrhk.rbac.exception.UserForbiddenException;
+import com.ymjrhk.rbac.exception.UserNotExistException;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
-import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
@@ -60,7 +64,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional // create 是一个复合写操作（insert + update），必须在同一事务内
-    public void create(UserLoginDTO userLoginDTO) {
+    public Long create(UserLoginDTO userLoginDTO) {
         // 1. 构造用户（先不设 password）
         User insertUser = new User();
         insertUser.setUsername(userLoginDTO.getUsername());
@@ -96,6 +100,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 5. 写到历史表
         userHistoryService.record(newUserId, OperateTypeConstant.CREATE);
+
+        return newUserId;
     }
 
     /**
@@ -152,6 +158,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Transactional
     // 暂不更新 status
     public void update(Long userId, UserDTO userDTO) {
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         User dbUser = userMapper.getByUserId(userId);
 
         // 用户不存在
@@ -170,6 +177,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());
 
+        // 如果修改了 usename，则 auth_version + 1
+        if (userDTO.getUsername() != null) {
+            user.setAuthVersion(dbUser.getAuthVersion()); // 其实这里随便填什么，只要不为 null 就可以触发 xml 中 auth_version + 1
+        }
+
         Integer version = dbUser.getVersion(); // 获取版本号
         String secretToken = dbUser.getSecretToken(); // 获取旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
@@ -181,8 +193,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 写到历史表
         userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
@@ -195,6 +205,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Transactional
     public void changeStatus(Long userId, Integer status) {
         // 1. 查数据库
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         User dbUser = userMapper.getByUserId(userId);
         if (dbUser == null) { // 用户不存在
             throw new UserNotExistException(USER_NOT_EXIST);
@@ -207,13 +218,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 3. 调 BaseService 的模板方法
         changeStatus(dbUser, user, status);
 
-        // 4. 执行 update
+        // 4. 如果禁用用户，则 auth_version 应该加一
+        if (status == DISABLE) {
+            user.setAuthVersion(dbUser.getAuthVersion());
+        }
+
+        // 5. 执行 update
         doUpdate(user);
 
         // 写到历史表
         userHistoryService.record(userId, OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
@@ -224,6 +238,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public void resetPassword(Long userId) {
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         User dbUser = userMapper.getByUserId(userId);
 
         // 用户不存在
@@ -247,7 +262,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         fillOptimisticLockFields(user, version, secretToken, newSecretToken, updateUserId);
 
-        // 获取登录版本号
+        // 获取登录版本号（其实这里随便填什么，只要不为 null 就可以触发 xml 中 auth_version + 1）
         // 用于触发 auth_version + 1（强制下线），通过 authVersion + 1 使已有 jwt 失效
         Integer authVersion = dbUser.getAuthVersion();
         user.setAuthVersion(authVersion);
@@ -256,8 +271,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 写到历史表
         userHistoryService.record(userId, OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
@@ -291,8 +304,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @param requestMethod
      * @return
      */
+    @Override
     public boolean hasPermission(Long userId, String requestPath, String requestMethod) {
-        // 0. 超级管理员直接放行（最重要）
+        // 0. 超级管理员直接放行
         if (isSuperAdmin(userId)) {
             log.info("超级管理员直接放行，userId={}, path={}, method={}",
                     userId, requestPath, requestMethod);
@@ -342,12 +356,43 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
+     * 根据 userId 获取数据库中用户登录所需的验证信息（只会被 userId 本人用，即只在 AuthInterceptor 中用）
+     * （所以其实不需要判断 userId 是否不存在）
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public UserAuthInfo getUserAuthInfo(Long userId) {
+        UserAuthInfo userAuthInfo = userMapper.getUserAuthInfo(userId);
+
+        if (userAuthInfo == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+        return userAuthInfo;
+    }
+
+    /**
+     * auth_version 字段加一
+     *
+     * @param userId
+     */
+    @Override
+    public void incrementAuthVersion(Long userId) {
+        int updated = userMapper.incrementAuthVersion(userId);
+        if (updated == 0) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+    }
+
+    /**
      * 判断是否是超级管理员，为 hasPermission() 服务
+     *
      * @param userId
      * @return
      */
     private boolean isSuperAdmin(Long userId) {
-        log.debug("查询用户是否是超级管理员...");
+        log.debug("查询用户是否是超级管理员：");
         return userRoleService.userHasRole(userId, RoleNameConstant.SUPER_ADMIN);
     }
 
@@ -372,6 +417,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 调用 mapper 的更新方法，同时进行乐观锁判断
+     *
      * @param user
      */
     private void doUpdate(User user) {

@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.controller;
 
 import com.ymjrhk.rbac.annotation.Audit;
-import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.dto.IdsDTO;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.vo.RoleVO;
@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.USER_ASSIGN;
+import static com.ymjrhk.rbac.constant.PermissionNameConstant.USER_VIEW;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,6 +28,7 @@ public class UserRoleController {
 
     /**
      * 用户分配角色
+     *
      * @param userId
      * @param roleIdsDTO
      * @return
@@ -42,6 +44,7 @@ public class UserRoleController {
 
     /**
      * 查询用户角色
+     *
      * @param userId
      * @return
      */

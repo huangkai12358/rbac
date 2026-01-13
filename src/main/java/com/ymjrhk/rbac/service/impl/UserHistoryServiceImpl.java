@@ -8,6 +8,7 @@ import com.ymjrhk.rbac.mapper.UserHistoryMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,14 +16,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserHistoryServiceImpl implements UserHistoryService {
 
     private final UserHistoryMapper userHistoryMapper;
 
     private final UserMapper userMapper;
 
+    /**
+     * 记录到历史表
+     *
+     * @param userId
+     * @param operateType
+     */
     @Override
     public void record(Long userId, Integer operateType) {
+        log.debug("先读出新表所有数据，再拷贝到历史表中：");
         User user = userMapper.getByUserId(userId);
 
         UserHistory userHistory = new UserHistory();
@@ -43,7 +52,7 @@ public class UserHistoryServiceImpl implements UserHistoryService {
         int result = userHistoryMapper.insert(userHistory);
 
         if (result != 1) { // 写入历史失败（应该极少）
-            throw new HistoryInsertFailedException(MessageConstant.HistoryInsertFailed);
+            throw new HistoryInsertFailedException(MessageConstant.HISTORY_INSERT_FAILED);
         }
 
     }

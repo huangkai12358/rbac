@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.mapper;
 
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
+import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,6 +15,7 @@ import java.util.List;
 public interface UserMapper {
     /**
      * 根据用户名查询用户
+     *
      * @param username
      * @return
      */
@@ -22,6 +24,7 @@ public interface UserMapper {
 
     /**
      * 创建用户
+     *
      * @param user
      */
 //    @Insert("insert into sys_user (username, password, nickname, secret_token, create_user_id, update_user_id)" +
@@ -32,6 +35,7 @@ public interface UserMapper {
 
     /**
      * 用户分页查询
+     *
      * @param userPageQueryDTO
      * @return
      */
@@ -39,6 +43,7 @@ public interface UserMapper {
 
     /**
      * 根据 userId 查询用户
+     *
      * @param userId
      * @return
      */
@@ -47,6 +52,7 @@ public interface UserMapper {
 
     /**
      * 修改用户
+     *
      * @param user
      */
     // TODO: 把update分成几个
@@ -55,6 +61,7 @@ public interface UserMapper {
 
     /**
      * 因为创建用户而更新用户（只更新密码）
+     *
      * @param user
      * @return
      */
@@ -63,9 +70,27 @@ public interface UserMapper {
 
     /**
      * 根据 userId 查询用户权限
+     *
      * @param userId
      * @return
      */
     List<PermissionVO> selectPermissionsByUserId(Long userId);
 
+    /**
+     * 根据 userId 获取数据库中用户登录所需的验证信息
+     *
+     * @param userId
+     * @return
+     */
+    @Select("select user_id, username, status, auth_version from sys_user where user_id = #{userId}")
+    UserAuthInfo getUserAuthInfo(Long userId);
+
+    /**
+     * auth_version 字段加一
+     *
+     * @param userId
+     * @return
+     */
+    @Update("update sys_user set auth_version = auth_version + 1 where user_id = #{userId}")
+    int incrementAuthVersion(Long userId);
 }

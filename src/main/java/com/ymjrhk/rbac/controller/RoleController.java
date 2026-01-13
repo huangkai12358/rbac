@@ -1,7 +1,10 @@
 package com.ymjrhk.rbac.controller;
 
 import com.ymjrhk.rbac.annotation.Audit;
-import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.dto.RoleCreateDTO;
+import com.ymjrhk.rbac.dto.RoleDTO;
+import com.ymjrhk.rbac.dto.RolePageQueryDTO;
+import com.ymjrhk.rbac.dto.StatusDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.RoleService;
@@ -25,20 +28,22 @@ public class RoleController {
 
     /**
      * 创建角色
+     *
      * @param roleCreateDTO
      * @return
      */
     @Audit(permission = ROLE_CREATE)
     @PostMapping
     @Operation(summary = "创建角色")
-    public Result<Void> createRole(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
+    public Result<Long> createRole(@RequestBody @Valid RoleCreateDTO roleCreateDTO) {
         log.info("创建角色：{}", roleCreateDTO);
-        roleService.create(roleCreateDTO);
-        return Result.success();
+        Long roleId = roleService.create(roleCreateDTO);
+        return Result.success(roleId);
     }
 
     /**
      * 角色分页查询
+     *
      * @param rolePageQueryDTO
      * @return
      */
@@ -53,6 +58,7 @@ public class RoleController {
 
     /**
      * 根据 roleId 查询角色
+     *
      * @param roleId
      * @return
      */
@@ -66,6 +72,7 @@ public class RoleController {
 
     /**
      * 修改角色
+     *
      * @param roleId
      * @param roleDTO
      * @return
@@ -81,6 +88,7 @@ public class RoleController {
 
     /**
      * 启用或禁用角色
+     *
      * @param roleId
      * @param statusDTO
      * @return

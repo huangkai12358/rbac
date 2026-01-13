@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 public interface MeMapper {
     /**
      * 查询个人信息
+     *
      * @param userId
      * @return
      */

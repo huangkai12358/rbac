@@ -4,15 +4,15 @@
 <mapper namespace="com.ymjrhk.rbac.mapper.AuditLogMapper">
     <select id="pageQuery" resultType="com.ymjrhk.rbac.vo.AuditLogVO">
         select log_seq,
-               username,
-               permission_name,
-               path,
-               method,
-               request_body,
-               ip,
-               success,
-               error_message,
-               create_time
+        username,
+        permission_name,
+        path,
+        method,
+        request_body,
+        ip,
+        success,
+        error_message,
+        create_time
         from sys_audit_log
         <where>
             <if test="username != null and username !=''">
@@ -39,29 +39,26 @@
     </select>
 
     <insert id="insert" parameterType="AuditLog">
-        insert into sys_audit_log (
-            user_id,
-            username,
-            permission_id,
-            permission_name,
-            path,
-            method,
-            request_body,
-            ip,
-            success,
-            error_message
-        ) values (
-            #{userId},
-            #{username},
-            #{permissionId},
-            #{permissionName},
-            #{path},
-            #{method},
-            #{requestBody},
-            #{ip},
-            #{success},
-            #{errorMessage}
-        )
+        insert into sys_audit_log (user_id,
+                                   username,
+                                   permission_id,
+                                   permission_name,
+                                   path,
+                                   method,
+                                   request_body,
+                                   ip,
+                                   success,
+                                   error_message)
+        values (#{userId},
+                #{username},
+                #{permissionId},
+                #{permissionName},
+                #{path},
+                #{method},
+                #{requestBody},
+                #{ip},
+                #{success},
+                #{errorMessage})
     </insert>
 
 </mapper>

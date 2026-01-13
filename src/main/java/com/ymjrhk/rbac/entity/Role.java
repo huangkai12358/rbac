@@ -1,13 +1,12 @@
 package com.ymjrhk.rbac.entity;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class Role implements Serializable, OptimisticLockEntity{
+public class Role implements Serializable, OptimisticLockEntity {
     private static final long serialVersionUID = 1L;
 
     private Long roleId;

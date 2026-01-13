@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class Permission implements Serializable, OptimisticLockEntity{
+public class Permission implements Serializable, OptimisticLockEntity {
     private static final long serialVersionUID = 1L;
 
     private Long permissionId;

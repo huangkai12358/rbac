@@ -28,20 +28,22 @@ public class PermissionController {
 
     /**
      * 创建权限
+     *
      * @param permissionCreateDTO
      * @return
      */
     @Audit(permission = PERMISSION_CREATE)
     @PostMapping
     @Operation(summary = "创建权限")
-    public Result<Void> createPermission(@RequestBody @Valid PermissionCreateDTO permissionCreateDTO) {
+    public Result<Long> createPermission(@RequestBody @Valid PermissionCreateDTO permissionCreateDTO) {
         log.info("创建权限：{}", permissionCreateDTO);
-        permissionService.create(permissionCreateDTO);
-        return Result.success();
+        Long permissionId = permissionService.create(permissionCreateDTO);
+        return Result.success(permissionId);
     }
 
     /**
      * 权限分页查询
+     *
      * @param permissionPageQueryDTO
      * @return
      */
@@ -56,6 +58,7 @@ public class PermissionController {
 
     /**
      * 根据 permissionId 查询权限
+     *
      * @param permissionId
      * @return
      */
@@ -69,6 +72,7 @@ public class PermissionController {
 
     /**
      * 修改权限
+     *
      * @param permissionId
      * @param permissionDTO
      * @return
@@ -84,6 +88,7 @@ public class PermissionController {
 
     /**
      * 启用或禁用权限
+     *
      * @param permissionId
      * @param statusDTO
      * @return

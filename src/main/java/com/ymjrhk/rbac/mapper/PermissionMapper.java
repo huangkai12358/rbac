@@ -13,12 +13,14 @@ import java.util.List;
 public interface PermissionMapper {
     /**
      * 创建权限
+     *
      * @param permission
      */
     int insert(Permission permission);
 
     /**
      * 权限分页查询
+     *
      * @param permissionPageQueryDTO
      * @return
      */
@@ -26,6 +28,7 @@ public interface PermissionMapper {
 
     /**
      * 根据 permissionId 查询权限
+     *
      * @param permissionId
      * @return
      */
@@ -34,6 +37,7 @@ public interface PermissionMapper {
 
     /**
      * 更新权限
+     *
      * @param permission
      * @return
      */
@@ -41,6 +45,7 @@ public interface PermissionMapper {
 
     /**
      * 选出在 sys_permission 表中实际存在的 permissionIds
+     *
      * @param permissionIds
      * @return
      */
@@ -48,6 +53,7 @@ public interface PermissionMapper {
 
     /**
      * 查询 sys_permission 表中所有未禁用的权限
+     *
      * @return
      */
     @Select("select permission_id, permission_name, permission_display_name, description, status, type, parent_id, path, method, sort " +

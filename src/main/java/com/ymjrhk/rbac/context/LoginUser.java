@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 当前是谁
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

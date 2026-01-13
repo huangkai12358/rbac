@@ -9,7 +9,10 @@ import com.ymjrhk.rbac.dto.PermissionCreateDTO;
 import com.ymjrhk.rbac.dto.PermissionDTO;
 import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
 import com.ymjrhk.rbac.entity.Permission;
-import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.exception.PermissionCreateFailedException;
+import com.ymjrhk.rbac.exception.PermissionForbiddenException;
+import com.ymjrhk.rbac.exception.PermissionNotExistException;
+import com.ymjrhk.rbac.exception.UpdateFailedException;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.PermissionHistoryService;
@@ -17,6 +20,7 @@ import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,7 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PermissionServiceImpl extends BaseService implements PermissionService {
     private final PermissionMapper permissionMapper;
 
@@ -36,11 +41,12 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
     /**
      * 创建权限
+     *
      * @param permissionCreateDTO
      */
     @Override
     @Transactional
-    public void create(PermissionCreateDTO permissionCreateDTO) {
+    public Long create(PermissionCreateDTO permissionCreateDTO) {
         Permission permission = BeanUtil.copyProperties(permissionCreateDTO, Permission.class);
 
         String secretToken = UUID.randomUUID().toString();
@@ -60,11 +66,12 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         // 写到历史表
         permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.CREATE);
 
-        // TODO:写审计表
+        return permission.getPermissionId();
     }
 
     /**
      * 权限分页查询
+     *
      * @param permissionPageQueryDTO
      * @return
      */
@@ -79,14 +86,15 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         long total = page.getTotal();
 
         List<PermissionVO> records = page.getResult().stream()
-                                   .map(permission -> BeanUtil.copyProperties(permission, PermissionVO.class))
-                                   .toList();
+                                         .map(permission -> BeanUtil.copyProperties(permission, PermissionVO.class))
+                                         .toList();
 
         return new PageResult(total, records);
     }
 
     /**
      * 根据 permissionId 查询权限
+     *
      * @param permissionId
      * @return
      */
@@ -104,12 +112,14 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
     /**
      * 修改权限
+     *
      * @param permissionId
      * @param permissionDTO
      */
     @Override
     @Transactional
     public void update(Long permissionId, PermissionDTO permissionDTO) {
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Permission dbPermission = permissionMapper.getByPermissionId(permissionId);
 
         // 权限不存在
@@ -136,12 +146,11 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         // 写到历史表
         permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
      * 启用或禁用权限
+     *
      * @param permissionId
      * @param status
      */
@@ -149,6 +158,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
     @Transactional
     public void changeStatus(Long permissionId, Integer status) {
         // 1. 查数据库
+        log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Permission dbPermission = permissionMapper.getByPermissionId(permissionId);
         if (dbPermission == null) { // 权限不存在
             throw new PermissionNotExistException(PERMISSION_NOT_EXIST);
@@ -165,12 +175,11 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         // 写到历史表
         permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
-
-        // TODO:写审计表
     }
 
     /**
      * 公共的调用 mapper 的 update() 方法
+     *
      * @param permission
      */
     private void doUpdate(Permission permission) {
@@ -182,6 +191,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
     /**
      * 从 PermissionDTO 拷贝属性到 Permission
+     *
      * @param permissionDTO
      * @return
      */

@@ -8,6 +8,7 @@ import com.ymjrhk.rbac.mapper.PermissionHistoryMapper;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.service.PermissionHistoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,14 +16,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PermissionHistoryServiceImpl implements PermissionHistoryService {
 
     private final PermissionHistoryMapper permissionHistoryMapper;
 
     private final PermissionMapper permissionMapper;
 
+    /**
+     * 记录到历史表
+     *
+     * @param permissionId
+     * @param operateType
+     */
     @Override
     public void record(Long permissionId, Integer operateType) {
+        log.debug("先读出新表所有数据，再拷贝到历史表中：");
         Permission permission = permissionMapper.getByPermissionId(permissionId);
 
         PermissionHistory permissionHistory = new PermissionHistory();
@@ -46,7 +55,7 @@ public class PermissionHistoryServiceImpl implements PermissionHistoryService {
         int result = permissionHistoryMapper.insert(permissionHistory);
 
         if (result != 1) { // 写入历史失败（应该极少）
-            throw new HistoryInsertFailedException(MessageConstant.HistoryInsertFailed);
+            throw new HistoryInsertFailedException(MessageConstant.HISTORY_INSERT_FAILED);
         }
     }
 }

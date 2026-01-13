@@ -8,22 +8,30 @@ import com.ymjrhk.rbac.mapper.RoleHistoryMapper;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.service.RoleHistoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 只保存成功的记录
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoleHistoryServiceImpl implements RoleHistoryService {
 
     private final RoleHistoryMapper roleHistoryMapper;
 
     private final RoleMapper roleMapper;
 
+    /**
+     * 记录到历史表
+     *
+     * @param roleId
+     * @param operateType
+     */
     @Override
     public void record(Long roleId, Integer operateType) {
+        log.debug("先读出新表所有数据，再拷贝到历史表中：");
         Role role = roleMapper.getByRoleId(roleId);
 
         RoleHistory roleHistory = new RoleHistory();
@@ -42,7 +50,7 @@ public class RoleHistoryServiceImpl implements RoleHistoryService {
         int result = roleHistoryMapper.insert(roleHistory);
 
         if (result != 1) { // 写入历史失败（应该极少）
-            throw new HistoryInsertFailedException(MessageConstant.HistoryInsertFailed);
+            throw new HistoryInsertFailedException(MessageConstant.HISTORY_INSERT_FAILED);
         }
     }
 }

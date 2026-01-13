@@ -3,12 +3,12 @@ package com.ymjrhk.rbac.exception;
 /**
  * 密码修改失败异常
  */
-public class PasswordEditFailedException extends BaseException{
+public class PasswordEditFailedException extends BaseException {
 
     public PasswordEditFailedException() {
     }
 
-    public PasswordEditFailedException(String msg){
+    public PasswordEditFailedException(String msg) {
         super(msg);
     }
 

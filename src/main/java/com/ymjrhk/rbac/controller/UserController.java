@@ -1,7 +1,10 @@
 package com.ymjrhk.rbac.controller;
 
 import com.ymjrhk.rbac.annotation.Audit;
-import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.dto.StatusDTO;
+import com.ymjrhk.rbac.dto.UserDTO;
+import com.ymjrhk.rbac.dto.UserLoginDTO;
+import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserService;
@@ -29,20 +32,22 @@ public class UserController {
 
     /**
      * 创建用户
+     *
      * @param userLoginDTO
      * @return
      */
     @Audit(permission = USER_CREATE)
     @PostMapping
     @Operation(summary = "创建用户")
-    public Result<Void> createUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
+    public Result<Long> createUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
         log.info("创建用户：{}", userLoginDTO);
-        userService.create(userLoginDTO);
-        return Result.success();
+        Long userId = userService.create(userLoginDTO);
+        return Result.success(userId);
     }
 
     /**
      * 用户分页查询
+     *
      * @param userPageQueryDTO
      * @return
      */
@@ -57,6 +62,7 @@ public class UserController {
 
     /**
      * 根据 userId 查询用户
+     *
      * @param userId
      * @return
      */
@@ -70,6 +76,7 @@ public class UserController {
 
     /**
      * 启用或禁用用户
+     *
      * @param userId
      * @param statusDTO
      * @return
@@ -84,6 +91,7 @@ public class UserController {
 
     /**
      * 修改用户
+     *
      * @param userId
      * @param userDTO
      * @return
@@ -99,6 +107,7 @@ public class UserController {
 
     /**
      * 重置用户密码
+     *
      * @param userId
      * @return
      */
@@ -112,6 +121,7 @@ public class UserController {
 
     /**
      * 查询用户权限（非禁用）// TODO: user status要不要为1
+     *
      * @param userId
      * @return
      */

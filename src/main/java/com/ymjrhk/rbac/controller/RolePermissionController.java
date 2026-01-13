@@ -23,11 +23,12 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.ROLE_VIEW;
 @Slf4j
 @Tag(name = "角色-权限管理模块")
 public class RolePermissionController {
-    
+
     private final RolePermissionService rolePermissionService;
 
     /**
      * 角色分配权限
+     *
      * @param roleId
      * @param permissionIdsDTO
      * @return
@@ -49,5 +50,5 @@ public class RolePermissionController {
         List<PermissionVO> permissions = rolePermissionService.getRolePermissions(roleId);
         return Result.success(permissions);
     }
-    
+
 }

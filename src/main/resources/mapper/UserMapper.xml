@@ -52,8 +52,8 @@
             update_user_id = #{updateUserId},
         </set>
         where user_id = #{userId}
-            and version = #{version}
-            and secret_token = #{secretToken}
+        and version = #{version}
+        and secret_token = #{secretToken}
     </update>
 
     <select id="selectPermissionsByUserId" resultType="com.ymjrhk.rbac.vo.PermissionVO">
@@ -68,13 +68,13 @@
                p.method,
                p.sort
         from sys_user u
-        join sys_user_role ur on u.user_id = ur.user_id
-        join sys_role r on ur.role_id = r.role_id
-        join sys_role_permission rp on r.role_id = rp.role_id
-        join sys_permission p on rp.permission_id = p.permission_id
+                 join sys_user_role ur on u.user_id = ur.user_id
+                 join sys_role r on ur.role_id = r.role_id
+                 join sys_role_permission rp on r.role_id = rp.role_id
+                 join sys_permission p on rp.permission_id = p.permission_id
         where u.user_id = #{userId}
-        and u.status = 1
-        and r.status = 1
-        and p.status = 1
+          and u.status = 1
+          and r.status = 1
+          and p.status = 1
     </select>
 </mapper>

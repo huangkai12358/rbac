@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.service;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
+import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
@@ -10,7 +11,7 @@ import com.ymjrhk.rbac.vo.UserVO;
 import java.util.List;
 
 public interface UserService {
-    void create(UserLoginDTO userLoginDTO);
+    Long create(UserLoginDTO userLoginDTO);
 
     PageResult pageQuery(UserPageQueryDTO userPageQueryDTO);
 
@@ -25,4 +26,8 @@ public interface UserService {
     List<PermissionVO> getUserPermissions(Long userId);
 
     boolean hasPermission(Long userId, String path, String method);
+
+    UserAuthInfo getUserAuthInfo(Long userId);
+
+    void incrementAuthVersion(Long userId);
 }

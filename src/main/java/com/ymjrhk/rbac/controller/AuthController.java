@@ -2,7 +2,6 @@ package com.ymjrhk.rbac.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.ymjrhk.rbac.constant.SuccessConstant;
-import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.AuditLogService;
@@ -34,6 +33,7 @@ public class AuthController {
 
     /**
      * 用户登录
+     *
      * @param userLoginDTO
      * @return
      */
@@ -77,15 +77,16 @@ public class AuthController {
         }
     }
 
-//    /**
-//     * 用户登出
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/logout")
-//    @Operation(summary = "用户登出", description = "用户登出")
-//    public Result<Void> logout(HttpServletRequest request) {
-//        authService.logout();
-//        return Result.success();
-//    }
+    /**
+     * 用户登出
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/logout")
+    @Operation(summary = "用户登出", description = "用户登出")
+    public void logout(HttpServletRequest request) {
+        authService.logout();
+        // TODO：写审计表
+    }
 }

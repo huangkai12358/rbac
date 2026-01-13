@@ -3,7 +3,9 @@ package com.ymjrhk.rbac.service.impl;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.entity.UserRole;
-import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.exception.AssignmentRoleFailedException;
+import com.ymjrhk.rbac.exception.RoleNotExistException;
+import com.ymjrhk.rbac.exception.UserNotExistException;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
@@ -92,6 +94,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     /**
      * 查用户是否拥有某角色
+     *
      * @param userId
      * @param roleName
      * @return

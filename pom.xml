@@ -69,18 +69,18 @@
             <version>1.4.7</version>
         </dependency>
 
-<!--        参数校验，在进入 Controller 业务逻辑之前，自动把非法参数拦下来-->
+        <!--        参数校验，在进入 Controller 业务逻辑之前，自动把非法参数拦下来-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-<!--        与@RestControllerAdvice存在冲突，故不用-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.xiaoymin</groupId>-->
-<!--            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>-->
-<!--            <originalVersion>4.4.0</originalVersion>-->
-<!--        </dependency>-->
+        <!--        与@RestControllerAdvice存在冲突，故不用-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.xiaoymin</groupId>-->
+        <!--            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>-->
+        <!--            <originalVersion>4.4.0</originalVersion>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.github.xingfudeshi</groupId>

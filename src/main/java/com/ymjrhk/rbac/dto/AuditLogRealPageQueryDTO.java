@@ -3,10 +3,8 @@ package com.ymjrhk.rbac.dto;
 import com.ymjrhk.rbac.dto.base.PageQuery;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**

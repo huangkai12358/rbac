@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -27,6 +26,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
     /**
      * 未登录
+     *
      * @param ex
      * @return
      */
@@ -38,6 +38,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 无权限访问
+     *
      * @param ex
      * @return
      */
@@ -49,17 +50,19 @@ public class GlobalExceptionHandler {
 
     /**
      * 捕获业务异常
+     *
      * @param ex
      * @return
      */
     @ExceptionHandler(BaseException.class)
-    public Result<Void> handleBusiness(BaseException ex){
+    public Result<Void> handleBusiness(BaseException ex) {
         log.warn("业务异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
     /**
      * 捕获数据库异常
+     *
      * @param ex
      * @return
      */
@@ -82,6 +85,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 请求参数格式错误
+     *
      * @param ex
      * @return
      */
@@ -93,6 +97,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 字段检验
+     *
      * @param ex
      * @return
      */
@@ -110,6 +115,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 兜底处理
+     *
      * @param ex
      * @return
      */

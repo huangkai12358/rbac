@@ -33,6 +33,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
 
     /**
      * 审计日志分页查询
+     *
      * @param auditLogPageQueryDTO
      * @return
      */
@@ -67,15 +68,18 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
 
     /**
      * AOP 插入审计日志
+     *
      * @param auditLog
      */
     @Async("auditExecutor")
+    @Override
     public void save(AuditLog auditLog) {
         auditLogMapper.insert(auditLog);
     }
 
     /**
      * 登录成功/失败，插入审计日志
+     *
      * @param userId
      * @param username
      * @param requestBody
@@ -83,6 +87,8 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
      * @param success
      * @param errorMessage
      */
+    @Async("auditExecutor")
+    @Override
     public void saveLoginLog(Long userId,
                              String username,
                              String requestBody,
@@ -118,6 +124,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
 
     /**
      * 未授权访问，插入审计日志
+     *
      * @param userId
      * @param username
      * @param requestURI
@@ -127,6 +134,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
      * @param success
      * @param errorMessage
      */
+    @Async("auditExecutor")
     @Override
     public void saveForbiddenLog(Long userId,
                                  String username,
