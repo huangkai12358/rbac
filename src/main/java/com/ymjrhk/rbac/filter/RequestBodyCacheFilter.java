@@ -35,6 +35,18 @@ public class RequestBodyCacheFilter implements Filter {
         log.info("过滤器开始运行...");
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String uri = httpRequest.getRequestURI();
+
+        // ===== Swagger / Knife4j 直接放行 =====
+        if (uri.startsWith("/v3/api-docs")
+                || uri.startsWith("/doc.html")
+                || uri.startsWith("/swagger-ui")
+                || uri.startsWith("/webjars")
+                || uri.contains("/webjars/")) {
+
+            chain.doFilter(request, response);
+            return;
+        }
 
         ContentCachingRequestWrapper wrappedRequest =
                 new ContentCachingRequestWrapper(httpRequest);

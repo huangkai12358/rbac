@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -111,6 +112,11 @@ public class GlobalExceptionHandler {
         FieldError error = fieldErrors.getFirst();
 
         return Result.error(error.getDefaultMessage());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public void handleNoResource(NoResourceFoundException ex) {
+        // favicon.ico / 静态资源不存在，忽略即可
     }
 
     /**
