@@ -28,7 +28,7 @@ public class WebConfigurer implements WebMvcConfigurer {
         // 1. 认证拦截器（先执行）
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/auth/**")
+                .excludePathPatterns("/api/auth/login") // "/api/auth/logout" 要拦
                 .order(1);
 
         // 2. 鉴权拦截器（后执行）
