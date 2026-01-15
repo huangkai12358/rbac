@@ -30,7 +30,6 @@ logging:
 rbac:
   jwt:
     secret-key: ${rbac.jwt.secret-key}
-    token-name: ${rbac.jwt.token-name}
     ttl: ${rbac.jwt.ttl}
 
 # springdoc-openapi项目配置

@@ -51,8 +51,21 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         // 2. 获取 Token
-        String token = request.getHeader(jwtProperties.getTokenName());
-        if (token == null || token.isBlank()) {
+        String authHeader = request.getHeader(jwtProperties.getHeader());
+
+        log.info("authHeader={}", authHeader);
+
+        if (authHeader == null || authHeader.isBlank()) {
+            throw new UserNotLoginException(USER_NOT_LOGIN);
+        }
+        if (!authHeader.startsWith(jwtProperties.getPrefix())) {
+            throw new UserNotLoginException(USER_NOT_LOGIN);
+        }
+
+        // 截取真正的 JWT
+        String token = authHeader.substring(jwtProperties.getPrefix().length()); // "Bearer ".length() = 7
+
+        if (token.isBlank()) {
             throw new UserNotLoginException(USER_NOT_LOGIN);
         }
 
