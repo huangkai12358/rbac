@@ -8,6 +8,7 @@ import com.ymjrhk.rbac.service.MeService;
 import com.ymjrhk.rbac.vo.MeViewVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class MeController {
     @Audit(permission = ME_PASSWORD_CHANGE)
     @PutMapping("/password/change")
     @Operation(summary = "修改个人密码")
-    public Result<Void> changePassword(@RequestBody MePasswordUpdateDTO mePasswordUpdateDTO) {
+    public Result<Void> changePassword(@RequestBody @Valid MePasswordUpdateDTO mePasswordUpdateDTO) {
         meService.changePassword(mePasswordUpdateDTO);
         return Result.success();
     }

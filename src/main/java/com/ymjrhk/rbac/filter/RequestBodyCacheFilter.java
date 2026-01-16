@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
  * 请求体本质是 InputStream，只能读一次
- * 在拦截器里读了，Controller 的 @RequestBody 就会炸
+ * 在Controller里读了，AuditFailInterceptor 的 getRequestBody 就读不到
  * 所以拦截器里不能直接读请求体，需要用 ContentCachingRequestWrapper 包装 request
  * <p>
  * Filter（最外层）
@@ -21,6 +21,9 @@ import java.io.IOException;
  * ↓
  * Controller
  * └── @RequestBody 正常工作
+ * ↓
+ * afterCompletion Interceptor - AuditFailInterceptor
+ * └── 从 wrapper 里“安全地”拿请求体
  */
 @Component
 @Slf4j

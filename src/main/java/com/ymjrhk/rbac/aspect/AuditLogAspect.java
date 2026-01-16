@@ -74,6 +74,7 @@ public class AuditLogAspect {
         auditLog.setRequestBody(serializeArgsSafely(args));
 
         try {
+            log.debug("尝试运行 Controller 方法...");
             Object result = joinPoint.proceed();
             auditLog.setSuccess(1);
 

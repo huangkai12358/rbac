@@ -35,9 +35,13 @@ public class MessageConstant {
     public static final String ACCESS_DENIED = "无权限访问";
     public static final String LOGIN_EXPIRED = "登录状态已失效，请重新登录";
 
+    public static final String PARAMETER_FORMAT_ERROR = "参数格式错误";
+    public static final String FIELD_VALID_FAILED = "字段校验失败";
+
     public static final String ALREADY_EXISTED = "已存在";
     public static final String UPLOAD_FAILED = "文件上传失败";
     public static final String UNKNOWN_ERROR = "未知错误";
 
+    public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
 
 }

@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.config;
 
+import com.ymjrhk.rbac.interceptor.AuditFailInterceptor;
 import com.ymjrhk.rbac.interceptor.AuthInterceptor;
 import com.ymjrhk.rbac.interceptor.PermissionInterceptor;
 import com.ymjrhk.rbac.json.JacksonObjectMapper;
@@ -31,6 +32,8 @@ public class WebConfigurer implements WebMvcConfigurer {
 
     private final PermissionInterceptor permissionInterceptor;
 
+    private final AuditFailInterceptor auditFailInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
@@ -48,6 +51,11 @@ public class WebConfigurer implements WebMvcConfigurer {
                         "/api/me/**"   // auth-only 只需认证不需鉴权
                 )
                 .order(2);
+
+        // 3. 参数类型失败审计日志记录拦截器（只有 afterCompetition）
+        registry.addInterceptor(auditFailInterceptor)
+                .addPathPatterns("/api/**")
+                .order(3);
     }
 
     @Bean

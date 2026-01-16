@@ -26,6 +26,8 @@ mybatis:
 logging:
   level:
     com.ymjrhk.rbac: debug
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %X{pid} --- [%thread] %logger - %msg%n"
 
 rbac:
   jwt:
@@ -52,6 +54,6 @@ knife4j:
 #mybatis 分页插件
 pagehelper:
   helper-dialect: mysql
-  reasonable: true # 对 pageNum / pageSize 做“合理化兜底”，pageNum ≤ 0 自动变成 1，pageNum > 总页数 自动变成最后一页，pageSize ≤ 0 自动变成默认值
+  reasonable: false # 对 pageNum / pageSize 做“合理化兜底”，pageNum ≤ 0 自动变成 1，pageNum > 总页数 自动变成最后一页，pageSize ≤ 0 自动变成默认值
 #  support-methods-arguments: true # 允许从方法参数中自动获取分页参数 List<User> list = userMapper.list(pageNum, pageSize); 系统会自动识别且参数名必须是 pageNum / pageSize
 #  params: count=countSql # reasonable: true （无用）
