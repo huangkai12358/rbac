@@ -4,9 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
+import com.ymjrhk.rbac.constant.PasswordConstant;
 import com.ymjrhk.rbac.constant.PermissionTypeConstant;
 import com.ymjrhk.rbac.constant.RoleNameConstant;
 import com.ymjrhk.rbac.context.UserContext;
+import com.ymjrhk.rbac.dto.UserCreateDTO;
 import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
@@ -60,17 +62,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     /**
      * 根据用户名和密码创建用户
      *
-     * @param userLoginDTO
+     * @param userCreateDTO
      */
     @Override
     @Transactional // create 是一个复合写操作（insert + update），必须在同一事务内
-    public Long create(UserLoginDTO userLoginDTO) {
+    public Long create(UserCreateDTO userCreateDTO) {
         // 1. 构造用户（先不设 password）
         User insertUser = new User();
-        insertUser.setUsername(userLoginDTO.getUsername());
+        insertUser.setUsername(userCreateDTO.getUsername());
         insertUser.setPassword("!INIT!"); // // 先插入一条“不可登录”的占位密码（因为 password 不能为空），之后要修改
-        insertUser.setNickname(userLoginDTO.getUsername()); // 默认昵称与用户名相同
+
+        String nickname = userCreateDTO.getNickname();
+        insertUser.setNickname(nickname.isBlank() ? userCreateDTO.getUsername() : nickname); // 判断昵称是否为空白
         insertUser.setSecretToken(UUID.randomUUID().toString());
+
+        insertUser.setEmail(userCreateDTO.getEmail());
 
         Long operatorId = UserContext.getCurrentUserId(); // 拿到当前操作人
         insertUser.setCreateUserId(operatorId);
@@ -84,7 +90,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         Long newUserId = insertUser.getUserId();
 
         // 3. 使用 userId 作为 pepper
-        String rawPassword = userLoginDTO.getPassword();
+        String rawPassword = PasswordConstant.rawPassword;
         String peppered = rawPassword + "#" + newUserId;
         String password = passwordEncoder.encode(peppered);
 

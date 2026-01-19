@@ -1,10 +1,7 @@
 package com.ymjrhk.rbac.controller;
 
 import com.ymjrhk.rbac.annotation.Audit;
-import com.ymjrhk.rbac.dto.StatusDTO;
-import com.ymjrhk.rbac.dto.UserDTO;
-import com.ymjrhk.rbac.dto.UserLoginDTO;
-import com.ymjrhk.rbac.dto.UserPageQueryDTO;
+import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.UserService;
@@ -33,16 +30,16 @@ public class UserController {
     /**
      * 创建用户
      *
-     * @param userLoginDTO
+     * @param userCreateDTO
      * @return
      */
     @Audit(permission = USER_CREATE)
     @PostMapping
     @Operation(summary = "创建用户")
     // 注意：“请求体反序列化失败（JSON为空） / 参数校验失败（用户名或密码不存在）”发生在 Controller 方法执行之前，AOP 根本没接管到，所以不会记审计日志。
-    public Result<Long> createUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
-        log.info("创建用户：{}", userLoginDTO);
-        Long userId = userService.create(userLoginDTO);
+    public Result<Long> createUser(@RequestBody @Valid UserCreateDTO userCreateDTO) {
+        log.info("创建用户：{}", userCreateDTO);
+        Long userId = userService.create(userCreateDTO);
         return Result.success(userId);
     }
 

@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.service;
 
+import com.ymjrhk.rbac.dto.UserCreateDTO;
 import com.ymjrhk.rbac.dto.UserDTO;
-import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.result.PageResult;
@@ -11,7 +11,7 @@ import com.ymjrhk.rbac.vo.UserVO;
 import java.util.List;
 
 public interface UserService {
-    Long create(UserLoginDTO userLoginDTO);
+    Long create(UserCreateDTO userCreateDTO);
 
     PageResult pageQuery(UserPageQueryDTO userPageQueryDTO);
 
