@@ -21,4 +21,5 @@ public class RoleCreateDTO {
 
     @Schema(description = "状态", example = "1")
     private Integer status;
+    // TODO：要 status 吗
 }

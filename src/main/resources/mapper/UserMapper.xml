@@ -73,7 +73,6 @@
                  join sys_role_permission rp on r.role_id = rp.role_id
                  join sys_permission p on rp.permission_id = p.permission_id
         where u.user_id = #{userId}
-          and u.status = 1
           and r.status = 1
           and p.status = 1
     </select>

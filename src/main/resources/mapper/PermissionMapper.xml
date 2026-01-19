@@ -41,6 +41,7 @@
             <if test="permissionName != null and permissionName !=''">
                 and permission_name like concat('%', #{permissionName}, '%')
             </if>
+            and type = 2
         </where>
         order by create_time desc
     </select>

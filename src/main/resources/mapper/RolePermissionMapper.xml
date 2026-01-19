@@ -23,5 +23,6 @@
         from sys_role_permission rp
                  join sys_permission p on rp.permission_id = p.permission_id
         where rp.role_id = #{roleId}
+          and p.status = 1
     </select>
 </mapper>

@@ -7,8 +7,9 @@
                r.role_name,
                r.role_display_name
         from sys_user_role ur
-        join sys_role r on ur.role_id = r.role_id
-        where ur.user_id = #{userId} and r.status = 1
+                 join sys_role r on ur.role_id = r.role_id
+        where ur.user_id = #{userId}
+          and r.status = 1
     </select>
 
     <select id="selectPermissionsByUserId" resultType="com.ymjrhk.rbac.vo.MePermissionVO">
@@ -16,9 +17,9 @@
                         p.permission_name,
                         p.permission_display_name
         from sys_user_role ur
-        join sys_role r on ur.role_id = r.role_id
-        join sys_role_permission rp on r.role_id = rp.role_id
-        join sys_permission p on rp.permission_id = p.permission_id
+                 join sys_role r on ur.role_id = r.role_id
+                 join sys_role_permission rp on r.role_id = rp.role_id
+                 join sys_permission p on rp.permission_id = p.permission_id
         where ur.user_id = #{userId}
           and r.status = 1
           and p.status = 1

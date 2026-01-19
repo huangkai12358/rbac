@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.ymjrhk.rbac.constant.MessageConstant;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.StatusConstant;
@@ -12,8 +13,10 @@ import com.ymjrhk.rbac.exception.UpdateFailedException;
 import com.ymjrhk.rbac.exception.UserForbiddenException;
 import com.ymjrhk.rbac.exception.UserNotExistException;
 import com.ymjrhk.rbac.mapper.MeMapper;
+import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.MeService;
+import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.vo.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
+import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
 
 @Service
@@ -40,6 +44,8 @@ public class MeServiceImpl implements MeService {
     private final UserHistoryService userHistoryService;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final PermissionMapper permissionMapper;
 
     /**
      * 查询个人信息
@@ -62,6 +68,24 @@ public class MeServiceImpl implements MeService {
         meViewVO.setRoles(roles);
 
         // 3. 权限
+        // 看拥有角色有没有超级管理员
+        for (MeRoleVO role : roles) {
+            if (Objects.equals(role.getRoleName(), SUPER_ADMIN)) {
+                List<PermissionVO> list = permissionMapper.listAllActivePermissions();
+
+                // List 转类型
+                List<MePermissionVO> permissions = list
+                        .stream()
+                        .map(permissionVO -> BeanUtil.copyProperties(permissionVO, MePermissionVO.class))
+                        .toList();
+
+                meViewVO.setPermissions(permissions);
+
+                return meViewVO;
+            }
+        }
+
+        // 拥有角色没有超级管理员
         List<MePermissionVO> permissions = meMapper.selectPermissionsByUserId(userId);
         meViewVO.setPermissions(permissions);
 

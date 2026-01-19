@@ -51,6 +51,8 @@ public class UserRoleServiceImpl implements UserRoleService {
             }
         }
 
+        // TODO：判断用户和角色有没有被禁用
+
         // 3. 从 sys_user_role 表中删除原本的关联
         userRoleMapper.deleteByUserId(userId);
 
@@ -70,8 +72,6 @@ public class UserRoleServiceImpl implements UserRoleService {
         if (result == 0) { // 分配角色失败
             throw new AssignmentRoleFailedException(ASSIGNMENT_ROLE_FAILED);
         }
-
-        // TODO: 5. 可选：写审计日志
     }
 
     /**

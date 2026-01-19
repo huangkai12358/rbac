@@ -21,6 +21,7 @@ public class PermissionCreateDTO {
 
     @Schema(description = "状态", example = "1")
     private Integer status;
+    // TODO：要 status 吗
 
     @Schema(description = "类型", example = "2")
     @NotNull(message = "类型不能为空")

@@ -18,6 +18,7 @@
         from sys_user_role ur
                  join sys_role r on ur.role_id = r.role_id
         where ur.user_id = #{userId}
+          and r.status = 1
     </select>
 
     <select id="userHasRole" resultType="boolean">
@@ -25,6 +26,7 @@
                        from sys_user_role ur
                                 join sys_role r on ur.role_id = r.role_id
                        where ur.user_id = #{userId}
-                         and r.role_name = #{roleName})
+                        and r.role_name = #{roleName}
+                        and r.status = 1)
     </select>
 </mapper>

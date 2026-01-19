@@ -52,6 +52,8 @@ public class RolePermissionServiceImpl implements RolePermissionService {
             }
         }
 
+        // TODO：角色和权限不能被禁用
+
         // 3. 从 sys_role_permission 表中删除原本的关联
         rolePermissionMapper.deleteByRoleId(roleId);
 
@@ -71,8 +73,6 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         if (result == 0) { // 分配权限失败
             throw new AssignmentPermissionFailedException(ASSIGNMENT_PERMISSION_FAILED);
         }
-
-        // 5. 写审计日志（通过 AOP）
     }
 
     /**
@@ -94,7 +94,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
             return permissionMapper.listAllActivePermissions();
         }
 
-        // 2. 查 roleId 对应的权限
+        // 3. 查 roleId 对应的权限
         return rolePermissionMapper.selectPermissionsByRoleId(roleId);
     }
 }

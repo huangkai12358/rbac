@@ -118,7 +118,7 @@ public class UserController {
     }
 
     /**
-     * 查询用户权限（非禁用）// TODO: user status要不要为1
+     * 查询用户权限（非禁用角色和权限）
      *
      * @param userId
      * @return
