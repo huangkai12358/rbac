@@ -51,7 +51,15 @@ public class UserRoleServiceImpl implements UserRoleService {
             }
         }
 
-        // TODO：判断用户和角色有没有被禁用
+        // TODO：3. 判断用户是否存在
+        // TODO：3. 判断用户有没有被禁用
+        // TODO：4. 判断角色有没有被禁用
+        // TODO：5. 查用户拥有的角色（非禁用）
+        // TODO：6. 查我拥有的角色（非禁用）
+        // TODO：7. 删除用户角色中用户和我都拥有的角色
+        // TODO：8.0 如果我给用户分配的角色为空列表，到此为止
+        // TODO：8. 插入我从我的角色中给用户新分配的角色（用户原来有我没有的角色保持不变）
+        // RolePermission 同理
 
         // 3. 从 sys_user_role 表中删除原本的关联
         userRoleMapper.deleteByUserId(userId);

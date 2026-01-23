@@ -21,4 +21,8 @@ public class PermissionDTO {
     private String method;
 
     private Integer sort;
+
+    private Integer version;
+
+    private String secretToken;
 }

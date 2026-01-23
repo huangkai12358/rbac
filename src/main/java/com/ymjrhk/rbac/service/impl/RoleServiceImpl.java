@@ -138,8 +138,8 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         role.setRoleDisplayName(roleDTO.getRoleDisplayName());
         role.setDescription(roleDTO.getDescription());
 
-        Integer version = dbRole.getVersion(); // 获取版本号
-        String secretToken = dbRole.getSecretToken(); // 获取旧 secretToken
+        Integer version = roleDTO.getVersion(); // 获取前端保存的版本号
+        String secretToken = roleDTO.getSecretToken(); // 获取前端保存的旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
         Long updateUserId = UserContext.getCurrentUserId();
 

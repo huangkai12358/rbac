@@ -183,13 +183,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());
 
-        // 如果修改了 usename，则 auth_version + 1
-        if (userDTO.getUsername() != null) {
+        // 如果修改了 username（且不和之前一样），则 auth_version + 1
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(dbUser.getUsername())) {
             user.setAuthVersion(dbUser.getAuthVersion()); // 其实这里随便填什么，只要不为 null 就可以触发 xml 中 auth_version + 1
         }
 
-        Integer version = dbUser.getVersion(); // 获取版本号
-        String secretToken = dbUser.getSecretToken(); // 获取旧 secretToken
+        Integer version = userDTO.getVersion(); // 获取前端保存的版本号
+        String secretToken = userDTO.getSecretToken(); // 获取前端保存的旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
         Long updateUserId = UserContext.getCurrentUserId();
 
@@ -209,6 +209,11 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional
+    // changeStatus 以及 Role 和 Permission 的 changeStatus 包括下面的 resetPassword 其实都不用搞什么乐观锁字段
+    // 因为它们的目的都是一致的，不像 update 可能修改的结果不一样。
+    // changeStatus 一般不会弄着玩，先从启用到禁用，然后立马从禁用到启用
+    // 更何况 changeStatus 还有个“状态未改变，无需修改”作为兜底
+    // TODO：更好的做法：changeStatus 还是加个乐观锁，resetPassword 完全不用加
     public void changeStatus(Long userId, Integer status) {
         // 1. 查数据库
         log.debug("获取更新前必要字段（包括乐观锁字段）：");

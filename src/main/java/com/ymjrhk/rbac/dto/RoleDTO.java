@@ -12,5 +12,9 @@ public class RoleDTO {
 
     private String description;
 
+    private Integer version;
+
+    private String secretToken;
+
 //    private Integer status;
 }

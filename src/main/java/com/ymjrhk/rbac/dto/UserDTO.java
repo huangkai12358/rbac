@@ -11,5 +11,9 @@ public class UserDTO {
 
     private String email;
 
+    private Integer version;
+
+    private String secretToken;
+
 //    private Integer status; // TODO: 要取消status吗
 }

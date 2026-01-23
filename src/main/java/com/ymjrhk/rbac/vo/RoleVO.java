@@ -15,4 +15,8 @@ public class RoleVO {
     private String description;
 
     private Integer status;
+
+    private Integer version;
+
+    private String secretToken;
 }

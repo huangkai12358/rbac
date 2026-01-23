@@ -135,8 +135,8 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         Permission permission = getPermission(permissionDTO); // 从 PermissionDTO 拷贝属性到 Permission
         permission.setPermissionId(permissionId);
 
-        Integer version = dbPermission.getVersion(); // 获取版本号
-        String secretToken = dbPermission.getSecretToken(); // 获取旧 secretToken
+        Integer version = permissionDTO.getVersion(); // 获取前端保存的版本号
+        String secretToken = permissionDTO.getSecretToken(); // 获取前端保存的旧 secretToken
         String newSecretToken = UUID.randomUUID().toString();
         Long updateUserId = UserContext.getCurrentUserId();
 
