@@ -3,9 +3,8 @@ package com.ymjrhk.rbac.service.impl;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.entity.UserRole;
-import com.ymjrhk.rbac.exception.AssignmentRoleFailedException;
-import com.ymjrhk.rbac.exception.RoleNotExistException;
-import com.ymjrhk.rbac.exception.UserNotExistException;
+import com.ymjrhk.rbac.exception.*;
+import com.ymjrhk.rbac.mapper.MeMapper;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
@@ -15,9 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
+import static com.ymjrhk.rbac.constant.StatusConstant.ENABLED;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     private final UserRoleMapper userRoleMapper;
 
     private final RoleMapper roleMapper;
+    private final MeMapper meMapper;
 
     /**
      * 给用户分配角色
@@ -37,47 +41,91 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Override
     @Transactional
     public void assignRolesToUser(Long userId, List<Long> roleIds) { // TODO: 需要version吗
-        // 1. 校验用户是否存在
+//        A = 我拥有的角色（非禁用）
+//        B = 用户拥有的角色（非禁用）
+//        C = 我这次提交勾选的角色（前端传 roleIds）
+//        最终用户角色 = (B - A) ∪ C
+
+        /*
+        1. 校验用户是否存在或者被禁用
+        2. 提交勾选的角色是否为空
+             1. 否，到步骤 3
+             2. 是，执行步骤 4、6、7
+        3. 校验提交勾选的角色是否存在或者被禁用
+        4. 查我拥有的角色（非禁用）
+        5. 提交勾选的角色是否有超出我的角色？
+        6. 查用户拥有的角色（非禁用）
+        7. 删除用户角色中用户和我都拥有的角色
+        8. 插入我从我的角色中给用户新分配的角色（用户原来有、我没有的角色保持不变）
+        */
+
+        /* ========= 1. 校验用户是否存在 / 是否被禁用 ========= */
         User dbUser = userMapper.getByUserId(userId);
-        if (dbUser == null) { // 用户不存在
+        if (dbUser == null) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
+        if (dbUser.getStatus() == DISABLED) {
+            throw new UserForbiddenException(USER_FORBIDDEN);
+        }
 
-        // 2. 校验角色是否存在（!!不要n次roleMapper.getByRoleId(roleId)，下面方法一条SQL，O(1)复杂度）
-        if (roleIds != null && !roleIds.isEmpty()) {
-            List<Long> existRoleIds = roleMapper.selectExistingRoleIds(roleIds);
-            if (existRoleIds.size() != roleIds.size()) { // 有某个角色不存在
-                throw new RoleNotExistException(ROLE_NOT_EXIST);
+        /* ========= 2. roleIds 是否为空 ========= */
+        // 如果为空，执行步骤 4、6、7
+        boolean assignEmpty = (roleIds == null || roleIds.isEmpty());
+
+        /* ========= 3. 校验提交角色是否存在 / 是否被禁用 ========= */
+        if (!assignEmpty) {
+            List<Long> validRoleIds = roleMapper.selectEnabledRoleIds(roleIds);
+            if (validRoleIds.size() != roleIds.size()) {
+                throw new RoleNotExistOrDisabledException(ROLE_NOT_EXIST_OR_DISABLED); // 分配的角色不存在或者被禁用
             }
         }
 
-        // TODO：3. 判断用户是否存在
-        // TODO：3. 判断用户有没有被禁用
-        // TODO：4. 判断角色有没有被禁用
-        // TODO：5. 查用户拥有的角色（非禁用）
-        // TODO：6. 查我拥有的角色（非禁用）
-        // TODO：7. 删除用户角色中用户和我都拥有的角色
-        // TODO：8.0 如果我给用户分配的角色为空列表，到此为止
-        // TODO：8. 插入我从我的角色中给用户新分配的角色（用户原来有我没有的角色保持不变）
-        // RolePermission 同理
+        /* ========= 4. 查我拥有的角色（非禁用） ========= */
+        Long operatorId = UserContext.getCurrentUserId();
+        List<Long> myRoleIds = userRoleMapper
+                .selectRoleIdsByUserIdAndStatus(operatorId, ENABLED);
 
-        // 3. 从 sys_user_role 表中删除原本的关联
-        userRoleMapper.deleteByUserId(userId);
+        Set<Long> myRoleSet = new HashSet<>(myRoleIds);
 
-        // 4. 新插入数据
-        Long operateUserId = UserContext.getCurrentUserId();
+        /* ========= 5. 校验勾选的角色是否有超出我的角色 ========= */
+        if (!assignEmpty) {
+            boolean illegal = roleIds.stream().anyMatch(id -> !myRoleSet.contains(id));
+            if (illegal) {
+                throw new AssignmentRoleDeniedException(ASSIGNMENT_ROLE_DENIED);
+            }
+        }
+
+        /* ========= 6. 查用户拥有的角色（非禁用） ========= */
+        List<Long> userRoleIds = userRoleMapper
+                .selectRoleIdsByUserIdAndStatus(userId, ENABLED);
+
+        Set<Long> userRoleSet = new HashSet<>(userRoleIds);
+
+        /* ========= 7. 删除：用户和我都拥有的角色 ========= */
+        Set<Long> deletableRoles = new HashSet<>(userRoleSet);
+        deletableRoles.retainAll(myRoleSet); // B ∩ A
+
+        if (!deletableRoles.isEmpty()) {
+            userRoleMapper.deleteByUserIdAndRoleIds(userId, deletableRoles);
+        }
+
+        /* ========= 8. 插入：我新分配的角色 ========= */
+        if (assignEmpty) {
+            return; // 我不再给任何角色，结束
+        }
 
         List<UserRole> relations = roleIds.stream()
                                           .map(roleId -> {
-                                              UserRole userRole = new UserRole();
-                                              userRole.setUserId(userId);
-                                              userRole.setRoleId(roleId);
-                                              userRole.setCreateUserId(operateUserId);
-                                              return userRole;
+                                              UserRole ur = new UserRole();
+                                              ur.setUserId(userId);
+                                              ur.setRoleId(roleId);
+                                              ur.setCreateUserId(operatorId);
+                                              return ur;
                                           })
                                           .toList();
-        int result = userRoleMapper.batchInsert(relations);
-        if (result == 0) { // 分配角色失败
+
+        int inserted = userRoleMapper.batchInsert(relations);
+        if (inserted != relations.size()) {
             throw new AssignmentRoleFailedException(ASSIGNMENT_ROLE_FAILED);
         }
     }

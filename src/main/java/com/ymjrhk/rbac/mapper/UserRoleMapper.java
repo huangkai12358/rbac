@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface UserRoleMapper {
@@ -43,4 +44,20 @@ public interface UserRoleMapper {
      */
     // 使用boolean代替int
     boolean userHasRole(Long userId, String roleName);
+
+
+    /**
+     * 根据 userId 和 role status 查 roleId（可查禁用或非禁用）
+     * @param userId
+     * @param status
+     * @return
+     */
+    List<Long> selectRoleIdsByUserIdAndStatus(Long userId, int status);
+
+    /**
+     * 根据 userId 和 要删除的 roleIds 从 sys_user_role 表中删除数据
+     * @param userId
+     * @param roleIds
+     */
+    void deleteByUserIdAndRoleIds(Long userId, Set<Long> roleIds);
 }

@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
-import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
 @RequiredArgsConstructor
@@ -128,7 +128,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         }
 
         // 角色被禁用，不能修改
-        if (Objects.equals(dbRole.getStatus(), DISABLE)) {
+        if (Objects.equals(dbRole.getStatus(), DISABLED)) {
             throw new RoleForbiddenException(ROLE_FORBIDDEN);
         }
 

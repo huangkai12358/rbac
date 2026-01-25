@@ -25,4 +25,22 @@
         where rp.role_id = #{roleId}
           and p.status = 1
     </select>
+
+    <select id="selectPermissionIdsByRoleIdAndStatus" resultType="java.lang.Long">
+        select p.permission_id
+        from sys_role_permission rp
+                 join sys_permission p on rp.permission_id = p.permission_id
+        where rp.role_id = #{roleId}
+          and p.status = #{status}
+    </select>
+
+    <delete id="deleteByRoleIdAndPermissionIds">
+        delete from sys_role_permission
+        where role_id = #{roleId}
+        and permission_id in
+        <foreach collection="permissionIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

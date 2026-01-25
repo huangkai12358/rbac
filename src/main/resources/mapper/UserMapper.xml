@@ -76,4 +76,14 @@
           and r.status = 1
           and p.status = 1
     </select>
+
+    <select id="selectPermissionIdsByUserIdAndStatus" resultType="java.lang.Long">
+        select distinct p.permission_id
+        from sys_user_role ur
+                 join sys_role_permission rp on ur.role_id = rp.role_id
+                 join sys_permission p on rp.permission_id = p.permission_id
+        where ur.user_id = #{userId}
+          and p.status = #{status}
+    </select>
+
 </mapper>

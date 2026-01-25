@@ -16,7 +16,6 @@ import com.ymjrhk.rbac.mapper.MeMapper;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.MeService;
-import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.vo.*;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,7 @@ import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
-import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
 @RequiredArgsConstructor
@@ -110,7 +109,7 @@ public class MeServiceImpl implements MeService {
         }
 
         // 用户被禁用，不能修改
-        if (Objects.equals(dbUser.getStatus(), DISABLE)) {
+        if (Objects.equals(dbUser.getStatus(), DISABLED)) {
             throw new UserForbiddenException(USER_FORBIDDEN);
         }
 
@@ -162,7 +161,7 @@ public class MeServiceImpl implements MeService {
         }
 
         // 2.3 如果账号被禁用
-        if (Objects.equals(dbUser.getStatus(), StatusConstant.DISABLE)) {
+        if (Objects.equals(dbUser.getStatus(), StatusConstant.DISABLED)) {
             throw new UserForbiddenException(MessageConstant.USER_FORBIDDEN);
         }
 

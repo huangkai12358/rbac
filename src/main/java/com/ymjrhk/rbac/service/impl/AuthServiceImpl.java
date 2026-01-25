@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 2.3 如果账号被禁用
-        if (Objects.equals(user.getStatus(), StatusConstant.DISABLE)) {
+        if (Objects.equals(user.getStatus(), StatusConstant.DISABLED)) {
             throw new UserForbiddenException(MessageConstant.USER_FORBIDDEN);
         }
 

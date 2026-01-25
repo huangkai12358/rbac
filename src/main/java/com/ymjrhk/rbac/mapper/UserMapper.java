@@ -68,7 +68,7 @@ public interface UserMapper {
     int updateForCreateUser(User user);
 
     /**
-     * 根据 userId 查询用户权限（user, role, permission status 都不能为 0）
+     * 根据 userId 查询用户权限（user, role, permission status 都不能为 0），要去重！
      *
      * @param userId
      * @return
@@ -92,4 +92,12 @@ public interface UserMapper {
      */
     @Update("update sys_user set auth_version = auth_version + 1 where user_id = #{userId}")
     int incrementAuthVersion(Long userId);
+
+    /**
+     * 根据 userId 和 permission status 查 permissionId（可查禁用或非禁用），要去重！
+     * @param userId
+     * @param status
+     * @return
+     */
+    List<Long> selectPermissionIdsByUserIdAndStatus(Long userId, int status);
 }

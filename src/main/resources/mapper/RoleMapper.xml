@@ -59,4 +59,14 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="selectEnabledRoleIds" resultType="java.lang.Long">
+        select role_id
+        from sys_role
+        where status = 1
+        and role_id in
+        <foreach collection="roleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

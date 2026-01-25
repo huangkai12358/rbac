@@ -10,7 +10,6 @@ import com.ymjrhk.rbac.constant.RoleNameConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.UserCreateDTO;
 import com.ymjrhk.rbac.dto.UserDTO;
-import com.ymjrhk.rbac.dto.UserLoginDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.entity.User;
@@ -41,7 +40,7 @@ import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.PasswordConstant.rawPassword;
-import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
 @RequiredArgsConstructor
@@ -173,7 +172,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 用户被禁用，不能修改
-        if (Objects.equals(dbUser.getStatus(), DISABLE)) {
+        if (Objects.equals(dbUser.getStatus(), DISABLED)) {
             throw new UserForbiddenException(USER_FORBIDDEN);
         }
 
@@ -230,7 +229,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         changeStatus(dbUser, user, status);
 
         // 4. 如果禁用用户，则 auth_version 应该加一
-        if (status == DISABLE) {
+        if (status == DISABLED) {
             user.setAuthVersion(dbUser.getAuthVersion());
         }
 
@@ -258,7 +257,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 用户被禁用，不能修改
-        if (Objects.equals(dbUser.getStatus(), DISABLE)) {
+        if (Objects.equals(dbUser.getStatus(), DISABLED)) {
             throw new UserForbiddenException(USER_FORBIDDEN);
         }
 

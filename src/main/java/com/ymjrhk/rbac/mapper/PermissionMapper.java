@@ -59,4 +59,11 @@ public interface PermissionMapper {
     @Select("select permission_id, permission_name, permission_display_name, description, status, type, parent_id, path, method, sort " +
             "from sys_permission where status = 1 and type = 2")
     List<PermissionVO> listAllActivePermissions();
+
+    /**
+     * 对给定的 permissionIds，选出其中在 sys_permission 表中实际存在并且未禁用的的 permissionIds
+     * @param permissionIds
+     * @return
+     */
+    List<Long> selectEnabledPermissionIds(List<Long> permissionIds);
 }

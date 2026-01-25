@@ -92,7 +92,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             }
 
             // 4.2 校验用户状态
-            if (authInfo.getStatus() == null || authInfo.getStatus() == StatusConstant.DISABLE) {
+            if (authInfo.getStatus() == null || authInfo.getStatus() == StatusConstant.DISABLED) {
                 log.warn("JWT 校验失败：用户被禁用 userId={}", userId);
                 throw new UserNotLoginException(USER_FORBIDDEN);
             }

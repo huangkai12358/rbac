@@ -25,15 +25,19 @@ public class MessageConstant {
     public static final String ROLE_NOT_EXIST = "角色不存在"; // 43002
     public static final String ROLE_FORBIDDEN = "角色被禁用"; // 43003
     public static final String ROLE_CREATE_FAILED = "角色创建失败"; // 43004
+    public static final String ROLE_NOT_EXIST_OR_DISABLED = "权限不存在或被禁用"; // 43005
 
     // 44xxx 权限
     public static final String PERMISSION_NOT_EXIST = "权限不存在"; // 44002
     public static final String PERMISSION_FORBIDDEN = "权限被禁用"; // 44003
     public static final String PERMISSION_CREATE_FAILED = "权限创建失败"; // 44004
+    public static final String PERMISSION_NOT_EXIST_OR_DISABLED = "权限不存在或被禁用"; // 44005
 
     // 45xxx 分配
     public static final String ASSIGNMENT_ROLE_FAILED = "分配角色失败"; // 45001
     public static final String ASSIGNMENT_PERMISSION_FAILED = "分配权限失败"; // 45002
+    public static final String ASSIGNMENT_ROLE_DENIED = "不能分配自己未拥有的角色"; // 45003
+    public static final String ASSIGNMENT_PERMISSION_DENIED = "不能分配自己未拥有的权限"; // 45004
 
     // 46xxx 业务通用
     public static final String STATUS_NOT_CHANGE = "状态未改变，无需修改"; // 46001

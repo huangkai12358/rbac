@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface RolePermissionMapper {
@@ -33,4 +34,19 @@ public interface RolePermissionMapper {
      * @return
      */
     List<PermissionVO> selectPermissionsByRoleId(Long roleId);
+
+    /**
+     * 根据 roleId 和 permission status 查 permissionId（可查禁用或非禁用）
+     * @param roleId
+     * @param status
+     * @return
+     */
+    List<Long> selectPermissionIdsByRoleIdAndStatus(Long roleId, int status);
+
+    /**
+     * 根据 roleId 和 要删除的 permissionsId 从 sys_role_permission 表中删除数据
+     * @param roleId
+     * @param permissionIds
+     */
+    void deleteByRoleIdAndPermissionIds(Long roleId, Set<Long> permissionIds);
 }

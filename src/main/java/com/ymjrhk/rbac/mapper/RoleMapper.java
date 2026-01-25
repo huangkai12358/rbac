@@ -43,10 +43,17 @@ public interface RoleMapper {
     int update(Role role);
 
     /**
-     * 选出在 sys_role 表中实际存在的 roleIds
+     * 对给定的 roleIds，选出其中在 sys_role 表中实际存在的 roleIds
      *
      * @param roleIds
      * @return
      */
     List<Long> selectExistingRoleIds(List<Long> roleIds);
+
+    /**
+     * 对给定的 roleIds，选出其中在 sys_role 表中实际存在并且未禁用的的 roleIds
+     * @param roleIds
+     * @return
+     */
+    List<Long> selectEnabledRoleIds(List<Long> roleIds);
 }

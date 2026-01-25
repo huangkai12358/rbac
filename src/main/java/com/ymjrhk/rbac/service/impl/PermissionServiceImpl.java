@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
-import static com.ymjrhk.rbac.constant.StatusConstant.DISABLE;
+import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
 @RequiredArgsConstructor
@@ -128,7 +128,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         }
 
         // 权限被禁用，不能修改
-        if (Objects.equals(dbPermission.getStatus(), DISABLE)) {
+        if (Objects.equals(dbPermission.getStatus(), DISABLED)) {
             throw new PermissionForbiddenException(PERMISSION_FORBIDDEN);
         }
 
