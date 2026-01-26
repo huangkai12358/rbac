@@ -4,8 +4,10 @@ import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.*;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
+import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.service.impl.UserServiceImpl;
+import com.ymjrhk.rbac.vo.AssignableRoleVO;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +29,8 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 public class UserController {
 
     private final UserService userService;
+
+    private final UserRoleService userRoleService;
 
     /**
      * 创建用户
@@ -131,5 +135,19 @@ public class UserController {
         log.info("查询用户权限，userId: {}", userId);
         List<PermissionVO> permissions = userService.getUserPermissions(userId);
         return Result.success(permissions);
+    }
+
+    /**
+     * 查看用户的角色和我的角色的关系
+     * @param userId
+     * @return
+     */
+    @Audit(permission = USER_VIEW)
+    @GetMapping("/{userId}/assignable-roles")
+    @Operation(summary = "查看用户的角色和我的角色的关系")
+    public List<AssignableRoleVO> getAssignableRoles(
+            @PathVariable Long userId
+    ) {
+        return userRoleService.getAssignableRoles(userId);
     }
 }

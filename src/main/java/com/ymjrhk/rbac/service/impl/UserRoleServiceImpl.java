@@ -1,6 +1,8 @@
 package com.ymjrhk.rbac.service.impl;
 
+import com.ymjrhk.rbac.constant.StatusConstant;
 import com.ymjrhk.rbac.context.UserContext;
+import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.entity.UserRole;
 import com.ymjrhk.rbac.exception.*;
@@ -9,14 +11,14 @@ import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
 import com.ymjrhk.rbac.service.UserRoleService;
+import com.ymjrhk.rbac.vo.AssignableRoleVO;
 import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
@@ -160,4 +162,71 @@ public class UserRoleServiceImpl implements UserRoleService {
         // 暂时不用查 userId 和 roleName 是否存在，调用它的函数后面部分查了，且不存在也没关系
         return userRoleMapper.userHasRole(userId, roleName);
     }
+
+    /**
+     * 查看用户的角色和我的角色的关系
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<AssignableRoleVO> getAssignableRoles(Long userId) {
+
+        /* ========= 1. 校验用户是否存在 / 是否禁用 ========= */
+        User user = userMapper.getByUserId(userId);
+        if (user == null) {
+            throw new UserNotExistException(USER_NOT_EXIST);
+        }
+        if (user.getStatus() == StatusConstant.DISABLED) {
+            throw new UserForbiddenException(USER_FORBIDDEN);
+        }
+
+        /* ========= 2. 查我拥有的角色（非禁用） ========= */
+        Long operatorId = UserContext.getCurrentUserId();
+
+        List<Role> myRoles =
+                roleMapper.selectRolesByUserIdAndStatus(
+                        operatorId, ENABLED
+                );
+
+        Map<Long, Role> myRoleMap = myRoles.stream()
+                                           .collect(Collectors.toMap(Role::getRoleId, r -> r));
+
+        /* ========= 3. 查用户拥有的角色（非禁用） ========= */
+        List<Role> userRoles =
+                roleMapper.selectRolesByUserIdAndStatus(
+                        userId, StatusConstant.ENABLED
+                );
+
+        Map<Long, Role> userRoleMap = userRoles.stream()
+                                               .collect(Collectors.toMap(Role::getRoleId, r -> r));
+
+        /* ========= 4. 合并角色集合（A ∪ B） ========= */
+        Set<Long> allRoleIds = new HashSet<>();
+        allRoleIds.addAll(myRoleMap.keySet());
+        allRoleIds.addAll(userRoleMap.keySet());
+
+        /* ========= 5. 组装返回 VO ========= */
+        List<AssignableRoleVO> result = new ArrayList<>();
+
+        for (Long roleId : allRoleIds) {
+            Role role = myRoleMap.getOrDefault(
+                    roleId,
+                    userRoleMap.get(roleId)
+            );
+
+            AssignableRoleVO vo = new AssignableRoleVO();
+            vo.setRoleId(roleId);
+            vo.setRoleDisplayName(role.getRoleDisplayName());
+            vo.setOwnedByMe(myRoleMap.containsKey(roleId));
+            vo.setOwnedByUser(userRoleMap.containsKey(roleId));
+
+            result.add(vo);
+        }
+
+        // 可选：按角色名排序，前端体验更好 // TODO: 按 sort 排序
+        result.sort(Comparator.comparing(AssignableRoleVO::getRoleDisplayName));
+
+        return result;
+    }
+
 }

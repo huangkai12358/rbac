@@ -56,4 +56,12 @@ public interface RoleMapper {
      * @return
      */
     List<Long> selectEnabledRoleIds(List<Long> roleIds);
+
+    /**
+     * 根据 userId 和 role status 查 Role（可查禁用或非禁用）
+     * @param userId
+     * @param status
+     * @return
+     */
+    List<Role> selectRolesByUserIdAndStatus(Long userId, int status);
 }
