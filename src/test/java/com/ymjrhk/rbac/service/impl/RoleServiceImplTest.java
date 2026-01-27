@@ -85,7 +85,7 @@ class RoleServiceImplTest {
         ));
 
         verify(roleHistoryService)
-                .record(10L, OperateTypeConstant.CREATE);
+                .recordHistory(10L, OperateTypeConstant.CREATE);
     }
 
     /**
@@ -105,7 +105,7 @@ class RoleServiceImplTest {
                 () -> roleService.create(dto));
 
         verify(roleHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
     // ========================= pageQuery() =========================
@@ -268,7 +268,7 @@ class RoleServiceImplTest {
         ));
 
         verify(roleHistoryService)
-                .record(roleId, OperateTypeConstant.UPDATE);
+                .recordHistory(roleId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -282,12 +282,14 @@ class RoleServiceImplTest {
         when(roleMapper.getByRoleId(roleId))
                 .thenReturn(null);
 
+        RoleDTO roleDTO = new RoleDTO();
+
         // then
         assertThrows(RoleNotExistException.class,
-                () -> roleService.update(roleId, new RoleDTO()));
+                () -> roleService.update(roleId, roleDTO));
 
         verify(roleMapper, never()).update(any());
-        verify(roleHistoryService, never()).record(anyLong(), any());
+        verify(roleHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -305,12 +307,14 @@ class RoleServiceImplTest {
         when(roleMapper.getByRoleId(roleId))
                 .thenReturn(dbRole);
 
+        RoleDTO roleDTO = new RoleDTO();
+
         // then
         assertThrows(RoleForbiddenException.class,
-                () -> roleService.update(roleId, new RoleDTO()));
+                () -> roleService.update(roleId, roleDTO));
 
         verify(roleMapper, never()).update(any());
-        verify(roleHistoryService, never()).record(anyLong(), any());
+        verify(roleHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -337,7 +341,7 @@ class RoleServiceImplTest {
                 () -> roleService.update(roleId, dto));
 
         verify(roleHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
     // ========================= changeStatus() =========================
@@ -376,7 +380,7 @@ class RoleServiceImplTest {
         ));
 
         verify(roleHistoryService)
-                .record(roleId, OperateTypeConstant.UPDATE);
+                .recordHistory(roleId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -395,7 +399,7 @@ class RoleServiceImplTest {
                 () -> roleService.changeStatus(roleId, StatusConstant.DISABLED));
 
         verify(roleMapper, never()).update(any());
-        verify(roleHistoryService, never()).record(anyLong(), any());
+        verify(roleHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -418,7 +422,7 @@ class RoleServiceImplTest {
                 () -> roleService.changeStatus(roleId, StatusConstant.ENABLED));
 
         verify(roleMapper, never()).update(any());
-        verify(roleHistoryService, never()).record(anyLong(), any());
+        verify(roleHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -445,7 +449,7 @@ class RoleServiceImplTest {
                 () -> roleService.changeStatus(roleId, StatusConstant.DISABLED));
 
         verify(roleHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
 

@@ -5,9 +5,6 @@ package com.ymjrhk.rbac.exception;
  */
 public class HistoryInsertFailedException extends BaseException {
 
-    public HistoryInsertFailedException() {
-    }
-
     public HistoryInsertFailedException(String msg) {
         super(msg);
     }

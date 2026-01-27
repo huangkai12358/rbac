@@ -5,9 +5,6 @@ package com.ymjrhk.rbac.exception;
  */
 public class PermissionForbiddenException extends BaseException {
 
-    public PermissionForbiddenException() {
-    }
-
     public PermissionForbiddenException(String msg) {
         super(msg);
     }

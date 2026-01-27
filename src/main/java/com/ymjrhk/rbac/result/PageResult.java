@@ -7,16 +7,16 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * 封装分页查询结果
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageResult implements Serializable {
+public class PageResult<T extends Serializable> implements Serializable {
 
-    private long total; //总记录数
+    private static final long serialVersionUID = 1L;
 
-    private List records; //当前页数据集合
+    /** 总记录数 */
+    private long total;
 
+    /** 当前页数据 */
+    private List<T> records;
 }

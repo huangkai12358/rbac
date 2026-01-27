@@ -198,7 +198,7 @@ class MeServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -220,7 +220,7 @@ class MeServiceImplTest {
                 () -> meService.update(dto));
 
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), anyInt());
+        verify(userHistoryService, never()).recordHistory(anyLong(), anyInt());
     }
 
     /**
@@ -276,7 +276,7 @@ class MeServiceImplTest {
                 () -> meService.update(dto));
 
         verify(userHistoryService, never())
-                .record(anyLong(), anyInt());
+                .recordHistory(anyLong(), anyInt());
     }
 
     // ========================= changePassword() =========================
@@ -326,7 +326,7 @@ class MeServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -350,7 +350,7 @@ class MeServiceImplTest {
                 () -> meService.changePassword(dto));
 
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), anyInt());
+        verify(userHistoryService, never()).recordHistory(anyLong(), anyInt());
     }
 
     /**
@@ -446,7 +446,7 @@ class MeServiceImplTest {
                 () -> meService.changePassword(dto));
 
         verify(userHistoryService, never())
-                .record(anyLong(), anyInt());
+                .recordHistory(anyLong(), anyInt());
     }
 
 

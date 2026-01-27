@@ -30,7 +30,7 @@ public class RoleHistoryServiceImpl implements RoleHistoryService {
      * @param operateType
      */
     @Override
-    public void record(Long roleId, Integer operateType) {
+    public void recordHistory(Long roleId, Integer operateType) {
         log.debug("先读出新表所有数据，再拷贝到历史表中：");
         Role role = roleMapper.getByRoleId(roleId);
 

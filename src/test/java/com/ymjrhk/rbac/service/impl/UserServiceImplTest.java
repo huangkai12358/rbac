@@ -23,14 +23,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 import static com.ymjrhk.rbac.constant.StatusConstant.ENABLED;
@@ -112,7 +115,7 @@ class UserServiceImplTest {
 
         // 验证历史表记录
         verify(userHistoryService)
-                .record(200L, OperateTypeConstant.CREATE);
+                .recordHistory(200L, OperateTypeConstant.CREATE);
     }
 
     /**
@@ -132,7 +135,7 @@ class UserServiceImplTest {
 
         // insert 失败后，后面的逻辑不应执行
         verify(userMapper, never()).updateForCreateUser(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
 
@@ -160,7 +163,7 @@ class UserServiceImplTest {
 
         // update 失败，不应写历史表
         verify(userHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
     /**
@@ -263,36 +266,33 @@ class UserServiceImplTest {
         verify(userMapper).pageQuery(dto);
     }
 
-    /**
-     * pageNum < 1（非法页码）
-     */
-    @Test
-    void pageQuery_pageNumLessThanOne_useDefault() {
-        // given
-        UserPageQueryDTO dto = new UserPageQueryDTO();
-        dto.setPageNum(0);      // 非法
-        dto.setPageSize(10);    // 合法
+    // 提供参数源
+    static Stream<Arguments> pageQueryInvalidParamProvider() {
+        return Stream.of(
+                // pageNum < 1
+                Arguments.of(0, 10, 1, 10),
 
-        Page<User> emptyPage = new Page<>();
-        when(userMapper.pageQuery(dto)).thenReturn(emptyPage);
+                // pageSize <= 0
+                Arguments.of(1, 0, 1, 10),
 
-        // when
-        userService.pageQuery(dto);
-
-        // then
-        assertEquals(1, dto.getPageNum());   // DEFAULT_PAGE_NUM
-        assertEquals(10, dto.getPageSize());
+                // pageSize > MAX_PAGE_SIZE
+                Arguments.of(1, 1000, 1, 100)
+        );
     }
 
-    /**
-     * pageSize <= 0（非法 pageSize）
-     */
-    @Test
-    void pageQuery_pageSizeLessThanOrEqualZero_useDefault() {
+    // 参数化测试
+    @ParameterizedTest(name = "pageNum={0}, pageSize={1} -> expectedPageNum={2}, expectedPageSize={3}")
+    @MethodSource("pageQueryInvalidParamProvider")
+    void pageQuery_invalidPageParam_useFallback(
+            int pageNum,
+            int pageSize,
+            int expectedPageNum,
+            int expectedPageSize
+    ) {
         // given
         UserPageQueryDTO dto = new UserPageQueryDTO();
-        dto.setPageNum(1);
-        dto.setPageSize(0); // 非法
+        dto.setPageNum(pageNum);
+        dto.setPageSize(pageSize);
 
         Page<User> emptyPage = new Page<>();
         when(userMapper.pageQuery(dto)).thenReturn(emptyPage);
@@ -301,29 +301,8 @@ class UserServiceImplTest {
         userService.pageQuery(dto);
 
         // then
-        assertEquals(1, dto.getPageNum());
-        assertEquals(10, dto.getPageSize()); // DEFAULT_PAGE_SIZE
-    }
-
-    /**
-     * pageSize > MAX_PAGE_SIZE（超上限）
-     */
-    @Test
-    void pageQuery_pageSizeGreaterThanMax_useMax() {
-        // given
-        UserPageQueryDTO dto = new UserPageQueryDTO();
-        dto.setPageNum(1);
-        dto.setPageSize(1000); // 超大
-
-        Page<User> emptyPage = new Page<>();
-        when(userMapper.pageQuery(dto)).thenReturn(emptyPage);
-
-        // when
-        userService.pageQuery(dto);
-
-        // then
-        assertEquals(1, dto.getPageNum());
-        assertEquals(100, dto.getPageSize()); // MAX_PAGE_SIZE
+        assertEquals(expectedPageNum, dto.getPageNum());
+        assertEquals(expectedPageSize, dto.getPageSize());
     }
     //endregion
 
@@ -391,7 +370,7 @@ class UserServiceImplTest {
 
         verify(userMapper).getByUserId(userId);
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -408,12 +387,14 @@ class UserServiceImplTest {
 
         when(userMapper.getByUserId(userId)).thenReturn(dbUser);
 
+        UserDTO userDTO = new UserDTO();
+
         // then
         assertThrows(UserForbiddenException.class,
-                () -> userService.update(userId, new UserDTO()));
+                () -> userService.update(userId, userDTO));
 
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -451,7 +432,7 @@ class UserServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -485,7 +466,7 @@ class UserServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -513,7 +494,7 @@ class UserServiceImplTest {
                 () -> userService.update(userId, dto));
 
         verify(userHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
     //endregion
 
@@ -534,7 +515,7 @@ class UserServiceImplTest {
 
         verify(userMapper).getByUserId(userId);
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -558,7 +539,7 @@ class UserServiceImplTest {
                 () -> userService.changeStatus(userId, ENABLED));
 
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -590,7 +571,7 @@ class UserServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
     //endregion
 
@@ -611,7 +592,7 @@ class UserServiceImplTest {
 
         verify(userMapper).getByUserId(userId);
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -633,7 +614,7 @@ class UserServiceImplTest {
                 () -> userService.resetPassword(userId));
 
         verify(userMapper, never()).update(any());
-        verify(userHistoryService, never()).record(anyLong(), any());
+        verify(userHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -672,7 +653,7 @@ class UserServiceImplTest {
         ));
 
         verify(userHistoryService)
-                .record(userId, OperateTypeConstant.UPDATE);
+                .recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -699,7 +680,7 @@ class UserServiceImplTest {
                 () -> userService.resetPassword(userId));
 
         verify(userHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
     //endregion
 

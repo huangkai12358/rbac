@@ -5,9 +5,6 @@ package com.ymjrhk.rbac.exception;
  */
 public class UserForbiddenException extends BaseException {
 
-    public UserForbiddenException() {
-    }
-
     public UserForbiddenException(String msg) {
         super(msg);
     }

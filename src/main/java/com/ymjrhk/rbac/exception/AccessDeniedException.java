@@ -5,9 +5,6 @@ package com.ymjrhk.rbac.exception;
  */
 public class AccessDeniedException extends BaseException {
 
-    public AccessDeniedException() {
-    }
-
     public AccessDeniedException(String msg) {
         super(msg);
     }

@@ -2,7 +2,7 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.PermissionCreateDTO;
@@ -64,7 +64,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         }
 
         // 写到历史表
-        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.CREATE);
+        permissionHistoryService.recordHistory(permission.getPermissionId(), OperateTypeConstant.CREATE);
 
         return permission.getPermissionId();
     }
@@ -79,7 +79,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
     public PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
         normalizePage(permissionPageQueryDTO);
 
-        PageHelper.startPage(permissionPageQueryDTO.getPageNum(), permissionPageQueryDTO.getPageSize());
+        PageMethod.startPage(permissionPageQueryDTO.getPageNum(), permissionPageQueryDTO.getPageSize());
 
         Page<Permission> page = permissionMapper.pageQuery(permissionPageQueryDTO);
 
@@ -145,7 +145,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         doUpdate(permission);
 
         // 写到历史表
-        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
+        permissionHistoryService.recordHistory(permission.getPermissionId(), OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -174,7 +174,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         doUpdate(permission);
 
         // 写到历史表
-        permissionHistoryService.record(permission.getPermissionId(), OperateTypeConstant.UPDATE);
+        permissionHistoryService.recordHistory(permission.getPermissionId(), OperateTypeConstant.UPDATE);
     }
 
     /**

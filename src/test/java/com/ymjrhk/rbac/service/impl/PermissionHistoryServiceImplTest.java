@@ -34,13 +34,13 @@ class PermissionHistoryServiceImplTest {
     @Mock
     private PermissionMapper permissionMapper;
 
-    // ========================= record() =========================
+    // ========================= recordHistory() =========================
 
     /**
      * 正常写入历史表
      */
     @Test
-    void record_success() {
+    void recordHistory_success() {
         // given
         Long permissionId = 100L;
         Integer operateType = OperateTypeConstant.UPDATE;
@@ -67,7 +67,7 @@ class PermissionHistoryServiceImplTest {
                 .thenReturn(1);
 
         // when
-        permissionHistoryService.record(permissionId, operateType);
+        permissionHistoryService.recordHistory(permissionId, operateType);
 
         // then
         verify(permissionMapper).getByPermissionId(permissionId);
@@ -94,7 +94,7 @@ class PermissionHistoryServiceImplTest {
      * 历史表写入失败
      */
     @Test
-    void record_insertFail_throwException() {
+    void recordHistory_insertFail_throwException() {
         // given
         Long permissionId = 100L;
         Integer operateType = OperateTypeConstant.CREATE;
@@ -110,7 +110,7 @@ class PermissionHistoryServiceImplTest {
 
         // then
         assertThrows(HistoryInsertFailedException.class,
-                () -> permissionHistoryService.record(permissionId, operateType));
+                () -> permissionHistoryService.recordHistory(permissionId, operateType));
     }
 
 

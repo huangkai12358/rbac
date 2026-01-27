@@ -89,7 +89,7 @@ class PermissionServiceImplTest {
         ));
 
         verify(permissionHistoryService)
-                .record(10L, OperateTypeConstant.CREATE);
+                .recordHistory(10L, OperateTypeConstant.CREATE);
     }
 
     /**
@@ -109,7 +109,7 @@ class PermissionServiceImplTest {
                 () -> permissionService.create(dto));
 
         verify(permissionHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
     // ========================= pageQuery() =========================
@@ -280,7 +280,7 @@ class PermissionServiceImplTest {
         ));
 
         verify(permissionHistoryService)
-                .record(permissionId, OperateTypeConstant.UPDATE);
+                .recordHistory(permissionId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -290,16 +290,17 @@ class PermissionServiceImplTest {
     void update_permissionNotExist_throwException() {
         // given
         Long permissionId = 99L;
+        PermissionDTO dto = new PermissionDTO();
 
         when(permissionMapper.getByPermissionId(permissionId))
                 .thenReturn(null);
 
         // then
         assertThrows(PermissionNotExistException.class,
-                () -> permissionService.update(permissionId, new PermissionDTO()));
+                () -> permissionService.update(permissionId, dto));
 
         verify(permissionMapper, never()).update(any());
-        verify(permissionHistoryService, never()).record(anyLong(), any());
+        verify(permissionHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -314,15 +315,17 @@ class PermissionServiceImplTest {
         dbPermission.setPermissionId(permissionId);
         dbPermission.setStatus(StatusConstant.DISABLED);
 
+        PermissionDTO dto = new PermissionDTO();
+
         when(permissionMapper.getByPermissionId(permissionId))
                 .thenReturn(dbPermission);
 
         // then
         assertThrows(PermissionForbiddenException.class,
-                () -> permissionService.update(permissionId, new PermissionDTO()));
+                () -> permissionService.update(permissionId, dto));
 
         verify(permissionMapper, never()).update(any());
-        verify(permissionHistoryService, never()).record(anyLong(), any());
+        verify(permissionHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -351,7 +354,7 @@ class PermissionServiceImplTest {
                 () -> permissionService.update(permissionId, dto));
 
         verify(permissionHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
     // ========================= changeStatus() =========================
@@ -390,7 +393,7 @@ class PermissionServiceImplTest {
         ));
 
         verify(permissionHistoryService)
-                .record(permissionId, OperateTypeConstant.UPDATE);
+                .recordHistory(permissionId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -409,7 +412,7 @@ class PermissionServiceImplTest {
                 () -> permissionService.changeStatus(permissionId, StatusConstant.DISABLED));
 
         verify(permissionMapper, never()).update(any());
-        verify(permissionHistoryService, never()).record(anyLong(), any());
+        verify(permissionHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -432,7 +435,7 @@ class PermissionServiceImplTest {
                 () -> permissionService.changeStatus(permissionId, StatusConstant.ENABLED));
 
         verify(permissionMapper, never()).update(any());
-        verify(permissionHistoryService, never()).record(anyLong(), any());
+        verify(permissionHistoryService, never()).recordHistory(anyLong(), any());
     }
 
     /**
@@ -459,7 +462,7 @@ class PermissionServiceImplTest {
                 () -> permissionService.changeStatus(permissionId, StatusConstant.DISABLED));
 
         verify(permissionHistoryService, never())
-                .record(anyLong(), any());
+                .recordHistory(anyLong(), any());
     }
 
 

@@ -129,7 +129,7 @@ public class MeServiceImpl implements MeService {
         }
 
         // 写到历史表
-        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+        userHistoryService.recordHistory(user.getUserId(), OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -190,6 +190,6 @@ public class MeServiceImpl implements MeService {
         }
 
         // 4. 写到历史表
-        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+        userHistoryService.recordHistory(user.getUserId(), OperateTypeConstant.UPDATE);
     }
 }

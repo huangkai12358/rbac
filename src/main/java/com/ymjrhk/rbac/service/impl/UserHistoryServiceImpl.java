@@ -30,7 +30,7 @@ public class UserHistoryServiceImpl implements UserHistoryService {
      * @param operateType
      */
     @Override
-    public void record(Long userId, Integer operateType) {
+    public void recordHistory(Long userId, Integer operateType) {
         log.debug("先读出新表所有数据，再拷贝到历史表中：");
         User user = userMapper.getByUserId(userId);
 

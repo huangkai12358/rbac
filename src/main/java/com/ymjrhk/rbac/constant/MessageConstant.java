@@ -4,6 +4,11 @@ package com.ymjrhk.rbac.constant;
  * 信息提示常量类
  */
 public class MessageConstant {
+
+    private MessageConstant() {
+        // 防止实例化
+    }
+
     // 40xxx 校验
     public static final String PARAMETER_FORMAT_ERROR = "参数格式错误"; // 40001
     public static final String FIELD_VALID_FAILED = "字段校验失败"; // 40002

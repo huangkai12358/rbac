@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.dto.AuditLogPageQueryDTO;
 import com.ymjrhk.rbac.dto.AuditLogRealPageQueryDTO;
@@ -60,7 +61,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         // 3. 分页
         normalizePage(realPageQueryDTO);
 
-        PageHelper.startPage(realPageQueryDTO.getPageNum(), realPageQueryDTO.getPageSize());
+        PageMethod.startPage(realPageQueryDTO.getPageNum(), realPageQueryDTO.getPageSize());
         Page<AuditLogVO> page = auditLogMapper.pageQuery(realPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
@@ -124,38 +125,11 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
 
     /**
      * 未授权访问，插入审计日志
-     *
-     * @param userId
-     * @param username
-     * @param requestURI
-     * @param method
-     * @param requestBody
-     * @param ip
-     * @param success
-     * @param errorMessage
+     * @param auditLog
      */
     @Async("auditExecutor")
     @Override
-    public void saveForbiddenLog(Long userId,
-                                 String username,
-                                 String requestURI,
-                                 String method,
-                                 String requestBody,
-                                 String ip,
-                                 int success,
-                                 String errorMessage) {
-
-        AuditLog log = new AuditLog();
-
-        log.setUserId(userId);
-        log.setUsername(username);
-        log.setPath(requestURI);
-        log.setMethod(method);
-        log.setRequestBody(requestBody);
-        log.setIp(ip);
-        log.setSuccess(success);
-        log.setErrorMessage(errorMessage);
-
-        auditLogMapper.insert(log);
+    public void saveForbiddenLog(AuditLog auditLog) {
+        auditLogMapper.insert(auditLog);
     }
 }

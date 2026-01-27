@@ -1,6 +1,11 @@
 package com.ymjrhk.rbac.constant;
 
 public class PermissionNameConstant {
+
+    private PermissionNameConstant() {
+        // 防止实例化
+    }
+
     public static final String AUTH_LOGIN = "AUTH:LOGIN";
 
     public static final String ME_VIEW = "ME:VIEW";

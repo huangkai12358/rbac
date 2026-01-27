@@ -34,18 +34,20 @@ public class WebConfigurer implements WebMvcConfigurer {
 
     private final AuditFailInterceptor auditFailInterceptor;
 
+    private static final String API_PATTERN = "/api/**";
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
         // 1. 认证拦截器（先执行）
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns(API_PATTERN)
                 .excludePathPatterns("/api/auth/login") // "/api/auth/logout" 要拦
                 .order(1);
 
         // 2. 鉴权拦截器（后执行）
         registry.addInterceptor(permissionInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns(API_PATTERN)
                 .excludePathPatterns(
                         "/api/auth/**",
                         "/api/me/**"   // auth-only 只需认证不需鉴权
@@ -54,7 +56,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 
         // 3. 参数类型失败审计日志记录拦截器（只有 afterCompetition）
         registry.addInterceptor(auditFailInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns(API_PATTERN)
                 .order(3);
     }
 

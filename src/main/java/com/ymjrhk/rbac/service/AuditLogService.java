@@ -16,12 +16,5 @@ public interface AuditLogService {
                       int success,
                       String errorMessage);
 
-    void saveForbiddenLog(Long userId,
-                          String username,
-                          String requestURI,
-                          String method,
-                          String requestBody,
-                          String ip,
-                          int success,
-                          String errorMessage);
+    void saveForbiddenLog(AuditLog auditLog);
 }

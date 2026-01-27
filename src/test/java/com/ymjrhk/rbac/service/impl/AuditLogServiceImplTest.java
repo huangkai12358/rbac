@@ -274,17 +274,18 @@ class AuditLogServiceImplTest {
         int success = SuccessConstant.FAIL;
         String errorMessage = "无权限访问";
 
+        AuditLog auditLog = new AuditLog();
+        auditLog.setUserId(userId);
+        auditLog.setUsername(username);
+        auditLog.setPath(requestURI);
+        auditLog.setMethod(method);
+        auditLog.setRequestBody(requestBody);
+        auditLog.setIp(ip);
+        auditLog.setSuccess(success);
+        auditLog.setErrorMessage(errorMessage);
+
         // when
-        auditLogService.saveForbiddenLog(
-                userId,
-                username,
-                requestURI,
-                method,
-                requestBody,
-                ip,
-                success,
-                errorMessage
-        );
+        auditLogService.saveForbiddenLog(auditLog);
 
         // then
         verify(auditLogMapper).insert(argThat(log ->

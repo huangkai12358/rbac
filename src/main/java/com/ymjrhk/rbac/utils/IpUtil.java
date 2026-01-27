@@ -4,6 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class IpUtil {
 
+    private IpUtil() {
+        // 防止实例化
+    }
+
     /**
      * 获取客户端 ip
      *

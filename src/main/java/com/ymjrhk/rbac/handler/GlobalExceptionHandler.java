@@ -127,13 +127,13 @@ public class GlobalExceptionHandler {
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 
         // 一般做法：取第一个错误
-        FieldError error = fieldErrors.getFirst();
+        FieldError firstError = fieldErrors.getFirst();
 
-        log.warn("{} —— {}：{}", FIELD_VALID_FAILED, error.getDefaultMessage(), ex.getMessage());
+        log.warn("{} —— {}：{}", FIELD_VALID_FAILED, firstError.getDefaultMessage(), ex.getMessage());
 
-        request.setAttribute(ERROR_MESSAGE, error.getDefaultMessage());
+        request.setAttribute(ERROR_MESSAGE, firstError.getDefaultMessage());
 
-        return Result.error(error.getDefaultMessage());
+        return Result.error(firstError.getDefaultMessage());
     }
 
     /**

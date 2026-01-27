@@ -115,7 +115,7 @@ public class UserController {
     @Audit(permission = USER_PASSWORD_RESET)
     @PostMapping("/{userId}/password/reset")
     @Operation(summary = "重置用户密码")
-    public Result<Void> resetPassward(@PathVariable("userId") Long userId) {
+    public Result<Void> resetPassword(@PathVariable("userId") Long userId) {
         userService.resetPassword(userId);
         return Result.success();
     }

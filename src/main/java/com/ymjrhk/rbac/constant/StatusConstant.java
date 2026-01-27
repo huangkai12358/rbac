@@ -5,6 +5,10 @@ package com.ymjrhk.rbac.constant;
  */
 public class StatusConstant {
 
+    private StatusConstant() {
+        // 防止实例化
+    }
+
     //启用
     public static final int ENABLED = 1;
 

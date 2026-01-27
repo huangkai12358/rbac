@@ -5,9 +5,6 @@ package com.ymjrhk.rbac.exception;
  */
 public class RoleForbiddenException extends BaseException {
 
-    public RoleForbiddenException() {
-    }
-
     public RoleForbiddenException(String msg) {
         super(msg);
     }

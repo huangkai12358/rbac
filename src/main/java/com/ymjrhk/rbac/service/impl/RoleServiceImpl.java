@@ -2,7 +2,7 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.RoleCreateDTO;
@@ -64,7 +64,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         }
 
         // 写到历史表
-        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.CREATE);
+        roleHistoryService.recordHistory(role.getRoleId(), OperateTypeConstant.CREATE);
 
         return role.getRoleId();
     }
@@ -79,7 +79,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     public PageResult pageQuery(RolePageQueryDTO rolePageQueryDTO) {
         normalizePage(rolePageQueryDTO);
 
-        PageHelper.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
+        PageMethod.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
 
         Page<Role> page = roleMapper.pageQuery(rolePageQueryDTO);
 
@@ -148,7 +148,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         doUpdate(role);
 
         // 写到历史表
-        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
+        roleHistoryService.recordHistory(role.getRoleId(), OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -177,7 +177,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         doUpdate(role);
 
         // 5. 写到历史表
-        roleHistoryService.record(role.getRoleId(), OperateTypeConstant.UPDATE);
+        roleHistoryService.recordHistory(role.getRoleId(), OperateTypeConstant.UPDATE);
     }
 
     /**

@@ -33,13 +33,13 @@ class UserHistoryServiceImplTest {
     @Mock
     private UserMapper userMapper;
 
-    // ========================= record() =========================
+    // ========================= recordHistory() =========================
 
     /**
      * 正常写入历史表
      */
     @Test
-    void record_success() {
+    void recordHistory_success() {
         // given
         Long userId = 1L;
         Integer operateType = OperateTypeConstant.CREATE;
@@ -63,7 +63,7 @@ class UserHistoryServiceImplTest {
                 .thenReturn(1);
 
         // when
-        userHistoryService.record(userId, operateType);
+        userHistoryService.recordHistory(userId, operateType);
 
         // then
         verify(userMapper).getByUserId(userId);
@@ -87,7 +87,7 @@ class UserHistoryServiceImplTest {
      * 历史表写入失败
      */
     @Test
-    void record_insertFail_throwException() {
+    void recordHistory_insertFail_throwException() {
         // given
         Long userId = 1L;
         Integer operateType = OperateTypeConstant.UPDATE;
@@ -104,7 +104,7 @@ class UserHistoryServiceImplTest {
 
         // then
         assertThrows(HistoryInsertFailedException.class,
-                () -> userHistoryService.record(userId, operateType));
+                () -> userHistoryService.recordHistory(userId, operateType));
     }
 
 }

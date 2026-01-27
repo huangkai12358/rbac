@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.interceptor;
 
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.context.UserContext;
+import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.exception.AccessDeniedException;
 import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.UserService;
@@ -70,16 +71,18 @@ public class PermissionInterceptor implements HandlerInterceptor {
         if (!allowed) {
             log.warn("未授权访问，将保存到审计日志表中...");
 
-            auditLogService.saveForbiddenLog(
-                    UserContext.getCurrentUserId(),
-                    UserContext.getCurrentUsername(),
-                    request.getRequestURI(),
-                    request.getMethod(),
-                    getRequestBody(request),
-                    getClientIp(request),
-                    SuccessConstant.FAIL,
-                    ACCESS_DENIED
-            );
+            AuditLog auditLog = new AuditLog();
+
+            auditLog.setUserId(UserContext.getCurrentUserId());
+            auditLog.setUsername(UserContext.getCurrentUsername());
+            auditLog.setPath(request.getRequestURI());
+            auditLog.setMethod(request.getMethod());
+            auditLog.setRequestBody(getRequestBody(request));
+            auditLog.setIp(getClientIp(request));
+            auditLog.setSuccess(SuccessConstant.FAIL);
+            auditLog.setErrorMessage(ACCESS_DENIED);
+
+            auditLogService.saveForbiddenLog(auditLog);
 
             throw new AccessDeniedException(ACCESS_DENIED);
         }

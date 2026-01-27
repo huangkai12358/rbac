@@ -1,5 +1,5 @@
 package com.ymjrhk.rbac.service;
 
 public interface RoleHistoryService {
-    void record(Long roleId, Integer operateType);
+    void recordHistory(Long roleId, Integer operateType);
 }

@@ -76,9 +76,11 @@ class UserRoleServiceImplTest {
         // given
         when(userMapper.getByUserId(1L)).thenReturn(null);
 
+        List<Long> roleIds = List.of(1L);
+
         // when & then
         assertThrows(UserNotExistException.class,
-                () -> userRoleService.assignRolesToUser(1L, List.of(1L)));
+                () -> userRoleService.assignRolesToUser(1L, roleIds));
     }
 
     /**
@@ -93,9 +95,11 @@ class UserRoleServiceImplTest {
 
         when(userMapper.getByUserId(1L)).thenReturn(user);
 
+        List<Long> roleIds = List.of(1L);
+
         // when & then
         assertThrows(UserForbiddenException.class,
-                () -> userRoleService.assignRolesToUser(1L, List.of(1L)));
+                () -> userRoleService.assignRolesToUser(1L, roleIds));
     }
 
     /**
@@ -114,9 +118,11 @@ class UserRoleServiceImplTest {
         when(roleMapper.selectEnabledRoleIds(List.of(1L, 2L)))
                 .thenReturn(List.of(1L));
 
+        List<Long> roleIds = List.of(1L, 2L);
+
         // when & then
         assertThrows(RoleNotExistOrDisabledException.class,
-                () -> userRoleService.assignRolesToUser(1L, List.of(1L, 2L)));
+                () -> userRoleService.assignRolesToUser(1L, roleIds));
     }
 
     /**
@@ -142,9 +148,11 @@ class UserRoleServiceImplTest {
         when(userRoleMapper.selectRoleIdsByUserIdAndStatus(100L, ENABLED))
                 .thenReturn(List.of(2L));
 
+        List<Long> roleIds = List.of(1L);
+
         // when & then
         assertThrows(AssignmentNotOwnedRoleException.class,
-                () -> userRoleService.assignRolesToUser(1L, List.of(1L)));
+                () -> userRoleService.assignRolesToUser(1L, roleIds));
     }
 
     /**
@@ -173,7 +181,7 @@ class UserRoleServiceImplTest {
 
         // then
         verify(userRoleMapper)
-                .deleteByUserIdAndRoleIds(eq(1L), eq(Set.of(1L, 2L)));
+                .deleteByUserIdAndRoleIds(1L, Set.of(1L, 2L));
 
         verify(userRoleMapper, never()).batchInsert(any());
     }
@@ -252,9 +260,7 @@ class UserRoleServiceImplTest {
         userRoleService.assignRolesToUser(1L, List.of(1L, 2L));
 
         // then
-        verify(userRoleMapper).deleteByUserIdAndRoleIds(
-                eq(1L), eq(Set.of(3L))
-        );
+        verify(userRoleMapper).deleteByUserIdAndRoleIds(1L, Set.of(3L));
 
         verify(userRoleMapper).batchInsert(argThat(list ->
                 list.size() == 2 &&
@@ -294,9 +300,11 @@ class UserRoleServiceImplTest {
         when(userRoleMapper.batchInsert(anyList()))
                 .thenReturn(0);
 
+        List<Long> roleIds = List.of(1L);
+
         // when & then
         assertThrows(AssignmentRoleFailedException.class,
-                () -> userRoleService.assignRolesToUser(1L, List.of(1L)));
+                () -> userRoleService.assignRolesToUser(1L, roleIds));
     }
 
     // ========================= getUserRoles() =========================

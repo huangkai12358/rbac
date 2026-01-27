@@ -79,10 +79,12 @@ class RolePermissionServiceImplTest {
      */
     @Test
     void assignPermissions_roleNotExist_throwException() {
+        List<Long> permissionIds = List.of(1L);
+
         when(roleMapper.getByRoleId(1L)).thenReturn(null);
 
         assertThrows(RoleNotExistException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(1L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     /**
@@ -94,10 +96,12 @@ class RolePermissionServiceImplTest {
         role.setRoleId(1L);
         role.setStatus(DISABLED);
 
+        List<Long> permissionIds = List.of(1L);
+
         when(roleMapper.getByRoleId(1L)).thenReturn(role);
 
         assertThrows(RoleForbiddenException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(1L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     /**
@@ -110,10 +114,12 @@ class RolePermissionServiceImplTest {
         role.setStatus(ENABLED);
         role.setRoleName(SUPER_ADMIN);
 
+        List<Long> permissionIds = List.of(1L);
+
         when(roleMapper.getByRoleId(1L)).thenReturn(role);
 
         assertThrows(AssignmentPermissionToSuperAdminException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(1L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     /**
@@ -131,8 +137,10 @@ class RolePermissionServiceImplTest {
         when(permissionMapper.selectEnabledPermissionIds(List.of(1L, 2L)))
                 .thenReturn(List.of(1L));
 
+        List<Long> permissionIds = List.of(1L, 2L);
+
         assertThrows(PermissionNotExistOrDisabledException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(1L, 2L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     /**
@@ -157,8 +165,10 @@ class RolePermissionServiceImplTest {
         when(userMapper.selectPermissionIdsByUserIdAndStatus(100L, ENABLED))
                 .thenReturn(List.of(20L));
 
+        List<Long> permissionIds = List.of(10L);
+
         assertThrows(AssignmentNotOwnedPermissionException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(10L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     /**
@@ -185,7 +195,7 @@ class RolePermissionServiceImplTest {
         rolePermissionService.assignPermissionsToRole(1L, List.of());
 
         verify(rolePermissionMapper)
-                .deleteByRoleIdAndPermissionIds(eq(1L), eq(Set.of(1L, 2L)));
+                .deleteByRoleIdAndPermissionIds(1L, Set.of(1L, 2L));
 
         verify(rolePermissionMapper, never()).batchInsert(any());
     }
@@ -257,7 +267,7 @@ class RolePermissionServiceImplTest {
         rolePermissionService.assignPermissionsToRole(1L, List.of(1L, 2L));
 
         verify(rolePermissionMapper)
-                .deleteByRoleIdAndPermissionIds(eq(1L), eq(Set.of(3L)));
+                .deleteByRoleIdAndPermissionIds(1L, Set.of(3L));
     }
 
     /**
@@ -287,8 +297,10 @@ class RolePermissionServiceImplTest {
         when(rolePermissionMapper.batchInsert(anyList()))
                 .thenReturn(0);
 
+        List<Long> permissionIds = List.of(1L);
+
         assertThrows(AssignmentPermissionFailedException.class,
-                () -> rolePermissionService.assignPermissionsToRole(1L, List.of(1L)));
+                () -> rolePermissionService.assignPermissionsToRole(1L, permissionIds));
     }
 
     // ========================= getRolePermissions() =========================

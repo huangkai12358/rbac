@@ -2,7 +2,7 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.PasswordConstant;
 import com.ymjrhk.rbac.constant.PermissionTypeConstant;
@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
-import static com.ymjrhk.rbac.constant.PasswordConstant.rawPassword;
+import static com.ymjrhk.rbac.constant.PasswordConstant.RAW_PASSWORD;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
@@ -57,6 +57,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     private final UserRoleService userRoleService;
 
     private final PermissionMapper permissionMapper;
+
+    public static final String PRINTING_MESSAGE = "获取更新前必要字段（包括乐观锁字段）：";
 
     /**
      * 根据用户名和密码创建用户
@@ -89,7 +91,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         Long newUserId = insertUser.getUserId();
 
         // 3. 使用 userId 作为 pepper
-        String rawPassword = PasswordConstant.rawPassword;
+        String rawPassword = PasswordConstant.RAW_PASSWORD;
         String peppered = rawPassword + "#" + newUserId;
         String password = passwordEncoder.encode(peppered);
 
@@ -104,7 +106,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 5. 写到历史表
-        userHistoryService.record(newUserId, OperateTypeConstant.CREATE);
+        userHistoryService.recordHistory(newUserId, OperateTypeConstant.CREATE);
 
         return newUserId;
     }
@@ -119,7 +121,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
         normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
-        PageHelper.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
+        PageMethod.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
 
         Page<User> page = userMapper.pageQuery(userPageQueryDTO);
 
@@ -163,7 +165,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Transactional
     // 暂不更新 status
     public void update(Long userId, UserDTO userDTO) {
-        log.debug("获取更新前必要字段（包括乐观锁字段）：");
+        log.debug(PRINTING_MESSAGE);
         User dbUser = userMapper.getByUserId(userId);
 
         // 用户不存在
@@ -197,7 +199,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         doUpdate(user);
 
         // 写到历史表
-        userHistoryService.record(user.getUserId(), OperateTypeConstant.UPDATE);
+        userHistoryService.recordHistory(user.getUserId(), OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -215,7 +217,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     // TODO：更好的做法：changeStatus 还是加个乐观锁，resetPassword 完全不用加
     public void changeStatus(Long userId, Integer status) {
         // 1. 查数据库
-        log.debug("获取更新前必要字段（包括乐观锁字段）：");
+        log.debug(PRINTING_MESSAGE);
         User dbUser = userMapper.getByUserId(userId);
         if (dbUser == null) { // 用户不存在
             throw new UserNotExistException(USER_NOT_EXIST);
@@ -237,7 +239,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         doUpdate(user);
 
         // 写到历史表
-        userHistoryService.record(userId, OperateTypeConstant.UPDATE);
+        userHistoryService.recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**
@@ -248,7 +250,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public void resetPassword(Long userId) {
-        log.debug("获取更新前必要字段（包括乐观锁字段）：");
+        log.debug(PRINTING_MESSAGE);
         User dbUser = userMapper.getByUserId(userId);
 
         // 用户不存在
@@ -263,7 +265,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         User user = new User();
         user.setUserId(userId);
-        user.setPassword(passwordEncoder.encode(rawPassword + "#" + userId));
+        user.setPassword(passwordEncoder.encode(RAW_PASSWORD + "#" + userId));
 
         Integer version = dbUser.getVersion();
         String secretToken = dbUser.getSecretToken();
@@ -280,7 +282,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         doUpdate(user);
 
         // 写到历史表
-        userHistoryService.record(userId, OperateTypeConstant.UPDATE);
+        userHistoryService.recordHistory(userId, OperateTypeConstant.UPDATE);
     }
 
     /**

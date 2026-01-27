@@ -4,5 +4,10 @@ package com.ymjrhk.rbac.constant;
  * 初始密码
  */
 public class PasswordConstant {
-    public static final String rawPassword = "123456";
+
+    private PasswordConstant() {
+        // 防止实例化
+    }
+
+    public static final String RAW_PASSWORD = "123456";
 }

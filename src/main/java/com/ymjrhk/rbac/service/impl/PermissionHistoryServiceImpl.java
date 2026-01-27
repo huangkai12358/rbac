@@ -30,7 +30,7 @@ public class PermissionHistoryServiceImpl implements PermissionHistoryService {
      * @param operateType
      */
     @Override
-    public void record(Long permissionId, Integer operateType) {
+    public void recordHistory(Long permissionId, Integer operateType) {
         log.debug("先读出新表所有数据，再拷贝到历史表中：");
         Permission permission = permissionMapper.getByPermissionId(permissionId);
 

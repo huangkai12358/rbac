@@ -33,13 +33,13 @@ class RoleHistoryServiceImplTest {
     @Mock
     private RoleMapper roleMapper;
 
-    // ========================= record() =========================
+    // ========================= recordHistory() =========================
 
     /**
      * 正常写入历史表
      */
     @Test
-    void record_success() {
+    void recordHistory_success() {
         // given
         Long roleId = 10L;
         Integer operateType = OperateTypeConstant.UPDATE;
@@ -61,7 +61,7 @@ class RoleHistoryServiceImplTest {
                 .thenReturn(1);
 
         // when
-        roleHistoryService.record(roleId, operateType);
+        roleHistoryService.recordHistory(roleId, operateType);
 
         // then
         verify(roleMapper).getByRoleId(roleId);
@@ -83,7 +83,7 @@ class RoleHistoryServiceImplTest {
      * 历史表写入失败
      */
     @Test
-    void record_insertFail_throwException() {
+    void recordHistory_insertFail_throwException() {
         // given
         Long roleId = 10L;
         Integer operateType = OperateTypeConstant.CREATE;
@@ -100,7 +100,7 @@ class RoleHistoryServiceImplTest {
 
         // then
         assertThrows(HistoryInsertFailedException.class,
-                () -> roleHistoryService.record(roleId, operateType));
+                () -> roleHistoryService.recordHistory(roleId, operateType));
     }
 
 }
