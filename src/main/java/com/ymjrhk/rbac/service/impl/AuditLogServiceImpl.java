@@ -16,6 +16,7 @@ import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.AuditLogVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.AUTH_LOGIN;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuditLogServiceImpl extends BaseService implements AuditLogService {
 
     private final AuditLogMapper auditLogMapper;
@@ -75,7 +77,11 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
     @Async("auditExecutor")
     @Override
     public void save(AuditLog auditLog) {
-        auditLogMapper.insert(auditLog);
+        try { // 异步方法内部自己 try-catch
+            auditLogMapper.insert(auditLog);
+        } catch (Exception e) {
+            log.error("异步保存审计日志失败", e);
+        }
     }
 
     /**
@@ -96,31 +102,35 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
                              String ip,
                              int success,
                              String errorMessage) {
-        AuditLog log = new AuditLog();
+        AuditLog auditLog = new AuditLog();
 
         if (userId == null) { // 如果没传 userId，说明登录失败，查 username 对应的 userId
             User user = userMapper.getByUsername(username);
             if (user != null) { // 如果 username 存在，记一下 userId
-                log.setUserId(user.getUserId());
+                auditLog.setUserId(user.getUserId());
             }
         } else { // 如果传了 userId，说明登录成功，直接用
-            log.setUserId(userId);
+            auditLog.setUserId(userId);
         }
 
-        log.setUsername(username);
-        log.setPermissionName(AUTH_LOGIN);
-        log.setPath("/api/auth/login");
-        log.setMethod("POST");
-        log.setIp(ip);
-        log.setSuccess(success);
-        log.setErrorMessage(errorMessage);
+        auditLog.setUsername(username);
+        auditLog.setPermissionName(AUTH_LOGIN);
+        auditLog.setPath("/api/auth/login");
+        auditLog.setMethod("POST");
+        auditLog.setIp(ip);
+        auditLog.setSuccess(success);
+        auditLog.setErrorMessage(errorMessage);
 
         // 双保险，登录失败才记录 requestBody，防止密码明文保存，是 Controller 层的冗余设计
         if (success == SuccessConstant.FAIL) {
-            log.setRequestBody(requestBody);
+            auditLog.setRequestBody(requestBody);
         }
 
-        auditLogMapper.insert(log);
+        try { // 异步方法内部自己 try-catch
+            auditLogMapper.insert(auditLog);
+        } catch (Exception e) {
+            log.error("异步保存登录审计日志失败", e);
+        }
     }
 
     /**
@@ -130,6 +140,10 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
     @Async("auditExecutor")
     @Override
     public void saveForbiddenLog(AuditLog auditLog) {
-        auditLogMapper.insert(auditLog);
+        try { // 异步方法内部自己 try-catch
+            auditLogMapper.insert(auditLog);
+        } catch (Exception e) {
+            log.error("异步保存未授权访问审计日志失败", e);
+        }
     }
 }

@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 1. 非 Controller 请求直接放行
         // 判断当前拦截到的是 Controller 的方法还是其他资源
         if (!(handler instanceof HandlerMethod)) {
-            return true; //当前拦截到的不是动态方法，直接放行
+            return true; // 当前拦截到的不是动态方法，直接放行
         }
 
         // 2. 获取 Token

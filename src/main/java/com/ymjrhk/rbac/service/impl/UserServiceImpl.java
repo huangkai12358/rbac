@@ -91,8 +91,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         Long newUserId = insertUser.getUserId();
 
         // 3. 使用 userId 作为 pepper
-        String rawPassword = PasswordConstant.RAW_PASSWORD;
-        String peppered = rawPassword + "#" + newUserId;
+        String peppered = PasswordConstant.RAW_PASSWORD + "#" + newUserId;
         String password = passwordEncoder.encode(peppered);
 
         // 4. 回写 password（// TODO：此处 auth_version 暂时不需要加一。未来应分为管理员创建用户版和用户自己注册版）

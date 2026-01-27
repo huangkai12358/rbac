@@ -2,6 +2,7 @@ package com.ymjrhk.rbac.aspect;
 
 import com.alibaba.fastjson2.JSON;
 import com.ymjrhk.rbac.annotation.Audit;
+import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.service.AuditLogService;
@@ -76,7 +77,7 @@ public class AuditLogAspect {
         try {
             log.debug("尝试运行 Controller 方法...");
             Object result = joinPoint.proceed();
-            auditLog.setSuccess(1);
+            auditLog.setSuccess(SuccessConstant.SUCCESS);
 
             // GET + 成功 → 不记录
             if (!"GET".equalsIgnoreCase(method)) {
@@ -86,7 +87,7 @@ public class AuditLogAspect {
 
             return result;
         } catch (Throwable t) { // Error（如 OOM）也会被记录
-            auditLog.setSuccess(0);
+            auditLog.setSuccess(SuccessConstant.FAIL);
             auditLog.setErrorMessage(t.getMessage());
 
             log.warn("接口出现异常，将记录到审计日志...");

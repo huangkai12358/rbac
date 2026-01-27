@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.interceptor;
 
+import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.AuditLog;
@@ -37,9 +38,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     // 仅认证接口
-    private static final List<String> AUTH_ONLY_PATHS = List.of(
-            "/api/me/**"
-    );
+    private static final List<String> AUTH_ONLY_PATHS = List.of("/api/me/**");
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -48,17 +47,19 @@ public class PermissionInterceptor implements HandlerInterceptor {
 
         log.info("拦截器-2 PermissionInterceptor 开始运行...");
 
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
+        // 1. 非 Controller 请求直接放行
+        // 判断当前拦截到的是 Controller 的方法还是其他资源
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
+            return true; // 当前拦截到的不是动态方法，直接放行
         }
 
-        // 1. auth-only 接口跳过鉴权（拦截器配置层已挡掉，此处为冗余设计）
+        // 2. auth-only 只需认证接口（/api/me/**）跳过鉴权（拦截器配置层已挡掉，此处为冗余设计）
         if (isAuthOnlyPath(request)) {
             log.info("auth-only 接口，跳过权限校验");
             return true;
         }
 
-        // 2. 鉴权（核心）
+        // 3. 鉴权（核心）
         log.info("开始鉴权...");
         log.info("当前请求 URI：{}，请求方法：{}", request.getRequestURI(), request.getMethod());
 
@@ -81,6 +82,23 @@ public class PermissionInterceptor implements HandlerInterceptor {
             auditLog.setIp(getClientIp(request));
             auditLog.setSuccess(SuccessConstant.FAIL);
             auditLog.setErrorMessage(ACCESS_DENIED);
+
+            /*
+            实现未授权时可以记录 permissionName：
+            - 因为 preHandle 方法有参数 handler
+            - 说明 HandlerMethod 已经解析出来了，DispatcherServlet 已经知道该分发给哪个 Controller
+            - Controller 方法对象本身是已经确定的，只是“还没执行”
+            - 则可以在拦截器中直接读取 Controller 方法上的权限注解
+            DispatcherServlet
+            ↓
+            HandlerInterceptor.preHandle   ← 这里做鉴权
+            */
+            Audit audit = handlerMethod.getMethodAnnotation(Audit.class);
+
+            if (audit != null) {
+                String permissionName = audit.permission();
+                auditLog.setPermissionName(permissionName);
+            }
 
             auditLogService.saveForbiddenLog(auditLog);
 
