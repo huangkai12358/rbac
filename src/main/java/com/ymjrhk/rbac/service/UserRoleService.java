@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service;
 
-import com.ymjrhk.rbac.vo.AssignableRoleVO;
 import com.ymjrhk.rbac.vo.RoleVO;
 
 import java.util.List;
@@ -11,6 +10,4 @@ public interface UserRoleService {
     List<RoleVO> getUserRoles(Long userId);
 
     boolean userHasRole(Long userId, String roleName);
-
-    List<AssignableRoleVO> getAssignableRoles(Long userId);
 }

@@ -66,4 +66,10 @@ public interface PermissionMapper {
      * @return
      */
     List<Long> selectEnabledPermissionIds(List<Long> permissionIds);
+
+    /**
+     * 获取所有未禁用的 permissionId
+     * @return
+     */
+    List<Long> selectAllEnabledPermissionIds();
 }

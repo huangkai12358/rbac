@@ -41,7 +41,6 @@
             <if test="permissionName != null and permissionName !=''">
                 and permission_name like concat('%', #{permissionName}, '%')
             </if>
-            and type = 2
         </where>
         order by create_time desc
     </select>
@@ -85,4 +84,11 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="selectAllEnabledPermissionIds" resultType="java.lang.Long">
+        select permission_id
+        from sys_permission
+        where status = 1
+    </select>
+
 </mapper>

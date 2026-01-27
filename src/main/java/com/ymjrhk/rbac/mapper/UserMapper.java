@@ -69,6 +69,7 @@ public interface UserMapper {
 
     /**
      * 根据 userId 查询用户权限（user, role, permission status 都不能为 0），要去重！
+     * 不能查超级管理员
      *
      * @param userId
      * @return
@@ -95,6 +96,8 @@ public interface UserMapper {
 
     /**
      * 根据 userId 和 permission status 查 permissionId（可查禁用或非禁用），要去重！
+     * 不能查超级管理员
+     *
      * @param userId
      * @param status
      * @return

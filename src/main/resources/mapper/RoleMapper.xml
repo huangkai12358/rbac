@@ -79,4 +79,11 @@
           and r.status = #{status}
     </select>
 
+    <select id="selectAllEnabledRoleIds" resultType="java.lang.Long">
+        select role_id
+        from sys_role
+        where status = 1
+    </select>
+
+
 </mapper>

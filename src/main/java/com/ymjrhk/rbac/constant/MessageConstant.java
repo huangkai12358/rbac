@@ -36,8 +36,9 @@ public class MessageConstant {
     // 45xxx 分配
     public static final String ASSIGNMENT_ROLE_FAILED = "分配角色失败"; // 45001
     public static final String ASSIGNMENT_PERMISSION_FAILED = "分配权限失败"; // 45002
-    public static final String ASSIGNMENT_ROLE_DENIED = "不能分配自己未拥有的角色"; // 45003
-    public static final String ASSIGNMENT_PERMISSION_DENIED = "不能分配自己未拥有的权限"; // 45004
+    public static final String ASSIGNMENT_NOT_OWNED_ROLE = "不能分配自己未拥有的角色"; // 45003
+    public static final String ASSIGNMENT_NOT_OWNED_PERMISSION = "不能分配自己未拥有的权限"; // 45004
+    public static final String ASSIGNMENT_PERMISSION_TO_SUPER_ADMIN = "不能为超级管理员角色分配权限";
 
     // 46xxx 业务通用
     public static final String STATUS_NOT_CHANGE = "状态未改变，无需修改"; // 46001

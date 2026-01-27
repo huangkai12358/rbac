@@ -29,6 +29,4 @@ public class PermissionVO {
     private Integer version;
 
     private String secretToken;
-
-    // TODO: private Boolean assigned; 该角色是否已拥有 可能要加？前端勾选框直接用
 }

@@ -72,7 +72,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         insertUser.setPassword("!INIT!"); // // 先插入一条“不可登录”的占位密码（因为 password 不能为空），之后要修改
 
         String nickname = userCreateDTO.getNickname();
-        insertUser.setNickname(nickname.isBlank() ? userCreateDTO.getUsername() : nickname); // 判断昵称是否为空白
+        insertUser.setNickname((nickname == null || nickname.isBlank()) ? userCreateDTO.getUsername() : nickname); // 判断昵称是否为空白
         insertUser.setSecretToken(UUID.randomUUID().toString());
 
         insertUser.setEmail(userCreateDTO.getEmail());
