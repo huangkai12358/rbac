@@ -12,6 +12,10 @@ package com.ymjrhk.rbac.context;
 
 public class UserContext {
 
+    private UserContext() {
+        // 防止实例化
+    }
+
     private static final ThreadLocal<LoginUser> TL = new ThreadLocal<>();
 
     public static void set(LoginUser user) {

@@ -21,6 +21,9 @@ import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
+import static com.ymjrhk.rbac.constant.CacheConstant.USER_ME;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
@@ -99,6 +104,10 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = ROLE_BASIC,
+            key = "#roleId"
+    )
     public RoleVO getByRoleId(Long roleId) {
         Role role = roleMapper.getByRoleId(roleId);
 
@@ -118,6 +127,20 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      */
     @Override
     @Transactional
+    @Caching(evict = { // 可以修改 roleName
+            @CacheEvict(
+                    cacheNames = ROLE_BASIC,
+                    key = "#roleId"
+            ),
+            @CacheEvict(
+                    cacheNames = {
+                            USER_ROLES,
+                            USER_ME
+                    },
+                    allEntries = true
+            )
+    }
+    )
     public void update(Long roleId, RoleDTO roleDTO) {
         log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Role dbRole = roleMapper.getByRoleId(roleId);
@@ -159,6 +182,20 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      */
     @Override
     @Transactional
+    @Caching(evict = { // 可以修改 status
+            @CacheEvict(
+                    cacheNames = ROLE_BASIC,
+                    key = "#roleId"
+            ),
+            @CacheEvict(
+                    cacheNames = {
+                            USER_ROLES,
+                            USER_ME
+                    },
+                    allEntries = true
+            )
+    }
+    )
     public void changeStatus(Long roleId, Integer status) {
         // 1. 查数据库
         log.debug("获取更新前必要字段（包括乐观锁字段）：");

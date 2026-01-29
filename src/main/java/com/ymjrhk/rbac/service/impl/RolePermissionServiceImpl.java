@@ -8,6 +8,9 @@ import com.ymjrhk.rbac.mapper.*;
 import com.ymjrhk.rbac.service.RolePermissionService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
@@ -41,6 +45,21 @@ public class RolePermissionServiceImpl implements RolePermissionService {
      */
     @Override
     @Transactional
+    @Caching(evict = {
+            // 角色权限：只清当前 role
+            @CacheEvict(
+                    cacheNames = ROLE_PERMISSIONS,
+                    key = "#roleId"
+            ),
+            // 用户权限 & 鉴权：全清（不知道哪些用户绑定了这个 role）
+            @CacheEvict(
+                    cacheNames = {
+                            USER_PERMISSIONS,
+                            USER_AUTH
+                    },
+                    allEntries = true
+            )
+    })
     public void assignPermissionsToRole(Long roleId, List<Long> permissionIds) { // TODO: 需要version吗
 //        A = 我（用户）拥有的权限（非禁用）
 //        B = 角色拥有的权限（非禁用）
@@ -156,6 +175,10 @@ public class RolePermissionServiceImpl implements RolePermissionService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = ROLE_PERMISSIONS,
+            key = "#roleId"
+    )
     public List<PermissionVO> getRolePermissions(Long roleId) {
         // 1. 查 roleId 是否存在
         Role role = roleMapper.getByRoleId(roleId);

@@ -156,6 +156,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<Void> handleAll(Exception ex) {
         log.warn("系统异常：{}", ex.getMessage());
+        log.warn("打印堆栈：");
+        ex.printStackTrace();
         return Result.error("系统繁忙，请稍后再试");
     }
 }

@@ -28,6 +28,8 @@ import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.PasswordConstant.RAW_PASSWORD;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
@@ -116,6 +119,15 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @param userPageQueryDTO
      * @return
      */
+    /*
+    pageQuery 默认不加缓存
+    因为：
+    - 查询条件是「组合态」，如果缓存的话 key 会变成像
+    page:username=admin&pageNum=3&pageSize=20
+    成百上千个 cache key
+    命中率极低
+    - 数据变化频繁，是瞬态数据
+    */
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
         normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
@@ -143,6 +155,11 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = USER_BASIC,
+            key = "#userId",
+            unless = "#result == null"
+    )
     public UserVO getByUserId(Long userId) {
         User user = userMapper.getByUserId(userId);
 
@@ -162,6 +179,14 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional
+    @CacheEvict( // 可能修改 username, nickname, email, version, secretToken
+            cacheNames = {
+                    USER_BASIC,
+                    USER_AUTH,
+                    USER_ME
+            },
+            key = "#userId"
+    )
     // 暂不更新 status
     public void update(Long userId, UserDTO userDTO) {
         log.debug(PRINTING_MESSAGE);
@@ -209,6 +234,14 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional
+    @CacheEvict( // 修改 status, version, secretToken, authVersion
+            cacheNames = {
+                    USER_BASIC,
+                    USER_PERMISSIONS,
+                    USER_AUTH
+            },
+            key = "#userId"
+    )
     // changeStatus 以及 Role 和 Permission 的 changeStatus 包括下面的 resetPassword 其实都不用搞什么乐观锁字段
     // 因为它们的目的都是一致的，不像 update 可能修改的结果不一样。
     // changeStatus 一般不会弄着玩，先从启用到禁用，然后立马从禁用到启用
@@ -248,6 +281,14 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     @Transactional
+    @CacheEvict( // 修改 password, version, secretToken, authVersion
+            cacheNames = {
+                    USER_BASIC,
+                    USER_PERMISSIONS,
+                    USER_AUTH
+            },
+            key = "#userId"
+    )
     public void resetPassword(Long userId) {
         log.debug(PRINTING_MESSAGE);
         User dbUser = userMapper.getByUserId(userId);
@@ -291,6 +332,11 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = USER_PERMISSIONS,
+            key = "#userId",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public List<PermissionVO> getUserPermissions(Long userId) {
         // 1. 查 userId 是否存在
         User user = userMapper.getByUserId(userId);
@@ -374,6 +420,11 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = USER_AUTH, // TTL 短一点
+            key = "#userId",
+            unless = "#result == null"
+    )
     public UserAuthInfo getUserAuthInfo(Long userId) {
         UserAuthInfo userAuthInfo = userMapper.getUserAuthInfo(userId);
 
@@ -389,6 +440,14 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @param userId
      */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                    USER_BASIC,
+                    USER_PERMISSIONS,
+                    USER_AUTH
+            },
+            key = "#userId"
+    )
     public void incrementAuthVersion(Long userId) {
         int updated = userMapper.incrementAuthVersion(userId);
         if (updated == 0) {

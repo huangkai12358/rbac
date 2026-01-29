@@ -20,6 +20,8 @@ import com.ymjrhk.rbac.service.UserHistoryService;
 import com.ymjrhk.rbac.vo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
@@ -52,6 +55,10 @@ public class MeServiceImpl implements MeService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = USER_ME,   // 新 cache
+            key = "T(com.ymjrhk.rbac.context.UserContext).getCurrentUserId()"
+    )
     public MeViewVO query() {
         Long userId = UserContext.getCurrentUserId();
 
@@ -98,6 +105,13 @@ public class MeServiceImpl implements MeService {
      */
     @Override
     @Transactional
+    @CacheEvict( // 暂时不能修改 username，所以不用加 USER_AUTH
+            cacheNames = {
+                    USER_ME,
+                    USER_BASIC
+            },
+            key = "T(com.ymjrhk.rbac.context.UserContext).getCurrentUserId()"
+    )
     public void update(MeUpdateDTO meUpdateDTO) {
         Long userId = UserContext.getCurrentUserId();
 
@@ -139,6 +153,14 @@ public class MeServiceImpl implements MeService {
      */
     @Override
     @Transactional
+    @CacheEvict(
+            cacheNames = {
+                    USER_ME,
+                    USER_BASIC,
+                    USER_AUTH    // 强制 JWT 失效
+            },
+            key = "T(com.ymjrhk.rbac.context.UserContext).getCurrentUserId()"
+    )
     public void changePassword(MePasswordUpdateDTO mePasswordUpdateDTO) {
         Long userId = UserContext.getCurrentUserId();
 

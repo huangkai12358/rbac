@@ -10,11 +10,14 @@ import com.ymjrhk.rbac.mapper.UserRoleMapper;
 import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
@@ -37,6 +40,14 @@ public class UserRoleServiceImpl implements UserRoleService {
      */
     @Override
     @Transactional
+    @CacheEvict(
+            cacheNames = {
+                    USER_ROLES,
+                    USER_PERMISSIONS,
+                    USER_AUTH
+            },
+            key = "#userId"
+    )
     public void assignRolesToUser(Long userId, List<Long> roleIds) { // TODO: 需要version吗
 //        A = 我拥有的角色（非禁用）
 //        B = 用户拥有的角色（非禁用）
@@ -148,6 +159,10 @@ public class UserRoleServiceImpl implements UserRoleService {
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = USER_ROLES,
+            key = "#userId"
+    )
     public List<RoleVO> getUserRoles(Long userId) {
         // 1. 查 userId 是否存在
         User user = userMapper.getByUserId(userId);

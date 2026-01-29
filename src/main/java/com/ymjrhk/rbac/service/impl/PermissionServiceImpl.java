@@ -21,6 +21,9 @@ import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
@@ -46,6 +50,15 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     @Override
     @Transactional
+    @CacheEvict(
+            // 只担心超级管理员，因为会自动获取全部权限
+            cacheNames = {
+                    USER_PERMISSIONS,
+                    USER_ME,
+                    ROLE_PERMISSIONS
+            },
+            allEntries = true
+    )
     public Long create(PermissionCreateDTO permissionCreateDTO) {
         Permission permission = BeanUtil.copyProperties(permissionCreateDTO, Permission.class);
 
@@ -99,6 +112,10 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      * @return
      */
     @Override
+    @Cacheable(
+            cacheNames = PERMISSION_BASIC,
+            key = "#permissionId"
+    )
     public PermissionVO getByPermissionId(Long permissionId) {
         Permission permission = permissionMapper.getByPermissionId(permissionId);
 
@@ -118,6 +135,21 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     @Override
     @Transactional
+    @Caching(evict = { // 可以修改 permissionName
+            @CacheEvict(
+                    cacheNames = PERMISSION_BASIC,
+                    key = "#permissionId"
+            ),
+            @CacheEvict(
+                    cacheNames = {
+                            USER_PERMISSIONS,
+                            ROLE_PERMISSIONS,
+                            USER_ME
+                    },
+                    allEntries = true
+            )
+    }
+    )
     public void update(Long permissionId, PermissionDTO permissionDTO) {
         log.debug("获取更新前必要字段（包括乐观锁字段）：");
         Permission dbPermission = permissionMapper.getByPermissionId(permissionId);
@@ -156,6 +188,21 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     @Override
     @Transactional
+    @Caching(evict = { // 可以修改 status
+            @CacheEvict(
+                    cacheNames = PERMISSION_BASIC,
+                    key = "#permissionId"
+            ),
+            @CacheEvict(
+                    cacheNames = {
+                            USER_PERMISSIONS,
+                            ROLE_PERMISSIONS,
+                            USER_ME
+                    },
+                    allEntries = true
+            )
+    }
+    )
     public void changeStatus(Long permissionId, Integer status) {
         // 1. 查数据库
         log.debug("获取更新前必要字段（包括乐观锁字段）：");

@@ -12,6 +12,13 @@ spring:
     url: jdbc:mysql://${rbac.datasource.host}:${rbac.datasource.port}/${rbac.datasource.database}?useSSL=false&serverTimezone=Asia/Shanghai
     username: ${rbac.datasource.username}
     password: ${rbac.datasource.password}
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 2
 
 mybatis:
   # mapper配置文件
@@ -26,6 +33,7 @@ mybatis:
 logging:
   level:
     com.ymjrhk.rbac: debug
+    org.springframework.cache: debug # 打日志确认是否走缓存
 #  pattern:
 #    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %X{pid} --- [%thread] %logger - %msg%n"
 
