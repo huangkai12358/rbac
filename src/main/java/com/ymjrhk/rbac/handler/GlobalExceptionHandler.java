@@ -29,11 +29,6 @@ import static com.ymjrhk.rbac.constant.MessageConstant.*;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    private final View error;
-
-    public GlobalExceptionHandler(View error) {
-        this.error = error;
-    }
 
     /**
      * 未登录
@@ -155,9 +150,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<Void> handleAll(Exception ex) {
-        log.warn("系统异常：{}", ex.getMessage());
-        log.warn("打印堆栈：");
-        ex.printStackTrace();
+        if (log.isDebugEnabled()) {
+            log.error("系统异常", ex);
+        } else {
+            log.error("系统异常：{}", ex.getMessage());
+        }
         return Result.error("系统繁忙，请稍后再试");
     }
 }

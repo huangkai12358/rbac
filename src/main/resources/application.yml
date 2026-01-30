@@ -32,7 +32,8 @@ mybatis:
 
 logging:
   level:
-    com.ymjrhk.rbac: debug
+    root: info # 全局默认：INFO
+    com.ymjrhk.rbac: debug # 你自己的业务代码：DEBUG
     org.springframework.cache: debug # 打日志确认是否走缓存
 #  pattern:
 #    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %X{pid} --- [%thread] %logger - %msg%n"
