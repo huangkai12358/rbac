@@ -150,7 +150,7 @@ public class AuditFailInterceptor implements HandlerInterceptor {
         }
     }
 
-    /**
+    /*
      * 含 password 字段脱敏方法二：用“线性扫描”
      * requestBody 可能不是合法 JSON，但仍要尽量脱敏
      * <p>
@@ -165,7 +165,126 @@ public class AuditFailInterceptor implements HandlerInterceptor {
      * @param body
      * @return
      */
+    /**
+     * 用于审计日志的请求体 password 脱敏（best-effort 实现）。
+     *
+     * <p>
+     * 该方法刻意不采用严格的 JSON 解析，也不使用正则表达式。
+     * 在真实系统中，请求体可能并非合法 JSON（如被截断、格式错误、
+     * 或包含非标准内容），如果依赖 JSON 解析失败将导致敏感信息
+     *（如密码）原样写入日志，存在安全风险。
+     * </p>
+     *
+     * <p>
+     * 实现方式为线性扫描（时间复杂度 O(n)），对 key 名称中包含
+     * “password”（不区分大小写）的字符串值进行统一脱敏处理。
+     * 该策略优先保证安全性和稳定性，而非结构上的完全正确。
+     * </p>
+     *
+     * <p>
+     * 设计取舍说明：
+     * <ul>
+     *   <li>采用 best-effort 脱敏，而非严格语法解析</li>
+     *   <li>线性扫描以避免正则可能带来的 ReDoS 风险</li>
+     *   <li>允许一定误杀（false positive），但尽量避免漏杀（false negative）</li>
+     * </ul>
+     * </p>
+     *
+     * <p>
+     * 本方法<strong>仅用于日志 / 审计场景</strong>，
+     * 不得用于请求校验、参数解析或任何业务逻辑。
+     * </p>
+     *
+     * @param body 原始请求体，可能不是合法 JSON
+     * @return 已对 password 字段进行安全脱敏的请求体
+     */
     public static String maskPasswordLinear(String body) {
+        if (body == null || body.isBlank()) {
+            return body;
+        }
+
+        StringBuilder result = new StringBuilder(body.length());
+        int i = 0;
+
+        while (i < body.length()) {
+            char c = body.charAt(i);
+
+            if (c == '"') {
+                i = processQuotedToken(body, i, result);
+            } else {
+                result.append(c);
+                i++;
+            }
+        }
+
+        return result.toString();
+    }
+
+    private static int processQuotedToken(String body, int start, StringBuilder out) {
+        int keyEnd = findClosingQuote(body, start + 1);
+        if (keyEnd < 0) {
+            out.append(body.substring(start));
+            return body.length();
+        }
+
+        String key = body.substring(start + 1, keyEnd);
+        out.append('"').append(key).append('"');
+
+        int i = skipWhitespace(body, keyEnd + 1, out);
+
+        if (!isKeyValueSeparator(body, i)) {
+            return i;
+        }
+
+        out.append(':');
+        i = skipWhitespace(body, i + 1, out);
+
+        if (isPasswordKey(key) && isQuotedValue(body, i)) {
+            return maskQuotedValue(body, i, out);
+        }
+
+        return i;
+    }
+
+    private static int findClosingQuote(String body, int start) {
+        for (int i = start; i < body.length(); i++) {
+            if (body.charAt(i) == '"') {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int skipWhitespace(String body, int i, StringBuilder out) {
+        while (i < body.length() && Character.isWhitespace(body.charAt(i))) {
+            out.append(body.charAt(i));
+            i++;
+        }
+        return i;
+    }
+
+    private static boolean isKeyValueSeparator(String body, int i) {
+        return i < body.length() && body.charAt(i) == ':';
+    }
+
+    private static boolean isPasswordKey(String key) {
+        return key.toLowerCase().contains("password");
+    }
+
+    private static boolean isQuotedValue(String body, int i) {
+        return i < body.length() && body.charAt(i) == '"';
+    }
+
+    private static int maskQuotedValue(String body, int start, StringBuilder out) {
+        int i = start + 1;
+        while (i < body.length() && body.charAt(i) != '"') {
+            i++;
+        }
+        out.append("\"******\"");
+        return Math.min(i + 1, body.length());
+    }
+
+/*    public static String maskPasswordLinear(String body) {
         if (body == null || body.isBlank()) {
             return body;
         }
@@ -245,13 +364,14 @@ public class AuditFailInterceptor implements HandlerInterceptor {
         }
 
         return result.toString();
-    }
+    }*/
 
     /**
      * 含 password 字段脱敏方法三：正则
-     *
+     * <p>
      * 优点：可以替换全部出现 password 的字段
      * 缺点：正则可能触发 ReDoS（正则拒绝服务）—— 某些输入会让回溯爆炸，CPU 飙满。
+     *
      * @param requestBody
      * @return
      */
