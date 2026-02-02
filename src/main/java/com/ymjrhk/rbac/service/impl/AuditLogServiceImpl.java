@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.page.PageMethod;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
+import java.util.Set;
 
 import static com.ymjrhk.rbac.constant.PermissionNameConstant.AUTH_LOGIN;
 
@@ -63,10 +66,63 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         // 3. 分页
         normalizePage(realPageQueryDTO);
 
+        // 加 limit
         PageMethod.startPage(realPageQueryDTO.getPageNum(), realPageQueryDTO.getPageSize());
+
+        // 加 order by
+        String orderBy = buildOrderBy(auditLogPageQueryDTO); // 排序字段白名单
+        if (orderBy != null) {
+            PageMethod.orderBy(orderBy);
+        }
+
+        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
         Page<AuditLogVO> page = auditLogMapper.pageQuery(realPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    /**
+     * 排序构建方法（排序字段白名单）
+     * @param dto
+     * @return
+     */
+    private String buildOrderBy(AuditLogPageQueryDTO dto) {
+        if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
+            return "create_time desc"; // 默认排序
+        }
+
+        // 允许排序的字段（数据库字段）
+        Set<String> allowedFields = Set.of(
+                "log_seq",
+                "username",
+                "permission_name",
+                "path",
+                "method",
+                "ip",
+                "success",
+                "createTime"
+        );
+
+        // 前端字段 → 数据库字段映射
+        Map<String, String> fieldMap = Map.of(
+                "logSeq", "log_seq",
+                "username", "username",
+                "permissionName", "permission_name",
+                "path", "path",
+                "method", "method",
+                "ip", "ip",
+                "success", "success",
+                "createTime", "create_time"
+        );
+
+        String column = fieldMap.get(dto.getSortField());
+        if (column == null || !allowedFields.contains(column)) {
+            return "create_time desc"; // 默认排序
+        }
+
+        String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
+
+        return column + " " + order;
     }
 
     /**

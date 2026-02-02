@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
@@ -27,9 +28,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
@@ -92,8 +91,16 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
     public PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
         normalizePage(permissionPageQueryDTO);
 
+        // 加 limit
         PageMethod.startPage(permissionPageQueryDTO.getPageNum(), permissionPageQueryDTO.getPageSize());
 
+        // 加 order by
+        String orderBy = buildOrderBy(permissionPageQueryDTO); // 排序字段白名单
+        if (orderBy != null) {
+            PageMethod.orderBy(orderBy);
+        }        
+
+        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
         Page<Permission> page = permissionMapper.pageQuery(permissionPageQueryDTO);
 
         long total = page.getTotal();
@@ -103,6 +110,48 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
                                          .toList();
 
         return new PageResult(total, records);
+    }
+
+    /**
+     * 排序构建方法（排序字段白名单）
+     * @param dto
+     * @return
+     */
+    private String buildOrderBy(PermissionPageQueryDTO dto) {
+        if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
+            return "create_time desc"; // 默认排序
+        }
+
+        // 允许排序的字段（数据库字段）
+        Set<String> allowedFields = Set.of(
+                "permission_id",
+                "permission_name",
+                "type",
+                "path",
+                "method",
+                "create_time",
+                "status"
+        );
+
+        // 前端字段 → 数据库字段映射
+        Map<String, String> fieldMap = Map.of(
+                "permissionId", "permission_id",
+                "permissionName", "permission_name",
+                "type", "type",
+                "path", "path",
+                "method", "method",
+                "createTime", "create_time",
+                "status", "status"
+        );
+
+        String column = fieldMap.get(dto.getSortField());
+        if (column == null || !allowedFields.contains(column)) {
+            return "create_time desc"; // 默认排序
+        }
+
+        String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
+
+        return column + " " + order;        
     }
 
     /**

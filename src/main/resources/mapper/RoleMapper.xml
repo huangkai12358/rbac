@@ -32,7 +32,6 @@
                 and role_name like concat('%', #{roleName}, '%')
             </if>
         </where>
-        order by create_time desc
     </select>
 
     <update id="update">

@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
@@ -36,9 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static com.ymjrhk.rbac.constant.CacheConstant.*;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
@@ -128,12 +127,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     命中率极低
     - 数据变化频繁，是瞬态数据
     */
+
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
         normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
+        // 加 limit
         PageMethod.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
 
+        // 加 order by
+        String orderBy = buildOrderBy(userPageQueryDTO); // 排序字段白名单
+        if (orderBy != null) {
+            PageMethod.orderBy(orderBy);
+        }
+
+        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
         Page<User> page = userMapper.pageQuery(userPageQueryDTO);
 
         long total = page.getTotal();
@@ -147,6 +155,46 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
     // TODO:为什么外卖里不填page,pageSize就查不到结果
     // TODO: 将来直接返回需要的字段，免得转换
+
+    /**
+     * 排序构建方法（排序字段白名单）
+     * @param dto
+     * @return
+     */
+    private String buildOrderBy(UserPageQueryDTO dto) {
+        if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
+            return "create_time desc"; // 默认排序
+        }
+
+        // 允许排序的字段（数据库字段）
+        Set<String> allowedFields = Set.of(
+                "user_id",
+                "username",
+                "email",
+                "create_time",
+                "update_time",
+                "status"
+        );
+
+        // 前端字段 → 数据库字段映射
+        Map<String, String> fieldMap = Map.of(
+                "userId", "user_id",
+                "username", "username",
+                "email", "email",
+                "createTime", "create_time",
+                "updateTime", "update_time",
+                "status", "status"
+        );
+
+        String column = fieldMap.get(dto.getSortField());
+        if (column == null || !allowedFields.contains(column)) {
+            return "create_time desc"; // 默认排序
+        }
+
+        String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
+
+        return column + " " + order;
+    }
 
     /**
      * 根据 userId 查询用户

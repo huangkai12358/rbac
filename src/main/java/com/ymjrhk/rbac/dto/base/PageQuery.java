@@ -8,5 +8,6 @@ import java.io.Serializable;
 public class PageQuery implements Serializable {
 
     private Integer pageNum;
+
     private Integer pageSize;
 }

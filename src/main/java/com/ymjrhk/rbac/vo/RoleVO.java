@@ -3,6 +3,8 @@ package com.ymjrhk.rbac.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Schema(description = "角色查询返回参数")
 public class RoleVO {
@@ -19,4 +21,8 @@ public class RoleVO {
     private Integer version;
 
     private String secretToken;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
 }

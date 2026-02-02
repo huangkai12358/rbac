@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AuditLogPageQueryDTO extends PageQuery implements Serializable {
+
     private String username;
 
     private String permissionName;
@@ -23,4 +24,10 @@ public class AuditLogPageQueryDTO extends PageQuery implements Serializable {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
+    // 排序字段
+    private String sortField;
+
+    // 排序方式：asc / desc
+    private String sortOrder;
 }

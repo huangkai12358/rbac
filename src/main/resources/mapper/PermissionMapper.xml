@@ -42,7 +42,6 @@
                 and permission_name like concat('%', #{permissionName}, '%')
             </if>
         </where>
-        order by create_time desc
     </select>
 
     <update id="update">
