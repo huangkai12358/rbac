@@ -1,5 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.RoleCreateDTO;
 import com.ymjrhk.rbac.dto.RoleDTO;
@@ -8,13 +9,19 @@ import com.ymjrhk.rbac.dto.StatusDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
 import com.ymjrhk.rbac.service.RoleService;
+import com.ymjrhk.rbac.utils.ExcelStyleUtil;
+import com.ymjrhk.rbac.vo.RoleExcelVO;
 import com.ymjrhk.rbac.vo.RoleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
 
 import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
@@ -99,5 +106,27 @@ public class RoleController {
     public Result<Void> changeStatus(@PathVariable("roleId") Long roleId, @RequestBody StatusDTO statusDTO) {
         roleService.changeStatus(roleId, statusDTO.getStatus());
         return Result.success();
+    }
+
+    @Audit(permission = ROLE_VIEW)
+    @GetMapping("/export")
+    @Operation(summary = "角色数据导出")
+    public void export(RolePageQueryDTO dto, HttpServletResponse response) {
+
+        List<RoleExcelVO> data = roleService.listForExport(dto);
+
+        try {
+            response.setContentType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+
+            EasyExcel.write(response.getOutputStream(), RoleExcelVO.class)
+                     .registerWriteHandler(ExcelStyleUtil.defaultStyle())
+                     .sheet("角色数据")
+                     .doWrite(data);
+
+        } catch (IOException e) {
+            throw new RuntimeException("导出 Excel 失败", e);
+        }
     }
 }

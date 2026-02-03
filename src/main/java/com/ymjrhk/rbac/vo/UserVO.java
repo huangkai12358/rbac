@@ -27,6 +27,4 @@ public class UserVO {
     private LocalDateTime updateTime;
 
 //    private LocalDateTime lastLoginTime;
-
-    // TODO: 注册时间/修改时间？
 }

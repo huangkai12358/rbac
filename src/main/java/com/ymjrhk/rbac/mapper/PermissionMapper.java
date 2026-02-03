@@ -62,6 +62,7 @@ public interface PermissionMapper {
 
     /**
      * 对给定的 permissionIds，选出其中在 sys_permission 表中实际存在并且未禁用的的 permissionIds
+     *
      * @param permissionIds
      * @return
      */
@@ -69,7 +70,16 @@ public interface PermissionMapper {
 
     /**
      * 获取所有未禁用的 permissionId
+     *
      * @return
      */
     List<Long> selectAllEnabledPermissionIds();
+
+    /**
+     * 按条件查询所有权限
+     *
+     * @param dto
+     * @return
+     */
+    List<PermissionVO> listForExport(PermissionPageQueryDTO dto);
 }

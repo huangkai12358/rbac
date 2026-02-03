@@ -19,6 +19,7 @@ import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.PermissionHistoryService;
 import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.base.BaseService;
+import com.ymjrhk.rbac.vo.PermissionExcelVO;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,16 +90,14 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
      */
     @Override
     public PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
-        normalizePage(permissionPageQueryDTO);
+        normalizePage(permissionPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
         // 加 limit
         PageMethod.startPage(permissionPageQueryDTO.getPageNum(), permissionPageQueryDTO.getPageSize());
 
         // 加 order by
         String orderBy = buildOrderBy(permissionPageQueryDTO); // 排序字段白名单
-        if (orderBy != null) {
-            PageMethod.orderBy(orderBy);
-        }        
+        PageMethod.orderBy(orderBy);
 
         // 正式分页（会被 PageHelper 拦截器拦截并加参数）
         Page<Permission> page = permissionMapper.pageQuery(permissionPageQueryDTO);
@@ -114,12 +113,17 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
     /**
      * 排序构建方法（排序字段白名单）
+     *
      * @param dto
      * @return
      */
     private String buildOrderBy(PermissionPageQueryDTO dto) {
+
+        // 默认排序（当用户没点排序时）
+        String defaultOrder = "create_time desc";
+
         if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         // 允许排序的字段（数据库字段）
@@ -146,12 +150,12 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         String column = fieldMap.get(dto.getSortField());
         if (column == null || !allowedFields.contains(column)) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
 
-        return column + " " + order;        
+        return column + " " + order;
     }
 
     /**
@@ -271,6 +275,33 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         // 写到历史表
         permissionHistoryService.recordHistory(permission.getPermissionId(), OperateTypeConstant.UPDATE);
+    }
+
+    /**
+     * 导出权限数据
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<PermissionExcelVO> listForExport(PermissionPageQueryDTO dto) {
+        // 动态排序：跟随页面排序
+        dto.setOrderBy(buildOrderBy(dto));
+
+        List<PermissionVO> list = permissionMapper.listForExport(dto);
+
+        return list.stream().map(permissionVO -> {
+            PermissionExcelVO vo = new PermissionExcelVO();
+            vo.setPermissionId(permissionVO.getPermissionId());
+            vo.setPermissionName(permissionVO.getPermissionName());
+            vo.setPermissionDisplayName(permissionVO.getPermissionDisplayName());
+            vo.setType(permissionVO.getType());
+            vo.setPath(permissionVO.getPath());
+            vo.setMethod(permissionVO.getMethod());
+            vo.setStatus(permissionVO.getStatus() == 1 ? "启用" : "禁用");
+            vo.setCreateTime(permissionVO.getCreateTime());
+            return vo;
+        }).toList();
     }
 
     /**

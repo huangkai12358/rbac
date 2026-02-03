@@ -84,5 +84,17 @@
         where status = 1
     </select>
 
+    <select id="listForExport" resultType="com.ymjrhk.rbac.vo.RoleVO">
+        select * from sys_role
+        <where>
+            <if test="roleName != null and roleName !=''">
+                and role_name like concat('%', #{roleName}, '%')
+            </if>
+        </where>
+        <!-- 动态排序：orderBy 必须来自后端白名单生成 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+    </select>
 
 </mapper>

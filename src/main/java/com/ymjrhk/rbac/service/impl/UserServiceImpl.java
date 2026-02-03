@@ -2,8 +2,6 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.PasswordConstant;
 import com.ymjrhk.rbac.constant.PermissionTypeConstant;
@@ -14,10 +12,7 @@ import com.ymjrhk.rbac.dto.UserDTO;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.entity.User;
-import com.ymjrhk.rbac.exception.UpdateFailedException;
-import com.ymjrhk.rbac.exception.UserCreateFailedException;
-import com.ymjrhk.rbac.exception.UserForbiddenException;
-import com.ymjrhk.rbac.exception.UserNotExistException;
+import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
@@ -26,6 +21,7 @@ import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
+import com.ymjrhk.rbac.vo.UserExcelVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,27 +123,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     命中率极低
     - 数据变化频繁，是瞬态数据
     */
-
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
+        // 1. 查总数
+        long total = userMapper.count(userPageQueryDTO);
+
+        // 2. 查当前页数据
         normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
-        // 加 limit
-        PageMethod.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
-
-        // 加 order by
+        // 根据 HashMap 白名单生成排序字段和排序方式，防止 SQL 注入
         String orderBy = buildOrderBy(userPageQueryDTO); // 排序字段白名单
-        if (orderBy != null) {
-            PageMethod.orderBy(orderBy);
-        }
+        userPageQueryDTO.setOrderBy(orderBy);
 
-        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
-        Page<User> page = userMapper.pageQuery(userPageQueryDTO);
+        List<User> list = userMapper.pageQuery(userPageQueryDTO);
 
-        long total = page.getTotal();
-
-        List<UserVO> records = page.getResult()
-                                   .stream()
+        List<UserVO> records = list.stream()
                                    .map(user -> BeanUtil.copyProperties(user, UserVO.class))
                                    .toList();
 
@@ -158,12 +148,17 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 排序构建方法（排序字段白名单）
+     *
      * @param dto
      * @return
      */
     private String buildOrderBy(UserPageQueryDTO dto) {
+
+        // 默认排序（当用户没点排序时）
+        String defaultOrder = "create_time desc";
+
         if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         // 允许排序的字段（数据库字段）
@@ -188,7 +183,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         String column = fieldMap.get(dto.getSortField());
         if (column == null || !allowedFields.contains(column)) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
@@ -501,6 +496,39 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (updated == 0) {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
+    }
+
+    /**
+     * 导出用户数据
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<UserExcelVO> listForExport(UserPageQueryDTO dto) {
+        // 动态排序：跟随页面排序
+        dto.setOrderBy(buildOrderBy(dto));
+
+        // 防止一次性导出过多数据
+        int maxExportSize = 50_000;
+        long count = userMapper.count(dto);
+        if (count > maxExportSize) {
+            throw new BaseException("导出数据量过大，请缩小查询范围");
+        }
+
+        List<UserVO> list = userMapper.listForExport(dto);
+
+        return list.stream().map(userVO -> {
+            UserExcelVO vo = new UserExcelVO();
+            vo.setUserId(userVO.getUserId());
+            vo.setUsername(userVO.getUsername());
+            vo.setNickname(userVO.getNickname());
+            vo.setEmail(userVO.getEmail());
+            vo.setStatus(userVO.getStatus() == 1 ? "启用" : "禁用");
+            vo.setCreateTime(userVO.getCreateTime());
+            vo.setUpdateTime(userVO.getUpdateTime());
+            return vo;
+        }).toList();
     }
 
     /**

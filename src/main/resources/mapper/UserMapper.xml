@@ -35,6 +35,20 @@
                 and username like concat('%', #{username}, '%')
             </if>
         </where>
+        <!-- 动态排序：orderBy 必须来自后端白名单生成 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        select count(1) from sys_user
+        <where>
+            <if test="username != null and username !=''">
+                and username like concat('%', #{username}, '%')
+            </if>
+        </where>
     </select>
 
     <update id="update">
@@ -83,6 +97,19 @@
                  join sys_permission p on rp.permission_id = p.permission_id
         where ur.user_id = #{userId}
           and p.status = #{status}
+    </select>
+
+    <select id="listForExport" resultType="com.ymjrhk.rbac.vo.UserVO">
+        select * from sys_user
+        <where>
+            <if test="username != null and username !=''">
+                and username like concat('%', #{username}, '%')
+            </if>
+        </where>
+        <!-- 动态排序：orderBy 必须来自后端白名单生成 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
     </select>
 
 </mapper>

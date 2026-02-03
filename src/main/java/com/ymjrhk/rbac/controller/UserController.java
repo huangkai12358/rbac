@@ -1,20 +1,27 @@
 package com.ymjrhk.rbac.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.ymjrhk.rbac.annotation.Audit;
-import com.ymjrhk.rbac.dto.*;
+import com.ymjrhk.rbac.dto.StatusDTO;
+import com.ymjrhk.rbac.dto.UserCreateDTO;
+import com.ymjrhk.rbac.dto.UserDTO;
+import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.result.Result;
-import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.service.UserService;
+import com.ymjrhk.rbac.utils.ExcelStyleUtil;
 import com.ymjrhk.rbac.vo.PermissionVO;
+import com.ymjrhk.rbac.vo.UserExcelVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
@@ -27,8 +34,6 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 public class UserController {
 
     private final UserService userService;
-
-    private final UserRoleService userRoleService;
 
     /**
      * 创建用户
@@ -133,5 +138,27 @@ public class UserController {
         log.info("查询用户权限，userId: {}", userId);
         List<PermissionVO> permissions = userService.getUserPermissions(userId);
         return Result.success(permissions);
+    }
+
+    @Audit(permission = USER_VIEW)
+    @GetMapping("/export")
+    @Operation(summary = "用户数据导出")
+    public void export(UserPageQueryDTO dto, HttpServletResponse response) {
+
+        List<UserExcelVO> data = userService.listForExport(dto);
+
+        try {
+            response.setContentType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+
+            EasyExcel.write(response.getOutputStream(), UserExcelVO.class)
+                     .registerWriteHandler(ExcelStyleUtil.defaultStyle())
+                     .sheet("用户数据")
+                     .doWrite(data);
+
+        } catch (IOException e) {
+            throw new RuntimeException("导出 Excel 失败", e);
+        }
     }
 }

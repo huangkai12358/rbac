@@ -35,6 +35,76 @@
                 ]]> #{endTime}
             </if>
         </where>
+        <!-- 动态排序：orderBy 必须来自后端白名单生成 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="listForExport" resultType="com.ymjrhk.rbac.vo.AuditLogVO">
+        select log_seq,
+        username,
+        permission_name,
+        path,
+        method,
+        request_body,
+        ip,
+        success,
+        error_message,
+        create_time
+        from sys_audit_log
+        <where>
+            <if test="username != null and username !=''">
+                and username like concat('%', #{username}, '%')
+            </if>
+            <if test="permissionName != null and permissionName !=''">
+                and permission_name like concat('%', #{permissionName}, '%')
+            </if>
+            <if test="success != null">
+                and success = #{success}
+            </if>
+            <if test="startTime != null">
+                and create_time <![CDATA[
+                >=
+                ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                and create_time <![CDATA[
+                <=
+                ]]> #{endTime}
+            </if>
+        </where>
+        <!-- 动态排序：orderBy 必须来自后端白名单生成 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from sys_audit_log
+        <where>
+            <if test="username != null and username !=''">
+                and username like concat('%', #{username}, '%')
+            </if>
+            <if test="permissionName != null and permissionName !=''">
+                and permission_name like concat('%', #{permissionName}, '%')
+            </if>
+            <if test="success != null">
+                and success = #{success}
+            </if>
+            <if test="startTime != null">
+                and create_time <![CDATA[
+                >=
+                ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                and create_time <![CDATA[
+                <=
+                ]]> #{endTime}
+            </if>
+        </where>
     </select>
 
     <insert id="insert" parameterType="AuditLog">

@@ -48,6 +48,7 @@ public interface UserRoleMapper {
 
     /**
      * 根据 userId 和 role status 查 roleId（可查禁用或非禁用）
+     *
      * @param userId
      * @param status
      * @return
@@ -56,6 +57,7 @@ public interface UserRoleMapper {
 
     /**
      * 根据 userId 和 要删除的 roleIds 从 sys_user_role 表中删除数据
+     *
      * @param userId
      * @param roleIds
      */

@@ -6,6 +6,7 @@ import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.vo.PermissionVO;
+import com.ymjrhk.rbac.vo.UserExcelVO;
 import com.ymjrhk.rbac.vo.UserVO;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface UserService {
     UserAuthInfo getUserAuthInfo(Long userId);
 
     void incrementAuthVersion(Long userId);
+
+    List<UserExcelVO> listForExport(UserPageQueryDTO dto);
 }

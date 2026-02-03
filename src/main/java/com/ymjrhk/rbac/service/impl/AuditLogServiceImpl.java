@@ -2,19 +2,18 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.dto.AuditLogPageQueryDTO;
 import com.ymjrhk.rbac.dto.AuditLogRealPageQueryDTO;
 import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.entity.User;
+import com.ymjrhk.rbac.exception.BaseException;
 import com.ymjrhk.rbac.mapper.AuditLogMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.base.BaseService;
+import com.ymjrhk.rbac.vo.AuditLogExcelVO;
 import com.ymjrhk.rbac.vo.AuditLogVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,32 +63,35 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         realPageQueryDTO.setStartTime(startTime);
         realPageQueryDTO.setEndTime(endTime);
 
-        // 3. 分页
-        normalizePage(realPageQueryDTO);
+        // 3. 查总数
+        long total = auditLogMapper.count(realPageQueryDTO);
 
-        // 加 limit
-        PageMethod.startPage(realPageQueryDTO.getPageNum(), realPageQueryDTO.getPageSize());
+        // 4. 查当前页数据
+        normalizePage(realPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
-        // 加 order by
-        String orderBy = buildOrderBy(auditLogPageQueryDTO); // 排序字段白名单
-        if (orderBy != null) {
-            PageMethod.orderBy(orderBy);
-        }
+        // 根据 HashMap 白名单生成排序字段和排序方式，防止 SQL 注入
+        String orderBy = buildOrderBy(realPageQueryDTO.getSortField(), realPageQueryDTO.getSortOrder()); // 排序字段白名单
+        realPageQueryDTO.setOrderBy(orderBy);
 
-        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
-        Page<AuditLogVO> page = auditLogMapper.pageQuery(realPageQueryDTO);
+        List<AuditLogVO> records = auditLogMapper.pageQuery(realPageQueryDTO);
 
-        return new PageResult(page.getTotal(), page.getResult());
+        return new PageResult(total, records);
     }
 
     /**
      * 排序构建方法（排序字段白名单）
-     * @param dto
+     *
+     * @param sortField
+     * @param sortOrder
      * @return
      */
-    private String buildOrderBy(AuditLogPageQueryDTO dto) {
-        if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
-            return "create_time desc"; // 默认排序
+    private String buildOrderBy(String sortField, String sortOrder) {
+
+        // 默认排序（当用户没点排序时）
+        String defaultOrder = "create_time desc";
+
+        if (StrUtil.isBlank(sortField) || StrUtil.isBlank(sortOrder)) {
+            return defaultOrder;
         }
 
         // 允许排序的字段（数据库字段）
@@ -115,12 +118,12 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
                 "createTime", "create_time"
         );
 
-        String column = fieldMap.get(dto.getSortField());
+        String column = fieldMap.get(sortField);
         if (column == null || !allowedFields.contains(column)) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
-        String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
+        String order = sortOrder.equalsIgnoreCase("asc") ? "asc" : "desc";
 
         return column + " " + order;
     }
@@ -191,6 +194,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
 
     /**
      * 未授权访问，插入审计日志
+     *
      * @param auditLog
      */
     @Async("auditExecutor")
@@ -201,5 +205,64 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         } catch (Exception e) {
             log.error("异步保存未授权访问审计日志失败", e);
         }
+    }
+
+    /**
+     * 导出审计日志数据
+     *
+     * @param auditLogPageQueryDTO
+     * @return
+     */
+    @Override
+    public List<AuditLogExcelVO> listForExport(AuditLogPageQueryDTO auditLogPageQueryDTO) {
+
+        // 1. 日期 → 时间（业务兜底）
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+
+        if (auditLogPageQueryDTO.getStartDate() != null) {
+            startTime = auditLogPageQueryDTO.getStartDate().atStartOfDay(); // 2026-01-01 00:00:00
+
+        }
+        if (auditLogPageQueryDTO.getEndDate() != null) {
+            endTime = auditLogPageQueryDTO.getEndDate().atTime(LocalTime.MAX); // 2026-01-31 23:59:59.999999999
+
+        }
+
+        // 2. 交给 Mapper 用的真正查询对象
+        AuditLogRealPageQueryDTO dto = BeanUtil.copyProperties(auditLogPageQueryDTO, AuditLogRealPageQueryDTO.class);
+        dto.setStartTime(startTime);
+        dto.setEndTime(endTime);
+
+        // 不跟随分页（导出全部符合条件的数据）
+        dto.setPageNum(null);
+        dto.setPageSize(null);
+
+        // 动态排序：跟随页面排序
+        dto.setOrderBy(buildOrderBy(dto.getSortField(), dto.getSortOrder()));
+
+        // 防止一次性导出过多数据
+        int maxExportSize = 50_000;
+        long count = auditLogMapper.count(dto);
+        if (count > maxExportSize) {
+            throw new BaseException("导出数据量过大，请缩小查询范围");
+        }
+
+        List<AuditLogVO> list = auditLogMapper.listForExport(dto);
+
+        return list.stream().map(log -> {
+            AuditLogExcelVO vo = new AuditLogExcelVO();
+            vo.setLogSeq(log.getLogSeq());
+            vo.setUsername(log.getUsername());
+            vo.setPermissionName(log.getPermissionName());
+            vo.setPath(log.getPath());
+            vo.setMethod(log.getMethod());
+            vo.setRequestBody(log.getRequestBody());
+            vo.setIp(log.getIp());
+            vo.setSuccess(log.getSuccess() == 1 ? "成功" : "失败");
+            vo.setErrorMessage(log.getErrorMessage());
+            vo.setCreateTime(log.getCreateTime());
+            return vo;
+        }).toList();
     }
 }

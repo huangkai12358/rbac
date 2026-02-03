@@ -1,6 +1,8 @@
 package com.ymjrhk.rbac.mapper;
 
-import com.ymjrhk.rbac.vo.*;
+import com.ymjrhk.rbac.vo.MePermissionVO;
+import com.ymjrhk.rbac.vo.MeRoleVO;
+import com.ymjrhk.rbac.vo.MeViewVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

@@ -1,10 +1,10 @@
 package com.ymjrhk.rbac.mapper;
 
-import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.UserPageQueryDTO;
 import com.ymjrhk.rbac.dto.auth.UserAuthInfo;
 import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.vo.PermissionVO;
+import com.ymjrhk.rbac.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -39,7 +39,15 @@ public interface UserMapper {
      * @param userPageQueryDTO
      * @return
      */
-    Page<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
+    List<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
+
+    /**
+     * 查符合条件用户总数
+     *
+     * @param userPageQueryDTO
+     * @return
+     */
+    long count(UserPageQueryDTO userPageQueryDTO);
 
     /**
      * 根据 userId 查询用户
@@ -103,4 +111,12 @@ public interface UserMapper {
      * @return
      */
     List<Long> selectPermissionIdsByUserIdAndStatus(Long userId, int status);
+
+    /**
+     * 按条件查询所有用户
+     *
+     * @param dto
+     * @return
+     */
+    List<UserVO> listForExport(UserPageQueryDTO dto);
 }

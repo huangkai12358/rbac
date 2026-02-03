@@ -19,6 +19,7 @@ import com.ymjrhk.rbac.result.PageResult;
 import com.ymjrhk.rbac.service.RoleHistoryService;
 import com.ymjrhk.rbac.service.RoleService;
 import com.ymjrhk.rbac.service.base.BaseService;
+import com.ymjrhk.rbac.vo.RoleExcelVO;
 import com.ymjrhk.rbac.vo.RoleVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.ymjrhk.rbac.constant.CacheConstant.*;
-import static com.ymjrhk.rbac.constant.CacheConstant.USER_ME;
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
@@ -81,16 +81,14 @@ public class RoleServiceImpl extends BaseService implements RoleService {
      */
     @Override
     public PageResult pageQuery(RolePageQueryDTO rolePageQueryDTO) {
-        normalizePage(rolePageQueryDTO);
+        normalizePage(rolePageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
         // 加 limit
         PageMethod.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
 
         // 加 order by
         String orderBy = buildOrderBy(rolePageQueryDTO); // 排序字段白名单
-        if (orderBy != null) {
-            PageMethod.orderBy(orderBy);
-        }
+        PageMethod.orderBy(orderBy); // 此处用 PageHelper 的 orderBy 方法，但为方便理解原理，用户和审计分页查询暂时不用
 
         // 正式分页（会被 PageHelper 拦截器拦截并加参数）
         Page<Role> page = roleMapper.pageQuery(rolePageQueryDTO);
@@ -106,12 +104,17 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     /**
      * 排序构建方法（排序字段白名单）
+     *
      * @param dto
      * @return
      */
     private String buildOrderBy(RolePageQueryDTO dto) {
+
+        // 默认排序（当用户没点排序时）
+        String defaultOrder = "create_time desc";
+
         if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         // 允许排序的字段（数据库字段）
@@ -132,7 +135,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         String column = fieldMap.get(dto.getSortField());
         if (column == null || !allowedFields.contains(column)) {
-            return "create_time desc"; // 默认排序
+            return defaultOrder;
         }
 
         String order = dto.getSortOrder().equalsIgnoreCase("asc") ? "asc" : "desc";
@@ -258,6 +261,31 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         // 5. 写到历史表
         roleHistoryService.recordHistory(role.getRoleId(), OperateTypeConstant.UPDATE);
+    }
+
+    /**
+     * 导出角色数据
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<RoleExcelVO> listForExport(RolePageQueryDTO dto) {
+        // 动态排序：跟随页面排序
+        dto.setOrderBy(buildOrderBy(dto));
+
+        List<RoleVO> list = roleMapper.listForExport(dto);
+
+        return list.stream().map(roleVO -> {
+            RoleExcelVO vo = new RoleExcelVO();
+            vo.setRoleId(roleVO.getRoleId());
+            vo.setRoleName(roleVO.getRoleName());
+            vo.setRoleDisplayName(roleVO.getRoleDisplayName());
+            vo.setDescription(roleVO.getDescription());
+            vo.setStatus(roleVO.getStatus() == 1 ? "启用" : "禁用");
+            vo.setCreateTime(roleVO.getCreateTime());
+            return vo;
+        }).toList();
     }
 
     /**

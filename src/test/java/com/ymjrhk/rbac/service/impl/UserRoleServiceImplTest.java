@@ -23,7 +23,6 @@ import static com.ymjrhk.rbac.constant.RoleNameConstant.SUPER_ADMIN;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 import static com.ymjrhk.rbac.constant.StatusConstant.ENABLED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

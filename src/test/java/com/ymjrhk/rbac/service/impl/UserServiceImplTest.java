@@ -77,6 +77,7 @@ class UserServiceImplTest {
     }
 
     //region create()
+
     /**
      * 创建成功
      */
@@ -195,6 +196,7 @@ class UserServiceImplTest {
     //endregion
 
     //region pageQuery()
+
     /**
      * 分页查询成功
      */
@@ -307,6 +309,7 @@ class UserServiceImplTest {
     //endregion
 
     //region getByUserId
+
     /**
      * 用户存在（成功路径）
      */
@@ -353,6 +356,7 @@ class UserServiceImplTest {
     //endregion
 
     //region update
+
     /**
      * 用户不存在
      */
@@ -499,6 +503,7 @@ class UserServiceImplTest {
     //endregion
 
     //region changeStatus
+
     /**
      * 用户不存在
      */
@@ -576,6 +581,7 @@ class UserServiceImplTest {
     //endregion
 
     //region resetPassword
+
     /**
      * 用户不存在
      */
@@ -685,6 +691,7 @@ class UserServiceImplTest {
     //endregion
 
     //region getUserPermissions
+
     /**
      * 用户不存在
      */
@@ -784,6 +791,7 @@ class UserServiceImplTest {
     //endregion
 
     //region hasPermission
+
     /**
      * 超级管理员直接放行
      */
@@ -992,6 +1000,7 @@ class UserServiceImplTest {
     //endregion
 
     //region incrementAuthVersion
+
     /**
      * 更新成功（正常路径）
      */

@@ -165,6 +165,7 @@ public class AuditFailInterceptor implements HandlerInterceptor {
      * @param body
      * @return
      */
+
     /**
      * 用于审计日志的请求体 password 脱敏（best-effort 实现）。
      *
@@ -172,7 +173,7 @@ public class AuditFailInterceptor implements HandlerInterceptor {
      * 该方法刻意不采用严格的 JSON 解析，也不使用正则表达式。
      * 在真实系统中，请求体可能并非合法 JSON（如被截断、格式错误、
      * 或包含非标准内容），如果依赖 JSON 解析失败将导致敏感信息
-     *（如密码）原样写入日志，存在安全风险。
+     * （如密码）原样写入日志，存在安全风险。
      * </p>
      *
      * <p>

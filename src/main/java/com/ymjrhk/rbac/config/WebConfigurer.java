@@ -64,12 +64,12 @@ public class WebConfigurer implements WebMvcConfigurer {
     public OpenAPI publicApi(Environment environment) {
         return new OpenAPI()
 //                .servers(serverList())
-                .info(new Info()
-                        .title("RBAC项目")
-                        //.extensions(Map.of("x-audience", "external-partner", "x-application-id", "APP-12345"))
-                        .description("RBAC项目接口文档")
-                        .version("1.0")
-                );
+.info(new Info()
+        .title("RBAC项目")
+        //.extensions(Map.of("x-audience", "external-partner", "x-application-id", "APP-12345"))
+        .description("RBAC项目接口文档")
+        .version("1.0")
+);
 //        .addSecurityItem(new SecurityRequirement().addList("bearer-jwt", Arrays.asList("read", "write"))).security(securityList());
     }
 

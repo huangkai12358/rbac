@@ -14,9 +14,13 @@ public class PageResult<T extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** 总记录数 */
+    /**
+     * 总记录数
+     */
     private long total;
 
-    /** 当前页数据 */
+    /**
+     * 当前页数据
+     */
     private List<T> records;
 }

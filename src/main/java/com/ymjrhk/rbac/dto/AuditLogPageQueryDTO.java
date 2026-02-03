@@ -25,9 +25,11 @@ public class AuditLogPageQueryDTO extends PageQuery implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    // 排序字段
-    private String sortField;
+    // 前端传：排序字段、排序方向
+    private String sortField; // e.g. "createTime", "username", "ip"
 
-    // 排序方式：asc / desc
-    private String sortOrder;
+    private String sortOrder; // "asc" / "desc"
+
+    // 后端生成：安全的 order by 子句（数据库字段）
+    private String orderBy;
 }

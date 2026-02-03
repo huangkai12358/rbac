@@ -3,6 +3,7 @@ package com.ymjrhk.rbac.mapper;
 import com.github.pagehelper.Page;
 import com.ymjrhk.rbac.dto.RolePageQueryDTO;
 import com.ymjrhk.rbac.entity.Role;
+import com.ymjrhk.rbac.vo.RoleVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -52,6 +53,7 @@ public interface RoleMapper {
 
     /**
      * 对给定的 roleIds，选出其中在 sys_role 表中实际存在并且未禁用的的 roleIds
+     *
      * @param roleIds
      * @return
      */
@@ -59,6 +61,7 @@ public interface RoleMapper {
 
     /**
      * 根据 userId 和 role status 查 Role（可查禁用或非禁用）
+     *
      * @param userId
      * @param status
      * @return
@@ -67,7 +70,16 @@ public interface RoleMapper {
 
     /**
      * 获取所有未禁用的 roleId
+     *
      * @return
      */
     List<Long> selectAllEnabledRoleIds();
+
+    /**
+     * 按条件查询所有角色
+     *
+     * @param dto
+     * @return
+     */
+    List<RoleVO> listForExport(RolePageQueryDTO dto);
 }

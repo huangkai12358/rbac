@@ -37,6 +37,7 @@ public interface RolePermissionMapper {
 
     /**
      * 根据 roleId 和 permission status 查 permissionId（可查禁用或非禁用）
+     *
      * @param roleId
      * @param status
      * @return
@@ -45,6 +46,7 @@ public interface RolePermissionMapper {
 
     /**
      * 根据 roleId 和 要删除的 permissionsId 从 sys_role_permission 表中删除数据
+     *
      * @param roleId
      * @param permissionIds
      */
