@@ -15,6 +15,9 @@
         create_time
         from sys_audit_log
         <where>
+            <if test="logSeq != null">
+                and log_seq = #{logSeq}
+            </if>
             <if test="username != null and username !=''">
                 and username like concat('%', #{username}, '%')
             </if>
@@ -55,6 +58,9 @@
         create_time
         from sys_audit_log
         <where>
+            <if test="logSeq != null">
+                and log_seq = #{logSeq}
+            </if>
             <if test="username != null and username !=''">
                 and username like concat('%', #{username}, '%')
             </if>
@@ -85,6 +91,9 @@
         select count(1)
         from sys_audit_log
         <where>
+            <if test="logSeq != null">
+                and log_seq = #{logSeq}
+            </if>
             <if test="username != null and username !=''">
                 and username like concat('%', #{username}, '%')
             </if>

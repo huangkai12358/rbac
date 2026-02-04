@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class AuditLogRealPageQueryDTO extends PageQuery implements Serializable {
 
+    private Long logSeq;
+
     private String username;
 
     private String permissionName;
