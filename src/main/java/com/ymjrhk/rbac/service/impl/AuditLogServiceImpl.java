@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.dto.AuditLogPageQueryDTO;
 import com.ymjrhk.rbac.dto.AuditLogRealPageQueryDTO;
@@ -90,7 +90,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         // 默认排序（当用户没点排序时）
         String defaultOrder = "create_time desc";
 
-        if (StrUtil.isBlank(sortField) || StrUtil.isBlank(sortOrder)) {
+        if (CharSequenceUtil.isBlank(sortField) || CharSequenceUtil.isBlank(sortOrder)) {
             return defaultOrder;
         }
 

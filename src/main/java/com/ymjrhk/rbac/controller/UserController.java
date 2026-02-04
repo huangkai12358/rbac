@@ -1,6 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
-import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.EasyExcelFactory;
 import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.StatusDTO;
 import com.ymjrhk.rbac.dto.UserCreateDTO;
@@ -152,10 +152,10 @@ public class UserController {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
 
-            EasyExcel.write(response.getOutputStream(), UserExcelVO.class)
-                     .registerWriteHandler(ExcelStyleUtil.defaultStyle())
-                     .sheet("用户数据")
-                     .doWrite(data);
+            EasyExcelFactory.write(response.getOutputStream(), UserExcelVO.class)
+                            .registerWriteHandler(ExcelStyleUtil.defaultStyle())
+                            .sheet("用户数据")
+                            .doWrite(data);
 
         } catch (IOException e) {
             throw new RuntimeException("导出 Excel 失败", e);

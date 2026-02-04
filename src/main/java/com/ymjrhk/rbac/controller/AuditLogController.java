@@ -1,6 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
-import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.EasyExcelFactory;
 import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.AuditLogPageQueryDTO;
 import com.ymjrhk.rbac.result.PageResult;
@@ -70,7 +70,7 @@ public class AuditLogController {
             - "+" 在文件名里不安全，改成 %20（空格）
             */
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
-                                               .replaceAll("\\+", "%20");
+                                               .replace("\\+", "%20");
 
             // 对于 跨域请求，浏览器只允许 JS 访问 “白名单响应头”
             /*
@@ -87,10 +87,10 @@ public class AuditLogController {
                     "attachment;filename*=utf-8''" + encodedFileName + ".xlsx"
             );
 
-            EasyExcel.write(response.getOutputStream(), AuditLogExcelVO.class)
-                     .registerWriteHandler(ExcelStyleUtil.defaultStyle())
-                     .sheet("审计日志")
-                     .doWrite(data);
+            EasyExcelFactory.write(response.getOutputStream(), AuditLogExcelVO.class)
+                            .registerWriteHandler(ExcelStyleUtil.defaultStyle())
+                            .sheet("审计日志")
+                            .doWrite(data);
 
         } catch (IOException e) {
             throw new RuntimeException("导出 Excel 失败", e);

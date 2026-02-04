@@ -1,7 +1,7 @@
 package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
@@ -122,7 +122,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         // 默认排序（当用户没点排序时）
         String defaultOrder = "create_time desc";
 
-        if (StrUtil.isBlank(dto.getSortField()) || StrUtil.isBlank(dto.getSortOrder())) {
+        if (CharSequenceUtil.isBlank(dto.getSortField()) || CharSequenceUtil.isBlank(dto.getSortOrder())) {
             return defaultOrder;
         }
 

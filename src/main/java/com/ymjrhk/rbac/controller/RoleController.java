@@ -1,6 +1,6 @@
 package com.ymjrhk.rbac.controller;
 
-import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.EasyExcelFactory;
 import com.ymjrhk.rbac.annotation.Audit;
 import com.ymjrhk.rbac.dto.RoleCreateDTO;
 import com.ymjrhk.rbac.dto.RoleDTO;
@@ -120,10 +120,10 @@ public class RoleController {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
 
-            EasyExcel.write(response.getOutputStream(), RoleExcelVO.class)
-                     .registerWriteHandler(ExcelStyleUtil.defaultStyle())
-                     .sheet("角色数据")
-                     .doWrite(data);
+            EasyExcelFactory.write(response.getOutputStream(), RoleExcelVO.class)
+                            .registerWriteHandler(ExcelStyleUtil.defaultStyle())
+                            .sheet("角色数据")
+                            .doWrite(data);
 
         } catch (IOException e) {
             throw new RuntimeException("导出 Excel 失败", e);
