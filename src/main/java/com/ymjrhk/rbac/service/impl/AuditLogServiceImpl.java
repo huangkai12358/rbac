@@ -103,7 +103,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
                 "method",
                 "ip",
                 "success",
-                "createTime"
+                "create_time"
         );
 
         // 前端字段 → 数据库字段映射
