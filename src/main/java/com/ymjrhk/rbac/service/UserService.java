@@ -14,7 +14,7 @@ import java.util.List;
 public interface UserService {
     Long create(UserCreateDTO userCreateDTO);
 
-    PageResult pageQuery(UserPageQueryDTO userPageQueryDTO);
+    PageResult pageQuery(UserPageQueryDTO dto);
 
     UserVO getByUserId(Long userId);
 

@@ -2,8 +2,6 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.RoleCreateDTO;
@@ -76,31 +74,42 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     /**
      * 角色分页查询
      *
-     * @param rolePageQueryDTO
+     * @param dto
      * @return
      */
     @Override
-    public PageResult pageQuery(RolePageQueryDTO rolePageQueryDTO) {
-        normalizePage(rolePageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
+    public PageResult pageQuery(RolePageQueryDTO dto) {
 
-        // 加 limit
-        PageMethod.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
+        // 1. 分页兜底
+        normalizePage(dto);
 
-        // 加 order by
-        String orderBy = buildOrderBy(rolePageQueryDTO); // 排序字段白名单
-        PageMethod.orderBy(orderBy); // 此处用 PageHelper 的 orderBy 方法，但为方便理解原理，用户和审计分页查询暂时不用
+        // 2. 查总数
+        long total = roleMapper.count(dto);
+        if (total == 0) {
+            return new PageResult<>(0, List.of());
+        }
 
-        // 正式分页（会被 PageHelper 拦截器拦截并加参数）
-        Page<Role> page = roleMapper.pageQuery(rolePageQueryDTO);
+        // 3. 构造安全 orderBy
+        String orderBy = buildOrderBy(dto);
+        dto.setOrderBy(orderBy);
 
-        long total = page.getTotal();
+        // 4. 第一段：只查 role_id（有序）
+        List<Long> ids = roleMapper.pageQueryIds(dto);
+        if (ids.isEmpty()) {
+            return new PageResult<>(total, List.of());
+        }
 
-        List<RoleVO> records = page.getResult().stream()
-                                   .map(role -> BeanUtil.copyProperties(role, RoleVO.class))
-                                   .toList();
+        // 5. 第二段：按 ID 查完整数据（顺序保证）
+        List<Role> roles = roleMapper.selectByIds(ids);
+
+        // 6. 转 VO
+        List<RoleVO> records = roles.stream()
+                                    .map(r -> BeanUtil.copyProperties(r, RoleVO.class))
+                                    .toList();
 
         return new PageResult(total, records);
     }
+
 
     /**
      * 排序构建方法（排序字段白名单）

@@ -5,6 +5,7 @@ import com.ymjrhk.rbac.dto.PermissionPageQueryDTO;
 import com.ymjrhk.rbac.entity.Permission;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -25,6 +26,30 @@ public interface PermissionMapper {
      * @return
      */
     Page<Permission> pageQuery(PermissionPageQueryDTO permissionPageQueryDTO);
+
+    /**
+     * 权限分页查询（只查 ID）
+     *
+     * @param dto
+     * @return
+     */
+    List<Long> pageQueryIds(PermissionPageQueryDTO dto);
+
+    /**
+     * 按 ID 查完整数据
+     *
+     * @param ids
+     * @return
+     */
+    List<Permission> selectByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 查符合条件权限总数
+     *
+     * @param dto
+     * @return
+     */
+    long count(PermissionPageQueryDTO dto);
 
     /**
      * 根据 permissionId 查询权限

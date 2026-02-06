@@ -6,6 +6,7 @@ import com.ymjrhk.rbac.entity.User;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -40,6 +41,22 @@ public interface UserMapper {
      * @return
      */
     List<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
+
+    /**
+     * 用户分页查询（只查 ID）
+     *
+     * @param dto
+     * @return
+     */
+    List<Long> pageQueryIds(UserPageQueryDTO dto);
+
+    /**
+     * 按 ID 查完整数据
+     *
+     * @param ids
+     * @return
+     */
+    List<User> selectByIds(@Param("ids") List<Long> ids);
 
     /**
      * 查符合条件用户总数

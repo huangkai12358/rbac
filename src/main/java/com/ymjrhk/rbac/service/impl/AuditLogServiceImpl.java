@@ -40,40 +40,53 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
     /**
      * 审计日志分页查询
      *
-     * @param auditLogPageQueryDTO
+     * @param dto
      * @return
      */
     @Override
-    public PageResult pageQuery(AuditLogPageQueryDTO auditLogPageQueryDTO) {
-        // 1. 日期 → 时间（业务兜底）
+    public PageResult pageQuery(AuditLogPageQueryDTO dto) {
+
+        // 1. 日期 → 时间（你原来的逻辑，完全保留）
         LocalDateTime startTime = null;
         LocalDateTime endTime = null;
 
-        if (auditLogPageQueryDTO.getStartDate() != null) {
-            startTime = auditLogPageQueryDTO.getStartDate().atStartOfDay(); // 2026-01-01 00:00:00
-
+        if (dto.getStartDate() != null) {
+            startTime = dto.getStartDate().atStartOfDay();
         }
-        if (auditLogPageQueryDTO.getEndDate() != null) {
-            endTime = auditLogPageQueryDTO.getEndDate().atTime(LocalTime.MAX); // 2026-01-31 23:59:59.999999999
-
+        if (dto.getEndDate() != null) {
+            endTime = dto.getEndDate().atTime(LocalTime.MAX);
         }
 
-        // 2. 交给 Mapper 用的真正查询对象
-        AuditLogRealPageQueryDTO realPageQueryDTO = BeanUtil.copyProperties(auditLogPageQueryDTO, AuditLogRealPageQueryDTO.class);
-        realPageQueryDTO.setStartTime(startTime);
-        realPageQueryDTO.setEndTime(endTime);
+        // 2. 构造真实查询 DTO
+        AuditLogRealPageQueryDTO realDTO =
+                BeanUtil.copyProperties(dto, AuditLogRealPageQueryDTO.class);
+        realDTO.setStartTime(startTime);
+        realDTO.setEndTime(endTime);
 
-        // 3. 查总数
-        long total = auditLogMapper.count(realPageQueryDTO);
+        // 3. 分页兜底
+        normalizePage(realDTO);
 
-        // 4. 查当前页数据
-        normalizePage(realPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
+        // 4. 查总数
+        long total = auditLogMapper.count(realDTO);
+        if (total == 0) {
+            return new PageResult<>(0, List.of());
+        }
 
-        // 根据 HashMap 白名单生成排序字段和排序方式，防止 SQL 注入
-        String orderBy = buildOrderBy(realPageQueryDTO.getSortField(), realPageQueryDTO.getSortOrder()); // 排序字段白名单
-        realPageQueryDTO.setOrderBy(orderBy);
+        // 5. 构造安全 orderBy（你原来就有）
+        String orderBy = buildOrderBy(
+                realDTO.getSortField(),
+                realDTO.getSortOrder()
+        );
+        realDTO.setOrderBy(orderBy);
 
-        List<AuditLogVO> records = auditLogMapper.pageQuery(realPageQueryDTO);
+        // 6. 第一段：只查 log_seq（有序）
+        List<Long> logSeqs = auditLogMapper.pageQueryIds(realDTO);
+        if (logSeqs.isEmpty()) {
+            return new PageResult<>(total, List.of());
+        }
+
+        // 7. 第二段：按 log_seq 查 VO（顺序保证）
+        List<AuditLogVO> records = auditLogMapper.selectByIds(logSeqs);
 
         return new PageResult(total, records);
     }

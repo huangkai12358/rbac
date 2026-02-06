@@ -111,7 +111,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     /**
      * 用户分页查询
      *
-     * @param userPageQueryDTO
+     * @param dto
      * @return
      */
     /*
@@ -124,22 +124,33 @@ public class UserServiceImpl extends BaseService implements UserService {
     - 数据变化频繁，是瞬态数据
     */
     @Override
-    public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
+    public PageResult pageQuery(UserPageQueryDTO dto) {
         // 1. 查总数
-        long total = userMapper.count(userPageQueryDTO);
+        long total = userMapper.count(dto);
+        if (total == 0) {
+            return new PageResult<>(0, List.of());
+        }
 
         // 2. 查当前页数据
-        normalizePage(userPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
+        normalizePage(dto); // pageNum 和 pageSize 设置默认值兜底
 
-        // 根据 HashMap 白名单生成排序字段和排序方式，防止 SQL 注入
-        String orderBy = buildOrderBy(userPageQueryDTO); // 排序字段白名单
-        userPageQueryDTO.setOrderBy(orderBy);
+        // 3. 根据 HashMap 白名单生成排序字段和排序方式，防止 SQL 注入
+        String orderBy = buildOrderBy(dto); // 排序字段白名单
+        dto.setOrderBy(orderBy);
 
-        List<User> list = userMapper.pageQuery(userPageQueryDTO);
+        // 4. 第一段：只查 ID（有序）
+        List<Long> ids = userMapper.pageQueryIds(dto);
+        if (ids.isEmpty()) {
+            return new PageResult<>(total, List.of());
+        }
 
-        List<UserVO> records = list.stream()
-                                   .map(user -> BeanUtil.copyProperties(user, UserVO.class))
-                                   .toList();
+        // 5. 第二段：根据 ID 查完整数据（顺序保证）
+        List<User> users = userMapper.selectByIds(ids);
+
+        // 6. 转 VO
+        List<UserVO> records = users.stream()
+                                    .map(u -> BeanUtil.copyProperties(u, UserVO.class))
+                                    .toList();
 
         return new PageResult(total, records);
     }

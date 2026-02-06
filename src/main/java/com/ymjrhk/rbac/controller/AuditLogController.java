@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +44,7 @@ public class AuditLogController {
     @Audit(permission = AUDIT_VIEW)
     @GetMapping("/page")
     @Operation(summary = "审计日志分页查询")
-    public Result<PageResult> pageQuery(AuditLogPageQueryDTO auditLogPageQueryDTO) {
+    public Result<PageResult> pageQuery(@Validated AuditLogPageQueryDTO auditLogPageQueryDTO) {
         log.info("审计日志分页查询，参数为：{}", auditLogPageQueryDTO);
         PageResult pageResult = auditLogService.pageQuery(auditLogPageQueryDTO);
         return Result.success(pageResult);

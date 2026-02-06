@@ -1,6 +1,7 @@
 package com.ymjrhk.rbac.dto;
 
 import com.ymjrhk.rbac.dto.base.PageQuery;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 public class AuditLogPageQueryDTO extends PageQuery implements Serializable {
 
+    @Min(value = 1, message = "序号必须为正整数")
     private Long logSeq;
 
     private String username;

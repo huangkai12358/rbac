@@ -2,8 +2,6 @@ package com.ymjrhk.rbac.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.page.PageMethod;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.dto.PermissionCreateDTO;
@@ -85,10 +83,43 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
     /**
      * 权限分页查询
      *
-     * @param permissionPageQueryDTO
+     * @param dto
      * @return
      */
     @Override
+    public PageResult pageQuery(PermissionPageQueryDTO dto) {
+
+        // 1. 分页兜底
+        normalizePage(dto);
+
+        // 2. 查总数
+        long total = permissionMapper.count(dto);
+        if (total == 0) {
+            return new PageResult<>(0, List.of());
+        }
+
+        // 3. 构造安全 orderBy（排序字段白名单）
+        String orderBy = buildOrderBy(dto);
+        dto.setOrderBy(orderBy);
+
+        // 4. 第一段：只查 permission_id（有序）
+        List<Long> ids = permissionMapper.pageQueryIds(dto);
+        if (ids.isEmpty()) {
+            return new PageResult<>(total, List.of());
+        }
+
+        // 5. 第二段：按 ID 查完整数据（顺序保证）
+        List<Permission> permissions = permissionMapper.selectByIds(ids);
+
+        // 6. 转 VO
+        List<PermissionVO> records = permissions.stream()
+                                                .map(p -> BeanUtil.copyProperties(p, PermissionVO.class))
+                                                .toList();
+
+        return new PageResult(total, records);
+    }
+
+/*    @Override
     public PageResult pageQuery(PermissionPageQueryDTO permissionPageQueryDTO) {
         normalizePage(permissionPageQueryDTO); // pageNum 和 pageSize 设置默认值兜底
 
@@ -109,7 +140,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
                                          .toList();
 
         return new PageResult(total, records);
-    }
+    }*/
 
     /**
      * 排序构建方法（排序字段白名单）

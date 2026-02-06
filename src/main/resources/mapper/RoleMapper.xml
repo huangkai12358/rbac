@@ -34,6 +34,47 @@
         </where>
     </select>
 
+    <select id="pageQueryIds" resultType="long">
+        select role_id
+        from sys_role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                and role_name like concat('%', #{roleName}, '%')
+            </if>
+        </where>
+
+        <!-- 排序字段来自后端白名单 -->
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectByIds" resultType="Role">
+        select *
+        from sys_role
+        where role_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        order by field(role_id,
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+
+    <select id="count" resultType="long">
+        select count(1)
+        from sys_role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                and role_name like concat('%', #{roleName}, '%')
+            </if>
+        </where>
+    </select>
+
     <update id="update">
         update sys_role
         <set>

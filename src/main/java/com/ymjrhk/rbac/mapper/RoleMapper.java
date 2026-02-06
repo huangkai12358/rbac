@@ -5,6 +5,7 @@ import com.ymjrhk.rbac.dto.RolePageQueryDTO;
 import com.ymjrhk.rbac.entity.Role;
 import com.ymjrhk.rbac.vo.RoleVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -25,6 +26,30 @@ public interface RoleMapper {
      * @return
      */
     Page<Role> pageQuery(RolePageQueryDTO rolePageQueryDTO);
+
+    /**
+     * 角色分页查询（只查 ID）
+     *
+     * @param dto
+     * @return
+     */
+    List<Long> pageQueryIds(RolePageQueryDTO dto);
+
+    /**
+     * 按 ID 查完整数据
+     *
+     * @param ids
+     * @return
+     */
+    List<Role> selectByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 查符合条件角色总数
+     *
+     * @param dto
+     * @return
+     */
+    long count(RolePageQueryDTO dto);
 
     /**
      * 根据 roleId 查询角色
