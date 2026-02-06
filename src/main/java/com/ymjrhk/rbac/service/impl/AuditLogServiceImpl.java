@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.ymjrhk.rbac.constant.SuccessConstant;
 import com.ymjrhk.rbac.dto.AuditLogPageQueryDTO;
@@ -58,8 +57,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         }
 
         // 2. 构造真实查询 DTO
-        AuditLogRealPageQueryDTO realDTO =
-                BeanUtil.copyProperties(dto, AuditLogRealPageQueryDTO.class);
+        AuditLogRealPageQueryDTO realDTO = toRealPageQueryDTO(dto);
         realDTO.setStartTime(startTime);
         realDTO.setEndTime(endTime);
 
@@ -243,7 +241,7 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         }
 
         // 2. 交给 Mapper 用的真正查询对象
-        AuditLogRealPageQueryDTO dto = BeanUtil.copyProperties(auditLogPageQueryDTO, AuditLogRealPageQueryDTO.class);
+        AuditLogRealPageQueryDTO dto = toRealPageQueryDTO(auditLogPageQueryDTO);
         dto.setStartTime(startTime);
         dto.setEndTime(endTime);
 
@@ -277,5 +275,24 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
             vo.setCreateTime(log.getCreateTime());
             return vo;
         }).toList();
+    }
+
+    /**
+     * 把 AuditLogPageQueryDTO 属性拷贝给 AuditLogRealPageQueryDTO
+     * @param dto
+     * @return
+     */
+    private AuditLogRealPageQueryDTO toRealPageQueryDTO(AuditLogPageQueryDTO dto) {
+        AuditLogRealPageQueryDTO realDTO = new AuditLogRealPageQueryDTO();
+        realDTO.setLogSeq(dto.getLogSeq());
+        realDTO.setUsername(dto.getUsername());
+        realDTO.setPermissionName(dto.getPermissionName());
+        realDTO.setSuccess(dto.getSuccess());
+        realDTO.setSortField(dto.getSortField());
+        realDTO.setSortOrder(dto.getSortOrder());
+        realDTO.setOrderBy(dto.getOrderBy());
+        realDTO.setPageNum(dto.getPageNum());
+        realDTO.setPageSize(dto.getPageSize());
+        return realDTO;
     }
 }

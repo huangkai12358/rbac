@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.ymjrhk.rbac.constant.MessageConstant;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.StatusConstant;
@@ -85,7 +84,7 @@ public class MeServiceImpl implements MeService {
                 // List 转类型
                 List<MePermissionVO> permissions = list
                         .stream()
-                        .map(permissionVO -> BeanUtil.copyProperties(permissionVO, MePermissionVO.class))
+                        .map(this::toMePermissionVO)
                         .toList();
 
                 meViewVO.setPermissions(permissions);
@@ -216,5 +215,18 @@ public class MeServiceImpl implements MeService {
 
         // 4. 写到历史表
         userHistoryService.recordHistory(user.getUserId(), OperateTypeConstant.UPDATE);
+    }
+
+    /**
+     * 把 PermissionVO 属性拷贝给 MePermissionVO
+     * @param permissionVO
+     * @return
+     */
+    private MePermissionVO toMePermissionVO(PermissionVO permissionVO) {
+        MePermissionVO vo = new MePermissionVO();
+        vo.setPermissionId(permissionVO.getPermissionId());
+        vo.setPermissionName(permissionVO.getPermissionName());
+        vo.setPermissionDisplayName(permissionVO.getPermissionDisplayName());
+        return vo;
     }
 }

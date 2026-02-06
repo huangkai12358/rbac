@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.constant.PasswordConstant;
@@ -149,7 +148,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 6. 转 VO
         List<UserVO> records = users.stream()
-                                    .map(u -> BeanUtil.copyProperties(u, UserVO.class))
+                                    .map(this::toUserVO)
                                     .toList();
 
         return new PageResult(total, records);
@@ -222,7 +221,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             throw new UserNotExistException(USER_NOT_EXIST);
         }
 
-        return BeanUtil.copyProperties(user, UserVO.class);
+        return toUserVO(user);
     }
 
     /**
@@ -582,5 +581,24 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
         }
+    }
+
+    /**
+     * 把 User 属性拷贝给 UserVO
+     * @param user
+     * @return
+     */
+    private UserVO toUserVO(User user) {
+        UserVO vo = new UserVO();
+        vo.setUserId(user.getUserId());
+        vo.setUsername(user.getUsername());
+        vo.setNickname(user.getNickname());
+        vo.setEmail(user.getEmail());
+        vo.setStatus(user.getStatus());
+        vo.setVersion(user.getVersion());
+        vo.setSecretToken(user.getSecretToken());
+        vo.setCreateTime(user.getCreateTime());
+        vo.setUpdateTime(user.getUpdateTime());
+        return vo;
     }
 }

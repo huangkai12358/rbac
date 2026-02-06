@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
@@ -49,7 +48,11 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     @Override
     @Transactional
     public Long create(RoleCreateDTO roleCreateDTO) {
-        Role role = BeanUtil.copyProperties(roleCreateDTO, Role.class);
+        Role role = new Role();
+        role.setRoleName(roleCreateDTO.getRoleName());
+        role.setRoleDisplayName(roleCreateDTO.getRoleDisplayName());
+        role.setDescription(roleCreateDTO.getDescription());
+        role.setStatus(roleCreateDTO.getStatus());
 
         String secretToken = UUID.randomUUID().toString();
 
@@ -104,7 +107,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         // 6. 转 VO
         List<RoleVO> records = roles.stream()
-                                    .map(r -> BeanUtil.copyProperties(r, RoleVO.class))
+                                    .map(this::toRoleVO)
                                     .toList();
 
         return new PageResult(total, records);
@@ -171,7 +174,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
             throw new RoleNotExistException(ROLE_NOT_EXIST);
         }
 
-        return BeanUtil.copyProperties(role, RoleVO.class);
+        return toRoleVO(role);
     }
 
     /**
@@ -307,5 +310,24 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
         }
+    }
+
+    /**
+     * 把 Role 属性拷贝给 RoleVO
+     * @param role
+     * @return
+     */
+    private RoleVO toRoleVO(Role role) {
+        RoleVO vo = new RoleVO();
+        vo.setRoleId(role.getRoleId());
+        vo.setRoleName(role.getRoleName());
+        vo.setRoleDisplayName(role.getRoleDisplayName());
+        vo.setDescription(role.getDescription());
+        vo.setStatus(role.getStatus());
+        vo.setVersion(role.getVersion());
+        vo.setSecretToken(role.getSecretToken());
+        vo.setCreateTime(role.getCreateTime());
+        vo.setUpdateTime(role.getUpdateTime());
+        return vo;
     }
 }

@@ -1,6 +1,5 @@
 package com.ymjrhk.rbac.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.ymjrhk.rbac.constant.OperateTypeConstant;
 import com.ymjrhk.rbac.context.UserContext;
@@ -58,7 +57,16 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
             allEntries = true
     )
     public Long create(PermissionCreateDTO permissionCreateDTO) {
-        Permission permission = BeanUtil.copyProperties(permissionCreateDTO, Permission.class);
+        Permission permission = new Permission();
+        permission.setPermissionName(permissionCreateDTO.getPermissionName());
+        permission.setPermissionDisplayName(permissionCreateDTO.getPermissionDisplayName());
+        permission.setDescription(permissionCreateDTO.getDescription());
+        permission.setStatus(permissionCreateDTO.getStatus());
+        permission.setType(permissionCreateDTO.getType());
+        permission.setParentId(permissionCreateDTO.getParentId());
+        permission.setPath(permissionCreateDTO.getPath());
+        permission.setMethod(permissionCreateDTO.getMethod());
+        permission.setSort(permissionCreateDTO.getSort());
 
         String secretToken = UUID.randomUUID().toString();
 
@@ -113,7 +121,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
 
         // 6. 转 VO
         List<PermissionVO> records = permissions.stream()
-                                                .map(p -> BeanUtil.copyProperties(p, PermissionVO.class))
+                                                .map(this::toPermissionVO)
                                                 .toList();
 
         return new PageResult(total, records);
@@ -136,7 +144,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         long total = page.getTotal();
 
         List<PermissionVO> records = page.getResult().stream()
-                                         .map(permission -> BeanUtil.copyProperties(permission, PermissionVO.class))
+                                         .map(this::toPermissionVO)
                                          .toList();
 
         return new PageResult(total, records);
@@ -208,7 +216,7 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
             throw new PermissionNotExistException(PERMISSION_NOT_EXIST);
         }
 
-        return BeanUtil.copyProperties(permission, PermissionVO.class);
+        return toPermissionVO(permission);
     }
 
     /**
@@ -345,6 +353,30 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         if (result != 1) {
             throw new UpdateFailedException(UPDATE_FAILED); // 数据已被修改，请刷新重试
         }
+    }
+
+    /**
+     * 把 Permission 属性拷贝给 PermissionVO
+     * @param permission
+     * @return
+     */
+    private PermissionVO toPermissionVO(Permission permission) {
+        PermissionVO vo = new PermissionVO();
+        vo.setPermissionId(permission.getPermissionId());
+        vo.setPermissionName(permission.getPermissionName());
+        vo.setPermissionDisplayName(permission.getPermissionDisplayName());
+        vo.setDescription(permission.getDescription());
+        vo.setStatus(permission.getStatus());
+        vo.setType(permission.getType());
+        vo.setParentId(permission.getParentId());
+        vo.setPath(permission.getPath());
+        vo.setMethod(permission.getMethod());
+        vo.setSort(permission.getSort());
+        vo.setVersion(permission.getVersion());
+        vo.setSecretToken(permission.getSecretToken());
+        vo.setCreateTime(permission.getCreateTime());
+        vo.setUpdateTime(permission.getUpdateTime());
+        return vo;
     }
 
     /**
