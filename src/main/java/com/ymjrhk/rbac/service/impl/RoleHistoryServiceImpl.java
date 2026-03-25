@@ -7,17 +7,17 @@ import com.ymjrhk.rbac.exception.HistoryInsertFailedException;
 import com.ymjrhk.rbac.mapper.RoleHistoryMapper;
 import com.ymjrhk.rbac.mapper.RoleMapper;
 import com.ymjrhk.rbac.service.RoleHistoryService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 只保存成功的记录
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class RoleHistoryServiceImpl implements RoleHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(RoleHistoryServiceImpl.class);
+
 
     private final RoleHistoryMapper roleHistoryMapper;
 
@@ -53,4 +53,9 @@ public class RoleHistoryServiceImpl implements RoleHistoryService {
             throw new HistoryInsertFailedException(MessageConstant.HISTORY_INSERT_FAILED);
         }
     }
+    public RoleHistoryServiceImpl(RoleHistoryMapper roleHistoryMapper, RoleMapper roleMapper) {
+        this.roleHistoryMapper = roleHistoryMapper;
+        this.roleMapper = roleMapper;
+    }
+
 }

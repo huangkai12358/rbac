@@ -1,11 +1,10 @@
 package com.ymjrhk.rbac.result;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-@Data
 @Schema(description = "返回结果封装")
 public class Result<T> implements Serializable {
 
@@ -42,4 +41,50 @@ public class Result<T> implements Serializable {
         r.data = data;
         return r;
     }
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Result that = (Result) o;
+        return Objects.equals(code, that.code) && Objects.equals(errorMessage, that.errorMessage) && Objects.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, errorMessage, data);
+    }
+
+    @Override
+    public String toString() {
+        return "Result" + "{" + "code=" + code + ", " + "errorMessage=" + errorMessage + ", " + "data=" + data + "}";
+    }
+
 }

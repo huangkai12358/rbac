@@ -6,8 +6,6 @@ import com.ymjrhk.rbac.interceptor.PermissionInterceptor;
 import com.ymjrhk.rbac.json.JacksonObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -16,17 +14,19 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
-@Slf4j
 // 将 extends WebMvcConfigurationSupport 改为 implements WebMvcConfigurer，
 // 并将重写的方法属性由 protected 改为 public，
 // 修改后可不重写静态资源映射的 addResourceHandlers 方法，
 // 因为 implements 了 WebMvcConfigurer 接口之后可以自动映射静态资源
 public class WebConfigurer implements WebMvcConfigurer {
+    private static final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
+
 
     private final AuthInterceptor authInterceptor;
 
@@ -88,4 +88,10 @@ public class WebConfigurer implements WebMvcConfigurer {
         // 顺序必须在自定义的“前面”
         converters.addFirst(new ByteArrayHttpMessageConverter());
     }
+    public WebConfigurer(AuthInterceptor authInterceptor, PermissionInterceptor permissionInterceptor, AuditFailInterceptor auditFailInterceptor) {
+        this.authInterceptor = authInterceptor;
+        this.permissionInterceptor = permissionInterceptor;
+        this.auditFailInterceptor = auditFailInterceptor;
+    }
+
 }

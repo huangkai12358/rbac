@@ -1,11 +1,10 @@
 package com.ymjrhk.rbac.entity;
 
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
 public class PermissionHistory implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -38,4 +37,146 @@ public class PermissionHistory implements Serializable {
     private LocalDateTime operateTime;
 
     private Long operatorId;
+    public Long getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissionId(Long permissionId) {
+        this.permissionId = permissionId;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public String getPermissionName() {
+        return permissionName;
+    }
+
+    public void setPermissionName(String permissionName) {
+        this.permissionName = permissionName;
+    }
+
+    public String getPermissionDisplayName() {
+        return permissionDisplayName;
+    }
+
+    public void setPermissionDisplayName(String permissionDisplayName) {
+        this.permissionDisplayName = permissionDisplayName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getSecretToken() {
+        return secretToken;
+    }
+
+    public void setSecretToken(String secretToken) {
+        this.secretToken = secretToken;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public Integer getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(Integer operateType) {
+        this.operateType = operateType;
+    }
+
+    public LocalDateTime getOperateTime() {
+        return operateTime;
+    }
+
+    public void setOperateTime(LocalDateTime operateTime) {
+        this.operateTime = operateTime;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(Long operatorId) {
+        this.operatorId = operatorId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionHistory that = (PermissionHistory) o;
+        return Objects.equals(permissionId, that.permissionId) && Objects.equals(version, that.version) && Objects.equals(permissionName, that.permissionName) && Objects.equals(permissionDisplayName, that.permissionDisplayName) && Objects.equals(description, that.description) && Objects.equals(status, that.status) && Objects.equals(secretToken, that.secretToken) && Objects.equals(type, that.type) && Objects.equals(parentId, that.parentId) && Objects.equals(path, that.path) && Objects.equals(method, that.method) && Objects.equals(sort, that.sort) && Objects.equals(operateType, that.operateType) && Objects.equals(operateTime, that.operateTime) && Objects.equals(operatorId, that.operatorId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(permissionId, version, permissionName, permissionDisplayName, description, status, secretToken, type, parentId, path, method, sort, operateType, operateTime, operatorId);
+    }
+
+    @Override
+    public String toString() {
+        return "PermissionHistory" + "{" + "permissionId=" + permissionId + ", " + "version=" + version + ", " + "permissionName=" + permissionName + ", " + "permissionDisplayName=" + permissionDisplayName + ", " + "description=" + description + ", " + "status=" + status + ", " + "secretToken=" + secretToken + ", " + "type=" + type + ", " + "parentId=" + parentId + ", " + "path=" + path + ", " + "method=" + method + ", " + "sort=" + sort + ", " + "operateType=" + operateType + ", " + "operateTime=" + operateTime + ", " + "operatorId=" + operatorId + "}";
+    }
+
 }

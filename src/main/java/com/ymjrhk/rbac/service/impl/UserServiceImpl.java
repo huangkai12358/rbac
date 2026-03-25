@@ -22,8 +22,6 @@ import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionVO;
 import com.ymjrhk.rbac.vo.UserExcelVO;
 import com.ymjrhk.rbac.vo.UserVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -40,9 +40,9 @@ import static com.ymjrhk.rbac.constant.PasswordConstant.RAW_PASSWORD;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class UserServiceImpl extends BaseService implements UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
@@ -601,4 +601,12 @@ public class UserServiceImpl extends BaseService implements UserService {
         vo.setUpdateTime(user.getUpdateTime());
         return vo;
     }
+    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, UserHistoryService userHistoryService, UserRoleService userRoleService, PermissionMapper permissionMapper) {
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.userHistoryService = userHistoryService;
+        this.userRoleService = userRoleService;
+        this.permissionMapper = permissionMapper;
+    }
+
 }

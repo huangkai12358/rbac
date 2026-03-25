@@ -2,9 +2,10 @@ package com.ymjrhk.rbac.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -26,8 +27,9 @@ import java.io.IOException;
  * └── 从 wrapper 里“安全地”拿请求体
  */
 @Component
-@Slf4j
 public class RequestBodyCacheFilter implements Filter {
+    private static final Logger log = LoggerFactory.getLogger(RequestBodyCacheFilter.class);
+
 
     @Override
     public void doFilter(ServletRequest request,

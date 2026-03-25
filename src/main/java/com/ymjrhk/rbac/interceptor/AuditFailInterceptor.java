@@ -10,13 +10,13 @@ import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.service.AuditLogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -32,9 +32,9 @@ import static com.ymjrhk.rbac.utils.IpUtil.getClientIp;
 // - 参数类型错误
 // - 缺少必填字段
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class AuditFailInterceptor implements HandlerInterceptor {
+    private static final Logger log = LoggerFactory.getLogger(AuditFailInterceptor.class);
+
 
     private final AuditLogService auditLogService;
 
@@ -385,6 +385,10 @@ public class AuditFailInterceptor implements HandlerInterceptor {
                 "(?i)(\"[^\"]*password[^\"]*\"\\s*:\\s*)\"[^\"]*\"",
                 "$1\"******\""
         );
+    }
+
+    public AuditFailInterceptor(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
     }
 
 }

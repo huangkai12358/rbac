@@ -14,10 +14,10 @@ import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.AuditLogExcelVO;
 import com.ymjrhk.rbac.vo.AuditLogVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,9 +28,9 @@ import java.util.Set;
 import static com.ymjrhk.rbac.constant.PermissionNameConstant.AUTH_LOGIN;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AuditLogServiceImpl extends BaseService implements AuditLogService {
+    private static final Logger log = LoggerFactory.getLogger(AuditLogServiceImpl.class);
+
 
     private final AuditLogMapper auditLogMapper;
 
@@ -295,4 +295,9 @@ public class AuditLogServiceImpl extends BaseService implements AuditLogService 
         realDTO.setPageSize(dto.getPageSize());
         return realDTO;
     }
+    public AuditLogServiceImpl(AuditLogMapper auditLogMapper, UserMapper userMapper) {
+        this.auditLogMapper = auditLogMapper;
+        this.userMapper = userMapper;
+    }
+
 }

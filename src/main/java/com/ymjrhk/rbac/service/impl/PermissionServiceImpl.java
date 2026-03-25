@@ -18,13 +18,13 @@ import com.ymjrhk.rbac.service.PermissionService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.PermissionExcelVO;
 import com.ymjrhk.rbac.vo.PermissionVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -33,9 +33,9 @@ import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class PermissionServiceImpl extends BaseService implements PermissionService {
+    private static final Logger log = LoggerFactory.getLogger(PermissionServiceImpl.class);
+
     private final PermissionMapper permissionMapper;
 
     private final PermissionHistoryService permissionHistoryService;
@@ -398,4 +398,9 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         permission.setSort(permissionDTO.getSort());
         return permission;
     }
+    public PermissionServiceImpl(PermissionMapper permissionMapper, PermissionHistoryService permissionHistoryService) {
+        this.permissionMapper = permissionMapper;
+        this.permissionHistoryService = permissionHistoryService;
+    }
+
 }

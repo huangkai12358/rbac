@@ -9,7 +9,6 @@ import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.mapper.UserRoleMapper;
 import com.ymjrhk.rbac.service.UserRoleService;
 import com.ymjrhk.rbac.vo.RoleVO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 import static com.ymjrhk.rbac.constant.StatusConstant.ENABLED;
 
 @Service
-@RequiredArgsConstructor
 public class UserRoleServiceImpl implements UserRoleService {
     private final UserMapper userMapper;
 
@@ -188,4 +186,10 @@ public class UserRoleServiceImpl implements UserRoleService {
         // 暂时不用查 userId 和 roleName 是否存在，调用它的函数后面部分查了，且不存在也没关系
         return userRoleMapper.userHasRole(userId, roleName);
     }
+    public UserRoleServiceImpl(UserMapper userMapper, UserRoleMapper userRoleMapper, RoleMapper roleMapper) {
+        this.userMapper = userMapper;
+        this.userRoleMapper = userRoleMapper;
+        this.roleMapper = roleMapper;
+    }
+
 }

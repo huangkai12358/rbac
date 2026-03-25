@@ -8,9 +8,9 @@ import com.ymjrhk.rbac.vo.PermissionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.ROLE_VIEW;
 
 @RestController
 @RequestMapping("/api/roles")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "角色-权限管理模块")
 public class RolePermissionController {
+    private static final Logger log = LoggerFactory.getLogger(RolePermissionController.class);
+
 
     private final RolePermissionService rolePermissionService;
 
@@ -49,6 +49,10 @@ public class RolePermissionController {
         log.info("查询角色权限，roleId: {}", roleId);
         List<PermissionVO> permissions = rolePermissionService.getRolePermissions(roleId);
         return Result.success(permissions);
+    }
+
+    public RolePermissionController(RolePermissionService rolePermissionService) {
+        this.rolePermissionService = rolePermissionService;
     }
 
 }

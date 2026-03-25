@@ -9,18 +9,18 @@ import com.ymjrhk.rbac.vo.MeViewVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
 @RestController
 @RequestMapping("/api/me")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "个人模块")
 public class MeController {
+    private static final Logger log = LoggerFactory.getLogger(MeController.class);
+
     private final MeService meService;
 
     /**
@@ -63,4 +63,8 @@ public class MeController {
         meService.changePassword(mePasswordUpdateDTO);
         return Result.success();
     }
+    public MeController(MeService meService) {
+        this.meService = meService;
+    }
+
 }

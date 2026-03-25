@@ -11,21 +11,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.ymjrhk.rbac.utils.IpUtil.getClientIp;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "认证模块")
 public class AuthController {
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
 
     private final AuthService authService;
 
@@ -89,4 +89,9 @@ public class AuthController {
         authService.logout();
         // TODO：写审计表
     }
+    public AuthController(AuthService authService, AuditLogService auditLogService) {
+        this.authService = authService;
+        this.auditLogService = auditLogService;
+    }
+
 }

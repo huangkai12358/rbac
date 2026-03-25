@@ -7,7 +7,6 @@ import com.ymjrhk.rbac.exception.*;
 import com.ymjrhk.rbac.mapper.*;
 import com.ymjrhk.rbac.service.RolePermissionService;
 import com.ymjrhk.rbac.vo.PermissionVO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -25,7 +24,6 @@ import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 import static com.ymjrhk.rbac.constant.StatusConstant.ENABLED;
 
 @Service
-@RequiredArgsConstructor
 public class RolePermissionServiceImpl implements RolePermissionService {
     private final RoleMapper roleMapper;
 
@@ -194,4 +192,12 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         // 3. 查 roleId 对应的权限
         return rolePermissionMapper.selectPermissionsByRoleId(roleId);
     }
+    public RolePermissionServiceImpl(RoleMapper roleMapper, RolePermissionMapper rolePermissionMapper, PermissionMapper permissionMapper, UserMapper userMapper, UserRoleMapper userRoleMapper) {
+        this.roleMapper = roleMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
+        this.permissionMapper = permissionMapper;
+        this.userMapper = userMapper;
+        this.userRoleMapper = userRoleMapper;
+    }
+
 }

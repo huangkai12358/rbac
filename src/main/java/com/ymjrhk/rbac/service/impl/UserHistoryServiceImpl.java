@@ -7,17 +7,17 @@ import com.ymjrhk.rbac.exception.HistoryInsertFailedException;
 import com.ymjrhk.rbac.mapper.UserHistoryMapper;
 import com.ymjrhk.rbac.mapper.UserMapper;
 import com.ymjrhk.rbac.service.UserHistoryService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 只保存成功的记录
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class UserHistoryServiceImpl implements UserHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(UserHistoryServiceImpl.class);
+
 
     private final UserHistoryMapper userHistoryMapper;
 
@@ -56,4 +56,9 @@ public class UserHistoryServiceImpl implements UserHistoryService {
         }
 
     }
+    public UserHistoryServiceImpl(UserHistoryMapper userHistoryMapper, UserMapper userMapper) {
+        this.userHistoryMapper = userHistoryMapper;
+        this.userMapper = userMapper;
+    }
+
 }

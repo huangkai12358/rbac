@@ -7,8 +7,6 @@ import com.ymjrhk.rbac.context.UserContext;
 import com.ymjrhk.rbac.entity.AuditLog;
 import com.ymjrhk.rbac.service.AuditLogService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -27,9 +27,9 @@ import static com.ymjrhk.rbac.utils.IpUtil.getClientIp;
 
 @Aspect
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class AuditLogAspect {
+    private static final Logger log = LoggerFactory.getLogger(AuditLogAspect.class);
+
 
     private final AuditLogService auditLogService;
 
@@ -271,6 +271,10 @@ public class AuditLogAspect {
         } catch (Exception e) {
             return "[unserializable]";
         }
+    }
+
+    public AuditLogAspect(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
     }
 
 }

@@ -18,13 +18,13 @@ import com.ymjrhk.rbac.service.RoleService;
 import com.ymjrhk.rbac.service.base.BaseService;
 import com.ymjrhk.rbac.vo.RoleExcelVO;
 import com.ymjrhk.rbac.vo.RoleVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -33,9 +33,9 @@ import static com.ymjrhk.rbac.constant.MessageConstant.*;
 import static com.ymjrhk.rbac.constant.StatusConstant.DISABLED;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class RoleServiceImpl extends BaseService implements RoleService {
+    private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
+
     private final RoleMapper roleMapper;
 
     private final RoleHistoryService roleHistoryService;
@@ -330,4 +330,9 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         vo.setUpdateTime(role.getUpdateTime());
         return vo;
     }
+    public RoleServiceImpl(RoleMapper roleMapper, RoleHistoryService roleHistoryService) {
+        this.roleMapper = roleMapper;
+        this.roleHistoryService = roleHistoryService;
+    }
+
 }

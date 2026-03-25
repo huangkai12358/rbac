@@ -8,9 +8,9 @@ import com.ymjrhk.rbac.vo.RoleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.USER_VIEW;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "用户-角色管理模块")
 public class UserRoleController {
+    private static final Logger log = LoggerFactory.getLogger(UserRoleController.class);
+
 
     private final UserRoleService userRoleService;
 
@@ -56,4 +56,8 @@ public class UserRoleController {
         List<RoleVO> roles = userRoleService.getUserRoles(userId);
         return Result.success(roles);
     }
+    public UserRoleController(UserRoleService userRoleService) {
+        this.userRoleService = userRoleService;
+    }
+
 }

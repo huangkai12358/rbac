@@ -9,13 +9,13 @@ import com.ymjrhk.rbac.service.AuditLogService;
 import com.ymjrhk.rbac.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,9 +27,9 @@ import static com.ymjrhk.rbac.utils.IpUtil.getClientIp;
  * 鉴权拦截器，RBAC 权限校验
  */
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class PermissionInterceptor implements HandlerInterceptor {
+    private static final Logger log = LoggerFactory.getLogger(PermissionInterceptor.class);
+
 
     private final UserService userService;
 
@@ -144,4 +144,9 @@ public class PermissionInterceptor implements HandlerInterceptor {
         return AUTH_ONLY_PATHS.stream()
                               .anyMatch(p -> PATH_MATCHER.match(p, uri));
     }
+    public PermissionInterceptor(UserService userService, AuditLogService auditLogService) {
+        this.userService = userService;
+        this.auditLogService = auditLogService;
+    }
+
 }

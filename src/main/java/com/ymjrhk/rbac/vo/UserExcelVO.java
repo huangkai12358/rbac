@@ -3,11 +3,10 @@ package com.ymjrhk.rbac.vo;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
 @Schema(description = "用户导出参数")
 public class UserExcelVO {
 
@@ -38,4 +37,82 @@ public class UserExcelVO {
     @ExcelProperty(value = "修改时间", index = 6)
     @ColumnWidth(25)
     private LocalDateTime updateTime;
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserExcelVO that = (UserExcelVO) o;
+        return Objects.equals(userId, that.userId) && Objects.equals(username, that.username) && Objects.equals(nickname, that.nickname) && Objects.equals(email, that.email) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, username, nickname, email, createTime, updateTime);
+    }
+
+    @Override
+    public String toString() {
+        return "UserExcelVO" + "{" + "userId=" + userId + ", " + "username=" + username + ", " + "nickname=" + nickname + ", " + "email=" + email + ", " + "createTime=" + createTime + ", " + "updateTime=" + updateTime + "}";
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }

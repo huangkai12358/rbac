@@ -16,9 +16,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,10 +27,10 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
 @RestController
 @RequestMapping("/api/permissions")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "权限管理模块")
 public class PermissionController {
+    private static final Logger log = LoggerFactory.getLogger(PermissionController.class);
+
     private final PermissionService permissionService;
 
     /**
@@ -129,4 +129,8 @@ public class PermissionController {
             throw new RuntimeException("导出 Excel 失败", e);
         }
     }
+    public PermissionController(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
+
 }

@@ -17,9 +17,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,10 +28,10 @@ import static com.ymjrhk.rbac.constant.PermissionNameConstant.*;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "用户管理模块")
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
 
     private final UserService userService;
 
@@ -161,4 +161,8 @@ public class UserController {
             throw new RuntimeException("导出 Excel 失败", e);
         }
     }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
 }

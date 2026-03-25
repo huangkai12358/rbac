@@ -12,11 +12,11 @@ import com.ymjrhk.rbac.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.ymjrhk.rbac.constant.MessageConstant.*;
 
@@ -29,9 +29,9 @@ import static com.ymjrhk.rbac.constant.MessageConstant.*;
  * 4. 设置 UserContext
  */
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
+    private static final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
+
 
     private final JwtProperties jwtProperties;
 
@@ -140,4 +140,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 移除用户，清理 ThreadLocal，防止线程复用污染
         UserContext.clear();
     }
+    public AuthInterceptor(JwtProperties jwtProperties, UserService userService) {
+        this.jwtProperties = jwtProperties;
+        this.userService = userService;
+    }
+
 }

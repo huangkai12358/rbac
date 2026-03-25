@@ -1,11 +1,10 @@
 package com.ymjrhk.rbac.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
 @Schema(description = "权限查询返回参数")
 public class PermissionVO {
     private Long permissionId;
@@ -35,4 +34,138 @@ public class PermissionVO {
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
+    public Long getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissionId(Long permissionId) {
+        this.permissionId = permissionId;
+    }
+
+    public String getPermissionName() {
+        return permissionName;
+    }
+
+    public void setPermissionName(String permissionName) {
+        this.permissionName = permissionName;
+    }
+
+    public String getPermissionDisplayName() {
+        return permissionDisplayName;
+    }
+
+    public void setPermissionDisplayName(String permissionDisplayName) {
+        this.permissionDisplayName = permissionDisplayName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public String getSecretToken() {
+        return secretToken;
+    }
+
+    public void setSecretToken(String secretToken) {
+        this.secretToken = secretToken;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionVO that = (PermissionVO) o;
+        return Objects.equals(permissionId, that.permissionId) && Objects.equals(permissionName, that.permissionName) && Objects.equals(permissionDisplayName, that.permissionDisplayName) && Objects.equals(description, that.description) && Objects.equals(status, that.status) && Objects.equals(type, that.type) && Objects.equals(parentId, that.parentId) && Objects.equals(path, that.path) && Objects.equals(method, that.method) && Objects.equals(sort, that.sort) && Objects.equals(version, that.version) && Objects.equals(secretToken, that.secretToken) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(permissionId, permissionName, permissionDisplayName, description, status, type, parentId, path, method, sort, version, secretToken, createTime, updateTime);
+    }
+
+    @Override
+    public String toString() {
+        return "PermissionVO" + "{" + "permissionId=" + permissionId + ", " + "permissionName=" + permissionName + ", " + "permissionDisplayName=" + permissionDisplayName + ", " + "description=" + description + ", " + "status=" + status + ", " + "type=" + type + ", " + "parentId=" + parentId + ", " + "path=" + path + ", " + "method=" + method + ", " + "sort=" + sort + ", " + "version=" + version + ", " + "secretToken=" + secretToken + ", " + "createTime=" + createTime + ", " + "updateTime=" + updateTime + "}";
+    }
+
 }

@@ -7,17 +7,17 @@ import com.ymjrhk.rbac.exception.HistoryInsertFailedException;
 import com.ymjrhk.rbac.mapper.PermissionHistoryMapper;
 import com.ymjrhk.rbac.mapper.PermissionMapper;
 import com.ymjrhk.rbac.service.PermissionHistoryService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 只保存成功的记录
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class PermissionHistoryServiceImpl implements PermissionHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(PermissionHistoryServiceImpl.class);
+
 
     private final PermissionHistoryMapper permissionHistoryMapper;
 
@@ -58,4 +58,9 @@ public class PermissionHistoryServiceImpl implements PermissionHistoryService {
             throw new HistoryInsertFailedException(MessageConstant.HISTORY_INSERT_FAILED);
         }
     }
+    public PermissionHistoryServiceImpl(PermissionHistoryMapper permissionHistoryMapper, PermissionMapper permissionMapper) {
+        this.permissionHistoryMapper = permissionHistoryMapper;
+        this.permissionMapper = permissionMapper;
+    }
+
 }

@@ -15,20 +15,20 @@ import com.ymjrhk.rbac.service.AuthService;
 import com.ymjrhk.rbac.service.UserService;
 import com.ymjrhk.rbac.utils.JwtUtil;
 import com.ymjrhk.rbac.vo.UserLoginVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AuthServiceImpl implements AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
+
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
@@ -106,4 +106,11 @@ public class AuthServiceImpl implements AuthService {
 
         // TODO：写历史表
     }
+    public AuthServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, JwtProperties jwtProperties, UserService userService) {
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtProperties = jwtProperties;
+        this.userService = userService;
+    }
+
 }
